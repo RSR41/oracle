@@ -137,3 +137,75 @@ dist
 # Vite logs files
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
+
+############################################################
+# Monorepo additions (Android + iOS + IDE + Secrets)
+############################################################
+
+# ===== Common OS / IDE noise =====
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# VS Code (optional: keep settings if you want)
+.vscode/
+!.vscode/extensions.json
+!.vscode/settings.json
+!.vscode/launch.json
+!.vscode/tasks.json
+
+# JetBrains IDE
+.idea/
+*.iml
+
+# ===== Android (Gradle / Android Studio) =====
+.gradle/
+**/.gradle/
+local.properties
+**/local.properties
+**/build/
+**/*.apk
+**/*.aab
+**/*.ap_
+**/*.dex
+**/*.class
+captures/
+
+# Android keystore / signing (NEVER commit)
+*.jks
+*.keystore
+
+# ===== iOS (Xcode / Swift) =====
+DerivedData/
+**/DerivedData/
+*.xcuserstate
+**/*.xcuserdata/
+*.ipa
+
+# CocoaPods (if used)
+Pods/
+**/Pods/
+
+# Swift Package Manager build artifacts
+.build/
+**/.build/
+.swiftpm/
+**/.swiftpm/
+
+# ===== Secrets / Certificates (NEVER commit) =====
+*.pem
+*.key
+*.p12
+*.pfx
+*.cer
+*.crt
+*.mobileprovision
+
+# Firebase / Google service files (Public repo에서 특히 주의)
+# (앱에 반드시 필요한 파일이지만, 공개 레포에서는 커밋하지 않는 편이 안전)
+**/google-services.json
+**/GoogleService-Info.plist
+
+# Service account keys (절대 커밋 금지)
+**/*service-account*.json
+**/*firebase-adminsdk*.json
