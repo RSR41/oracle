@@ -5,43 +5,48 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-import com.rsr41.oracle.ui.theme.Oracle_androidTheme
+import com.rsr41.oracle.ui.navigation.OracleNavHost
+import com.rsr41.oracle.ui.theme.OracleTheme
+import dagger.hilt.android.AndroidEntryPoint
+import timber.log.Timber
 
+/**
+ * 메인 액티비티
+ * - Hilt 주입 지원
+ * - Deep Link 처리
+ */
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        
+        // Deep link token 추출
+        val deepLinkToken = extractTokenFromIntent()
+        Timber.d("MainActivity created, deepLinkToken: $deepLinkToken")
+        
         setContent {
-            Oracle_androidTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
+            OracleTheme {
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color = MaterialTheme.colorScheme.background
+                ) {
+                    OracleNavHost(initialToken = deepLinkToken)
                 }
             }
         }
     }
-}
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    Oracle_androidTheme {
-        Greeting("Android")
+    
+    private fun extractTokenFromIntent(): String? {
+        val uri = intent?.data ?: return null
+        // oracle://tag/{token} or https://domain/tag/{token}
+        return when {
+            uri.host == "tag" && uri.pathSegments.isNotEmpty() -> uri.pathSegments.first()
+            uri.pathSegments.size >= 2 && uri.pathSegments[0] == "tag" -> uri.pathSegments[1]
+            else -> null
+        }
     }
 }
