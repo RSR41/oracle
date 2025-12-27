@@ -10,8 +10,10 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.rsr41.oracle.R
 import com.rsr41.oracle.domain.model.CalendarType
 import com.rsr41.oracle.ui.components.SelectableChipRow
+import androidx.compose.ui.res.stringResource
 
 /**
  * 설정 화면
@@ -27,12 +29,12 @@ fun SettingsScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("설정") },
+                title = { Text(stringResource(R.string.common_settings)) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "뒤로"
+                            contentDescription = stringResource(R.string.common_back)
                         )
                     }
                 },
@@ -59,12 +61,12 @@ fun SettingsScreen(
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
                     Text(
-                        "기본 달력 설정",
+                        stringResource(R.string.settings_default_calendar_title),
                         style = MaterialTheme.typography.titleMedium,
                         color = MaterialTheme.colorScheme.primary
                     )
                     Text(
-                        "입력 화면에서 기본으로 선택될 달력 유형입니다.",
+                        stringResource(R.string.settings_default_calendar_desc),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.outline
                     )
@@ -73,7 +75,7 @@ fun SettingsScreen(
                         options = CalendarType.entries.toList(),
                         selectedOption = viewModel.calendarType,
                         onOptionSelected = { viewModel.updateCalendarType(it) },
-                        labelProvider = { if (it == CalendarType.SOLAR) "양력 (陽)" else "음력 (陰)" }
+                        labelProvider = { if (it == CalendarType.SOLAR) stringResource(R.string.settings_calendar_solar) else stringResource(R.string.settings_calendar_lunar) }
                     )
                 }
             }
@@ -87,23 +89,23 @@ fun SettingsScreen(
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
                     Text(
-                        "추가 설정 (예정)",
+                        stringResource(R.string.settings_upcoming_title),
                         style = MaterialTheme.typography.titleMedium,
                         color = MaterialTheme.colorScheme.outline
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
-                        "• 기본 성별 설정",
+                        stringResource(R.string.settings_upcoming_gender),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.outline
                     )
                     Text(
-                        "• 시간 입력 방식 (모름/직접입력)",
+                        stringResource(R.string.settings_upcoming_time),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.outline
                     )
                     Text(
-                        "• 테마 설정",
+                        stringResource(R.string.settings_upcoming_theme),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.outline
                     )
@@ -119,17 +121,17 @@ fun SettingsScreen(
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
                     Text(
-                        "앱 정보",
+                        stringResource(R.string.settings_info_title),
                         style = MaterialTheme.typography.titleMedium
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
-                        "버전: 1.0.0 (MVP)",
+                        stringResource(R.string.settings_info_version),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.outline
                     )
                     Text(
-                        "패키지: com.rsr41.oracle",
+                        stringResource(R.string.settings_info_package),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.outline
                     )

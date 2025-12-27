@@ -1,9 +1,6 @@
 package com.rsr41.oracle.repository
 
-import com.rsr41.oracle.domain.model.BirthInfo
-import com.rsr41.oracle.domain.model.CalendarType
-import com.rsr41.oracle.domain.model.HistoryItem
-import com.rsr41.oracle.domain.model.SajuResult
+import com.rsr41.oracle.domain.model.*
 
 /**
  * 사주 데이터 저장소 인터페이스
@@ -19,7 +16,18 @@ interface SajuRepository {
     fun loadDefaultCalendarType(): CalendarType
     fun saveDefaultCalendarType(type: CalendarType)
     
-    // 히스토리
+    // 프로필 (로컬)
+    fun loadProfiles(): List<Profile>
+    fun saveProfile(profile: Profile)
+    fun deleteProfile(id: String)
+
+    // 히스토리 (Enhanced)
+    fun loadHistoryRecords(): List<HistoryRecord>
+    fun appendHistoryRecord(record: HistoryRecord)
+    fun deleteHistoryRecord(id: String)
+    fun clearAllHistoryRecords()
+
+    // 히스토리 (Legacy)
     fun loadHistory(): List<HistoryItem>
     fun appendHistory(item: HistoryItem)
     fun deleteHistoryItem(id: String)

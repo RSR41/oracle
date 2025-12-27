@@ -21,7 +21,7 @@ fun <T> SelectableChipRow(
     options: List<T>,
     selectedOption: T,
     onOptionSelected: (T) -> Unit,
-    labelProvider: (T) -> String,
+    labelProvider: @Composable (T) -> String,
     modifier: Modifier = Modifier
 ) {
     Row(

@@ -1,3 +1,141 @@
 <resources>
-    <string name="app_name">oracle</string>
+    <string name="app_name">ORACLE</string>
+    
+    <!-- 공통 -->
+    <string name="common_back">뒤로</string>
+    <string name="common_save">저장</string>
+    <string name="common_delete">삭제</string>
+    <string name="common_cancel">취소</string>
+    <string name="common_confirm">확인</string>
+    <string name="common_history">히스토리</string>
+    <string name="common_settings">설정</string>
+    <string name="common_save_history">히스토리에 저장</string>
+    <string name="common_saved">저장되었습니다</string>
+    <string name="common_profile_select">프로필 선택</string>
+    <string name="common_profile_none">프로필을 선택하세요</string>
+    <string name="common_profile_empty_error">등록된 프로필이 없습니다. \'운세\' 메뉴에서 프로필을 먼저 만들어주세요.</string>
+    <string name="common_analyze">분석하기</string>
+    <string name="common_result">분석 결과</string>
+    <string name="common_retry">다시 설정하기</string>
+    <string name="common_not_entered">미입력</string>
+    <string name="common_male">남성</string>
+    <string name="common_female">여성</string>
+    <string name="common_male_short">남</string>
+    <string name="common_female_short">여</string>
+    <string name="common_solar">양력</string>
+    <string name="common_lunar">음력</string>
+    <string name="common_selected">선택됨</string>
+    <string name="common_already_saved">이미 저장됨</string>
+    
+    <!-- 홈 -->
+    <string name="home_title">오라클</string>
+    <string name="home_today_fortune">🔮 오늘의 운세</string>
+    <string name="home_today_fortune_desc">나의 사주를 확인하고 오늘의 운세를 알아보세요</string>
+    <string name="home_view_fortune">운세 보기</string>
+    <string name="home_menu">운세 메뉴</string>
+    
+    <!-- 메뉴 이름 및 화면 제목 -->
+    <string name="menu_saju">사주/운세</string>
+    <string name="menu_manse">만세력</string>
+    <string name="menu_compatibility">궁합</string>
+    <string name="menu_face">관상</string>
+    <string name="menu_tarot">타로</string>
+    <string name="menu_dream">꿈해몽</string>
+    <string name="menu_not_ready">곧 준비될 예정입니다!</string>
+    
+    <string name="home_menu_fortune">만세력/대운</string>
+    <string name="home_menu_compatibility">궁합 분석</string>
+    <string name="home_menu_face">관상 분석</string>
+    
+    <string name="compatibility_type_select">궁합 유형 선택</string>
+    <string name="compatibility_my_profile">나의 프로필</string>
+    <string name="compatibility_partner_profile">상대방 프로필</string>
+    <string name="compatibility_analyze_btn">궁합 분석하기</string>
+    
+    <!-- 히스토리 관련 추가 -->
+    <string name="history_clear_all_desc">모든 기록 삭제</string>
+    <string name="history_empty_state">조회된 운세 내역이 없습니다</string>
+    <string name="history_clear_title">전체 삭제</string>
+    <string name="history_clear_confirm">모든 히스토리를 삭제하시겠습니까?</string>
+    <string name="history_legacy_title">이전 기록</string>
+    <string name="history_legacy_item_title">이전 사주 기록</string>
+    
+    <!-- 관상 상세 -->
+    <string name="face_privacy_title">개인정보 보호 안내</string>
+    <string name="face_privacy_desc">업로드하신 사진은 분석 즉시 폐기되며, 서버에 저장되지 않습니다.</string>
+    <string name="face_guide_title">안내사항</string>
+    <string name="face_guide_1">1. 정면을 응시한 밝은 사진이 가장 정확합니다.</string>
+    <string name="face_guide_2">2. 안경이나 모자는 벗고 촬영해 주세요.</string>
+    <string name="face_guide_3">3. 이마와 눈썹이 잘 보이도록 머리를 정리해 주세요.</string>
+    <string name="face_guide_4">4. 본 서비스는 재미로 보는 용도로만 참고해 주세요.</string>
+    
+    <!-- 관상 추가 -->
+    <string name="face_analyzing">관상을 분석 중입니다...</string>
+    <string name="face_ready">사진이 준비되었습니다</string>
+    <string name="face_upload_hint">정면 얼굴 사진을 업로드하세요</string>
+    <string name="face_camera">카메라</string>
+    <string name="face_gallery">갤러리</string>
+    <string name="face_analyze_btn">분석 시작하기</string>
+    <string name="face_retake">다시 촬영하기</string>
+    
+    <!-- 입력/프로필 -->
+    <string name="profile_setup_title">프로필 설정</string>
+    <string name="profile_nickname">닉네임</string>
+    <string name="profile_birth_date">생년월일 (yyyy-MM-dd)</string>
+    <string name="profile_birth_time">태어난 시간 (HH:mm)</string>
+    <string name="profile_birth_time_unknown">시간 모름</string>
+    <string name="profile_gender">성별</string>
+    <string name="profile_calendar_type">달력 유형</string>
+    <string name="profile_save_for_later">프로필에 저장하여 다음에 다시 사용하기</string>
+    
+    <!-- 입력 화면 메시지 추가 -->
+    <string name="input_view_result_btn">결과 확인하기</string>
+    <string name="input_error_nickname_short">닉네임이 너무 짧습니다</string>
+    <string name="input_error_date_format">날짜 형식이 올바르지 않습니다</string>
+    <string name="input_error_time_format">시간 형식이 올바르지 않습니다</string>
+    
+    <!-- 타로 -->
+    <string name="tarot_title">타로</string>
+    <string name="tarot_instruction">마음을 가다듬고 3장의 카드를 선택하세요</string>
+    <string name="tarot_selection_count">%1$d/%2$d 장 선택됨</string>
+    <string name="tarot_view_result">타로 결과 보기</string>
+    <string name="tarot_result_title">오늘의 타로 해석</string>
+    <string name="tarot_summary_label">한줄 요약</string>
+    <string name="tarot_detail_label">상세 해설</string>
+    
+    <!-- 만세력/운세 추가 -->
+    <string name="fortune_tab_daeun">대운</string>
+    <string name="fortune_tab_saeun">세운</string>
+    <string name="fortune_tab_wolun">월운</string>
+    <string name="fortune_select_profile_hint">상단의 프로필을 선택하여 만세력 결과를 확인하세요.</string>
+    <string name="fortune_profile_to_analyze">분석할 프로필</string>
+    <string name="profile_none_saved">저장된 프로필이 없습니다</string>
+    
+    <!-- 결과 화면 추가 -->
+    <string name="result_title">사주 결과</string>
+    <string name="result_input_summary">입력 정보</string>
+    <string name="result_birth_date">생년월일: %1$s</string>
+    <string name="result_birth_time">시간: %1$s</string>
+    <string name="result_gender">성별: %1$s</string>
+    <string name="result_calendar">달력: %1$s</string>
+    <string name="result_generated_at">조회시간: %1$s</string>
+    <string name="result_pillars_title">📊 사주 기둥 (四柱)</string>
+    <string name="result_summary_title">🔮 오늘의 총운</string>
+    <string name="result_retry_btn">다시 입력</string>
+    <string name="result_not_found">결과를 찾을 수 없습니다</string>
+    <string name="result_not_found_desc">입력 화면에서 정보를 입력해주세요</string>
+    <string name="result_go_to_input">입력 화면으로</string>
+    
+    <!-- 설정 화면 추가 -->
+    <string name="settings_default_calendar_title">기본 달력 설정</string>
+    <string name="settings_default_calendar_desc">입력 화면에서 기본으로 선택될 달력 유형입니다.</string>
+    <string name="settings_calendar_solar">양력 (陽)</string>
+    <string name="settings_calendar_lunar">음력 (陰)</string>
+    <string name="settings_upcoming_title">추가 설정 (예정)</string>
+    <string name="settings_upcoming_gender">• 기본 성별 설정</string>
+    <string name="settings_upcoming_time">• 시간 입력 방식 (모름/직접입력)</string>
+    <string name="settings_upcoming_theme">• 테마 설정</string>
+    <string name="settings_info_title">앱 정보</string>
+    <string name="settings_info_version">버전: 1.0.0 (MVP)</string>
+    <string name="settings_info_package">패키지: com.rsr41.oracle</string>
 </resources>

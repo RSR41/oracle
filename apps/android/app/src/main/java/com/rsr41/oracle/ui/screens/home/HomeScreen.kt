@@ -9,8 +9,12 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import android.widget.Toast
+import androidx.compose.ui.platform.LocalContext
+import com.rsr41.oracle.R
 
 /**
  * 홈 화면 - 오늘의 운세 프리뷰 + 기능 메뉴
@@ -27,16 +31,17 @@ fun HomeScreen(
     onNavigateToFace: () -> Unit,
     onNavigateToTarot: () -> Unit
 ) {
+    val context = LocalContext.current
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("오라클", fontWeight = FontWeight.Bold) },
+                title = { Text(stringResource(R.string.home_title), fontWeight = FontWeight.Bold) },
                 actions = {
                     IconButton(onClick = onNavigateToHistory) {
-                        Icon(Icons.Default.History, "히스토리")
+                        Icon(Icons.Default.History, stringResource(R.string.common_history))
                     }
                     IconButton(onClick = onNavigateToSettings) {
-                        Icon(Icons.Default.Settings, "설정")
+                        Icon(Icons.Default.Settings, stringResource(R.string.common_settings))
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -62,7 +67,7 @@ fun HomeScreen(
             // 기능 메뉴 타이틀
             item {
                 Text(
-                    "운세 메뉴",
+                    stringResource(R.string.home_menu),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold
                 )
@@ -75,7 +80,10 @@ fun HomeScreen(
                     onNavigateToFortune = onNavigateToFortune,
                     onNavigateToCompatibility = onNavigateToCompatibility,
                     onNavigateToFace = onNavigateToFace,
-                    onNavigateToTarot = onNavigateToTarot
+                    onNavigateToTarot = onNavigateToTarot,
+                    onNotReady = {
+                        Toast.makeText(context, R.string.menu_not_ready, Toast.LENGTH_SHORT).show()
+                    }
                 )
             }
         }
@@ -93,20 +101,20 @@ private fun TodayFortuneCard(onClick: () -> Unit) {
     ) {
         Column(modifier = Modifier.padding(20.dp)) {
             Text(
-                "🔮 오늘의 운세",
+                stringResource(R.string.home_today_fortune),
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold
             )
             Spacer(modifier = Modifier.height(12.dp))
             Text(
-                "나의 사주를 확인하고 오늘의 운세를 알아보세요",
+                stringResource(R.string.home_today_fortune_desc),
                 style = MaterialTheme.typography.bodyLarge
             )
             Spacer(modifier = Modifier.height(16.dp))
             Button(onClick = onClick) {
                 Icon(Icons.Default.ArrowForward, null)
                 Spacer(modifier = Modifier.width(8.dp))
-                Text("운세 보기")
+                Text(stringResource(R.string.home_view_fortune))
             }
         }
     }
@@ -118,19 +126,20 @@ private fun FeatureGrid(
     onNavigateToFortune: () -> Unit,
     onNavigateToCompatibility: () -> Unit,
     onNavigateToFace: () -> Unit,
-    onNavigateToTarot: () -> Unit
+    onNavigateToTarot: () -> Unit,
+    onNotReady: () -> Unit
 ) {
     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
         Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
             FeatureCard(
                 modifier = Modifier.weight(1f),
-                title = "사주/운세",
+                title = stringResource(R.string.menu_saju),
                 icon = Icons.Default.AutoAwesome,
                 onClick = onNavigateToInput
             )
             FeatureCard(
                 modifier = Modifier.weight(1f),
-                title = "만세력",
+                title = stringResource(R.string.menu_manse),
                 icon = Icons.Default.Timeline,
                 onClick = onNavigateToFortune
             )
@@ -138,13 +147,13 @@ private fun FeatureGrid(
         Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
             FeatureCard(
                 modifier = Modifier.weight(1f),
-                title = "궁합",
+                title = stringResource(R.string.menu_compatibility),
                 icon = Icons.Default.Favorite,
                 onClick = onNavigateToCompatibility
             )
             FeatureCard(
                 modifier = Modifier.weight(1f),
-                title = "관상",
+                title = stringResource(R.string.menu_face),
                 icon = Icons.Default.Face,
                 onClick = onNavigateToFace
             )
@@ -152,15 +161,15 @@ private fun FeatureGrid(
         Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
             FeatureCard(
                 modifier = Modifier.weight(1f),
-                title = "타로",
+                title = stringResource(R.string.menu_tarot),
                 icon = Icons.Default.Style,
                 onClick = onNavigateToTarot
             )
             FeatureCard(
                 modifier = Modifier.weight(1f),
-                title = "꿈해몽",
+                title = stringResource(R.string.menu_dream),
                 icon = Icons.Default.Nightlight,
-                onClick = { /* TODO */ }
+                onClick = onNotReady
             )
         }
     }

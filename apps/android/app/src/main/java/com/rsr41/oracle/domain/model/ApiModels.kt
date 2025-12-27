@@ -26,14 +26,18 @@ data class ProfileInput(
     val gender: Gender
 )
 
+/**
+ * 사주 입력을 위한 사용자 프로필
+ */
 data class Profile(
     val id: String,
-    val name: String,
-    val birthDate: String,
-    val birthTime: String?,
+    val nickname: String,
+    val birthDate: String, // yyyy-MM-dd
+    val birthTime: String?, // HH:mm
     val timeUnknown: Boolean,
     val calendarType: CalendarType,
-    val gender: Gender
+    val gender: Gender,
+    val createdAt: Long = System.currentTimeMillis()
 )
 
 data class CheckInResult(

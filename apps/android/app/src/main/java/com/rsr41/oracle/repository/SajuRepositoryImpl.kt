@@ -1,10 +1,7 @@
 package com.rsr41.oracle.repository
 
 import com.rsr41.oracle.data.local.PreferencesManager
-import com.rsr41.oracle.domain.model.BirthInfo
-import com.rsr41.oracle.domain.model.CalendarType
-import com.rsr41.oracle.domain.model.HistoryItem
-import com.rsr41.oracle.domain.model.SajuResult
+import com.rsr41.oracle.domain.model.*
 import com.rsr41.oracle.domain.usecase.BuildMockSajuUseCase
 
 /**
@@ -29,6 +26,18 @@ class SajuRepositoryImpl(
         preferencesManager.saveDefaultCalendarType(type)
     }
 
+    // 프로필
+    override fun loadProfiles(): List<Profile> = preferencesManager.loadProfiles()
+    override fun saveProfile(profile: Profile) = preferencesManager.saveProfile(profile)
+    override fun deleteProfile(id: String) = preferencesManager.deleteProfile(id)
+
+    // 히스토리 (Enhanced)
+    override fun loadHistoryRecords(): List<HistoryRecord> = preferencesManager.loadHistoryRecords()
+    override fun appendHistoryRecord(record: HistoryRecord) = preferencesManager.appendHistoryRecord(record)
+    override fun deleteHistoryRecord(id: String) = preferencesManager.deleteHistoryRecord(id)
+    override fun clearAllHistoryRecords() = preferencesManager.clearAllHistoryRecords()
+
+    // 히스토리 (Legacy)
     override fun loadHistory(): List<HistoryItem> {
         return preferencesManager.loadHistory()
     }

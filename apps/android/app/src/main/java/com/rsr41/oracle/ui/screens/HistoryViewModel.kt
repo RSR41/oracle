@@ -5,9 +5,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.rsr41.oracle.domain.model.HistoryItem
+import com.rsr41.oracle.domain.model.HistoryRecord
+import com.rsr41.oracle.domain.model.HistoryType
 import com.rsr41.oracle.repository.SajuRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -19,10 +23,13 @@ class HistoryViewModel @Inject constructor(
         private const val TAG = "HistoryViewModel"
     }
 
+    var historyRecords by mutableStateOf<List<HistoryRecord>>(emptyList())
+        private set
+
     var historyList by mutableStateOf<List<HistoryItem>>(emptyList())
         private set
     
-    var isLoading by mutableStateOf(true)
+    var isLoading by mutableStateOf(false)
         private set
 
     var shouldNavigateToResult by mutableStateOf(false)
@@ -33,15 +40,29 @@ class HistoryViewModel @Inject constructor(
     }
 
     fun loadHistory() {
-        isLoading = true
-        historyList = repository.loadHistory()
-        isLoading = false
-        Log.d(TAG, "Loaded history: ${historyList.size} items")
+        viewModelScope.launch {
+            isLoading = true
+            historyRecords = repository.loadHistoryRecords()
+            historyList = repository.loadHistory()
+            isLoading = false
+            Log.d(TAG, "Loaded history: ${historyRecords.size} records, ${historyList.size} legacy items")
+        }
     }
 
-    fun selectItem(item: HistoryItem) {
+    fun selectRecord(record: HistoryRecord) {
+        if (record.type == HistoryType.SAJU_FORTUNE) {
+            shouldNavigateToResult = true
+        }
+    }
+
+    fun selectLegacyItem(item: HistoryItem) {
         repository.saveLastResult(item)
         shouldNavigateToResult = true
+    }
+
+    fun deleteRecord(id: String) {
+        repository.deleteHistoryRecord(id)
+        loadHistory()
     }
 
     fun deleteItem(id: String) {
@@ -49,7 +70,8 @@ class HistoryViewModel @Inject constructor(
         loadHistory()
     }
 
-    fun clearAllHistory() {
+    fun clearAll() {
+        repository.clearAllHistoryRecords()
         repository.clearHistory()
         loadHistory()
     }

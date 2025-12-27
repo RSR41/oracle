@@ -11,10 +11,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.rsr41.oracle.R
 import com.rsr41.oracle.core.util.DateTimeUtil
 import com.rsr41.oracle.domain.model.CalendarType
 import com.rsr41.oracle.domain.model.Gender
 import com.rsr41.oracle.ui.components.SectionCard
+import androidx.compose.ui.res.stringResource
 
 /**
  * 결과 화면
@@ -33,12 +35,12 @@ fun ResultScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("사주 결과") },
+                title = { Text(stringResource(R.string.result_title)) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "뒤로"
+                            contentDescription = stringResource(R.string.common_back)
                         )
                     }
                 },
@@ -73,17 +75,17 @@ fun ResultScreen(
                 ) {
                     Column(modifier = Modifier.padding(16.dp)) {
                         Text(
-                            "입력 정보",
+                            stringResource(R.string.result_input_summary),
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold
                         )
                         Spacer(modifier = Modifier.height(8.dp))
-                        Text("생년월일: ${birthInfo.date}")
-                        Text("시간: ${birthInfo.time.ifBlank { "미입력" }}")
-                        Text("성별: ${if (birthInfo.gender == Gender.MALE) "남성" else "여성"}")
-                        Text("달력: ${if (birthInfo.calendarType == CalendarType.SOLAR) "양력" else "음력"}")
+                        Text(stringResource(R.string.result_birth_date, birthInfo.date))
+                        Text(stringResource(R.string.result_birth_time, birthInfo.time.ifBlank { stringResource(R.string.common_not_entered) }))
+                        Text(stringResource(R.string.result_gender, if (birthInfo.gender == Gender.MALE) stringResource(R.string.common_male) else stringResource(R.string.common_female)))
+                        Text(stringResource(R.string.result_calendar, if (birthInfo.calendarType == CalendarType.SOLAR) stringResource(R.string.common_solar) else stringResource(R.string.common_lunar)))
                         Text(
-                            "조회시간: ${DateTimeUtil.formatMillisToDateTime(result.generatedAtMillis)}",
+                            stringResource(R.string.result_generated_at, DateTimeUtil.formatMillisToDateTime(result.generatedAtMillis)),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.outline
                         )
@@ -92,13 +94,13 @@ fun ResultScreen(
 
                 // 사주 기둥
                 SectionCard(
-                    title = "📊 사주 기둥 (四柱)",
+                    title = stringResource(R.string.result_pillars_title),
                     content = result.pillars
                 )
 
                 // 오늘의 총운
                 SectionCard(
-                    title = "🔮 오늘의 총운",
+                    title = stringResource(R.string.result_summary_title),
                     content = result.summaryToday
                 )
 
@@ -113,13 +115,13 @@ fun ResultScreen(
                         onClick = onBack,
                         modifier = Modifier.weight(1f)
                     ) {
-                        Text("다시 입력")
+                        Text(stringResource(R.string.result_retry_btn))
                     }
                     Button(
                         onClick = { onNavigate("HISTORY") },
                         modifier = Modifier.weight(1f)
                     ) {
-                        Text("히스토리")
+                        Text(stringResource(R.string.common_history))
                     }
                 }
             } else {
@@ -135,16 +137,16 @@ fun ResultScreen(
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         Text(
-                            "결과를 찾을 수 없습니다",
+                            stringResource(R.string.result_not_found),
                             style = MaterialTheme.typography.titleMedium
                         )
                         Spacer(modifier = Modifier.height(8.dp))
-                        Text("입력 화면에서 정보를 입력해주세요")
+                        Text(stringResource(R.string.result_not_found_desc))
                     }
                 }
 
                 Button(onClick = onBack) {
-                    Text("입력 화면으로")
+                    Text(stringResource(R.string.result_go_to_input))
                 }
             }
         }
