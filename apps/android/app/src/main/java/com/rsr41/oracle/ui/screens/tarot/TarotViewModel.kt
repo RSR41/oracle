@@ -11,12 +11,23 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import java.util.*
 import javax.inject.Inject
 
+data class TarotCardState(
+    val card: TarotCard,
+    val isReversed: Boolean // Fixed per session
+)
+
 @HiltViewModel
 class TarotViewModel @Inject constructor(
     private val repository: SajuRepository
 ) : ViewModel() {
 
-    var selectedIds by mutableStateOf<List<Int>>(emptyList())
+    // 36장 덱 초기화 (세션 고정 역방향 여부)
+    val deck: List<TarotCardState> = TarotData.cards.map { card ->
+        TarotCardState(card, Random().nextBoolean())
+    }
+
+    // 선택된 카드들 (순서 보장)
+    var selectedCards by mutableStateOf<List<TarotCardState>>(emptyList())
         private set
 
     var currentPage by mutableIntStateOf(0)
@@ -27,60 +38,84 @@ class TarotViewModel @Inject constructor(
     var resultInterpretation by mutableStateOf<TarotResult?>(null)
         private set
 
-    fun toggleCard(id: Int) {
-        if (selectedIds.contains(id)) {
-            selectedIds = selectedIds - id
-        } else if (selectedIds.size < 3) {
-            selectedIds = selectedIds + id
+    fun toggleCard(cardState: TarotCardState) {
+        if (selectedCards.contains(cardState)) {
+            selectedCards = selectedCards - cardState
+        } else if (selectedCards.size < 3) {
+            selectedCards = selectedCards + cardState
         }
     }
+    
+    fun isSelected(cardState: TarotCardState): Boolean = selectedCards.contains(cardState)
 
     fun generateResult() {
-        if (selectedIds.size == 3) {
-            val selectedCards = selectedIds.map { id -> TarotData.cards.find { it.id == id }!! }
-            
-            // 결정적(Deterministic) 결과 생성을 위해 ID와 오늘 날짜를 조합한 시드 사용 가능
-            // 여기서는 간단히 카드 정보들을 조합하여 요약 생성
-            val summary = "선택하신 카드는 ${selectedCards[0].name}, ${selectedCards[1].name}, ${selectedCards[2].name}입니다."
-            val detail = "당신의 현재 상황은 '${selectedCards[0].keyword}' 기운이 강하며, " +
-                    "앞으로 '${selectedCards[1].keyword}' 과정을 거쳐, " +
-                    "결과적으로 '${selectedCards[2].keyword}' 상태에 이르게 될 것입니다."
+        if (selectedCards.size != 3) return
 
-            resultInterpretation = TarotResult(
-                selectedCards = selectedCards,
-                summary = summary,
-                detail = detail
-            )
-            showResult = true
-        }
+        val c1 = selectedCards[0]
+        val c2 = selectedCards[1]
+        val c3 = selectedCards[2]
+        
+        // 카드 1: 과거
+        val pastMeaning = if (c1.isReversed) c1.card.meaningReversed else c1.card.meaningUpright
+        val pastKeyword = if (c1.isReversed) "${c1.card.keywordEn} (Reversed)" else c1.card.keywordEn
+        
+        // 카드 2: 현재
+        val presentMeaning = if (c2.isReversed) c2.card.meaningReversed else c2.card.meaningUpright
+        val presentKeyword = if (c2.isReversed) "${c2.card.keywordEn} (Reversed)" else c2.card.keywordEn
+        
+        // 카드 3: 미래/조언
+        val futureMeaning = if (c3.isReversed) c3.card.meaningReversed else c3.card.meaningUpright
+        val futureKeyword = if (c3.isReversed) "${c3.card.keywordEn} (Reversed)" else c3.card.keywordEn
+        
+        val summary = "${c1.card.nameKo}, ${c2.card.nameKo}, ${c3.card.nameKo} 카드가 선택되었습니다."
+        
+        val detail = """
+            [과거/원인] ${c1.card.nameKo} (${if(c1.isReversed) "역방향" else "정방향"})
+            $pastMeaning
+            
+            [현재/상황] ${c2.card.nameKo} (${if(c2.isReversed) "역방향" else "정방향"})
+            $presentMeaning
+            
+            [미래/조언] ${c3.card.nameKo} (${if(c3.isReversed) "역방향" else "정방향"})
+            $futureMeaning
+        """.trimIndent()
+
+        resultInterpretation = TarotResult(
+            selectedCards = selectedCards,
+            summary = summary,
+            detail = detail
+        )
+        showResult = true
     }
 
     fun saveToHistory() {
         val interpretation = resultInterpretation ?: return
         
-        // JSON 페이로드 생성 (간단히)
+        // JSON 페이로드 생성
+        val selectedIds = selectedCards.map { mapOf("id" to it.card.id, "reversed" to it.isReversed) }
+        
         val payload = """
             {
-                "selectedCardIds": ${selectedIds},
+                "selectedCards": $selectedIds,
                 "summary": "${interpretation.summary}",
-                "detail": "${interpretation.detail}"
+                "detail": "${interpretation.detail.replace("\n", "\\n")}"
             }
         """.trimIndent()
 
         val record = HistoryRecord(
             id = UUID.randomUUID().toString(),
             type = HistoryType.TAROT,
-            title = "타로 상담 결과",
-            summary = interpretation.summary.take(30) + "...",
+            title = "타로 상담 (${selectedCards.map { it.card.nameKo }.joinToString()})",
+            summary = interpretation.summary.take(40) + "...",
             payload = payload,
-            profileId = null // 타로는 프로필 없이도 가능하게 설정
+            profileId = null
         )
         
         repository.appendHistoryRecord(record)
     }
 
     fun reset() {
-        selectedIds = emptyList()
+        selectedCards = emptyList()
         showResult = false
         resultInterpretation = null
         currentPage = 0
@@ -88,7 +123,7 @@ class TarotViewModel @Inject constructor(
 }
 
 data class TarotResult(
-    val selectedCards: List<TarotCard>,
+    val selectedCards: List<TarotCardState>,
     val summary: String,
     val detail: String
 )

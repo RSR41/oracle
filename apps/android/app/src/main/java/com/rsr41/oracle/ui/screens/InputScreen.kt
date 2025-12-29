@@ -2,6 +2,7 @@ package com.rsr41.oracle.ui.screens
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -17,7 +18,7 @@ import androidx.compose.ui.unit.dp
 import com.rsr41.oracle.R
 import com.rsr41.oracle.domain.model.CalendarType
 import com.rsr41.oracle.domain.model.Gender
-import com.rsr41.oracle.ui.components.SelectableChipRow
+import com.rsr41.oracle.ui.components.*
 
 /**
  * 사주 정보 입력 화면
@@ -35,18 +36,11 @@ fun InputScreen(
         }
     }
 
-    Scaffold(
+    OracleScaffold(
         topBar = {
-            TopAppBar(
-                title = { Text(stringResource(R.string.profile_setup_title)) },
-                navigationIcon = {
-                    IconButton(onClick = { onNavigate("HOME") }) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, stringResource(R.string.common_back))
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer
-                )
+            OracleTopAppBar(
+                title = stringResource(R.string.profile_setup_title),
+                onBack = { onNavigate("HOME") }
             )
         }
     ) { padding ->
@@ -55,107 +49,143 @@ fun InputScreen(
                 .fillMaxSize()
                 .padding(padding)
                 .verticalScroll(rememberScrollState())
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(20.dp)
+                .padding(horizontal = 24.dp),
+            verticalArrangement = Arrangement.spacedBy(24.dp)
         ) {
+            Spacer(modifier = Modifier.height(8.dp))
+
             // 닉네임
-            Card(modifier = Modifier.fillMaxWidth()) {
-                Column(modifier = Modifier.padding(16.dp)) {
-                    Text(stringResource(R.string.profile_nickname), style = MaterialTheme.typography.titleSmall)
-                    Spacer(modifier = Modifier.height(8.dp))
-                    OutlinedTextField(
-                        value = viewModel.nickname,
-                        onValueChange = { viewModel.updateNickname(it) },
-                        modifier = Modifier.fillMaxWidth(),
-                        isError = viewModel.nicknameError != null,
-                        supportingText = viewModel.nicknameError?.let { { Text(it) } }
+            OracleCard {
+                OracleSectionTitle(stringResource(R.string.profile_nickname))
+                OutlinedTextField(
+                    value = viewModel.nickname,
+                    onValueChange = { viewModel.updateNickname(it) },
+                    modifier = Modifier.fillMaxWidth(),
+                    isError = viewModel.nicknameError != null,
+                    supportingText = viewModel.nicknameError?.let { { Text(it) } },
+                    shape = RoundedCornerShape(12.dp),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = MaterialTheme.colorScheme.primary,
+                        unfocusedBorderColor = MaterialTheme.colorScheme.outline
                     )
-                }
+                )
             }
 
             // 생년월일
-            Card(modifier = Modifier.fillMaxWidth()) {
-                Column(modifier = Modifier.padding(16.dp)) {
-                    Text(stringResource(R.string.profile_birth_date), style = MaterialTheme.typography.titleSmall)
-                    Spacer(modifier = Modifier.height(8.dp))
-                    OutlinedTextField(
-                        value = viewModel.date,
-                        onValueChange = { viewModel.updateDate(it) },
-                        modifier = Modifier.fillMaxWidth(),
-                        placeholder = { Text("1990-01-01") },
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                        isError = viewModel.dateError != null,
-                        supportingText = viewModel.dateError?.let { { Text(it) } }
+            OracleCard {
+                OracleSectionTitle(stringResource(R.string.profile_birth_date))
+                OutlinedTextField(
+                    value = viewModel.date,
+                    onValueChange = { viewModel.updateDate(it) },
+                    modifier = Modifier.fillMaxWidth(),
+                    placeholder = { Text("1990-01-01", color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f)) },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    isError = viewModel.dateError != null,
+                    supportingText = viewModel.dateError?.let { { Text(it) } },
+                    shape = RoundedCornerShape(12.dp),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = MaterialTheme.colorScheme.primary,
+                        unfocusedBorderColor = MaterialTheme.colorScheme.outline
                     )
-                }
+                )
             }
 
             // 태어난 시간
-            Card(modifier = Modifier.fillMaxWidth()) {
-                Column(modifier = Modifier.padding(16.dp)) {
-                    Text(stringResource(R.string.profile_birth_time), style = MaterialTheme.typography.titleSmall)
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        OutlinedTextField(
-                            value = viewModel.time,
-                            onValueChange = { viewModel.updateTime(it) },
-                            modifier = Modifier.weight(1f),
-                            enabled = !viewModel.timeUnknown,
-                            placeholder = { Text("14:30") },
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                            isError = viewModel.timeError != null,
-                            supportingText = viewModel.timeError?.let { { Text(it) } }
+            OracleCard {
+                OracleSectionTitle(stringResource(R.string.profile_birth_time))
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    OutlinedTextField(
+                        value = viewModel.time,
+                        onValueChange = { viewModel.updateTime(it) },
+                        modifier = Modifier.weight(1f),
+                        enabled = !viewModel.timeUnknown,
+                        placeholder = { Text("14:30", color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f)) },
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                        isError = viewModel.timeError != null,
+                        supportingText = viewModel.timeError?.let { { Text(it) } },
+                        shape = RoundedCornerShape(12.dp),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = MaterialTheme.colorScheme.primary,
+                            unfocusedBorderColor = MaterialTheme.colorScheme.outline
                         )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Checkbox(
-                                checked = viewModel.timeUnknown,
-                                onCheckedChange = { viewModel.toggleTimeUnknown(it) }
-                            )
-                            Text(stringResource(R.string.profile_birth_time_unknown), style = MaterialTheme.typography.bodySmall)
-                        }
+                    )
+                    Spacer(modifier = Modifier.width(16.dp))
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Checkbox(
+                            checked = viewModel.timeUnknown,
+                            onCheckedChange = { viewModel.toggleTimeUnknown(it) },
+                            colors = CheckboxDefaults.colors(checkedColor = MaterialTheme.colorScheme.primary)
+                        )
+                        Text(
+                            stringResource(R.string.profile_birth_time_unknown),
+                            style = MaterialTheme.typography.bodyMedium
+                        )
                     }
                 }
             }
 
             // 성별 & 매력 타입
-            Card(modifier = Modifier.fillMaxWidth()) {
-                Column(modifier = Modifier.padding(16.dp)) {
-                    Text(stringResource(R.string.profile_gender), style = MaterialTheme.typography.titleSmall)
-                    SelectableChipRow(
-                        options = Gender.entries.toList(),
-                        selectedOption = viewModel.gender,
-                        onOptionSelected = { viewModel.updateGender(it) },
-                        labelProvider = { it.displayName }
-                    )
+            OracleCard {
+                OracleSectionTitle(stringResource(R.string.profile_gender))
+                SelectableChipRow(
+                    options = Gender.entries.toList(),
+                    selectedOption = viewModel.gender,
+                    onOptionSelected = { viewModel.updateGender(it) },
+                    labelProvider = { it.displayName }
+                )
 
-                    Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(24.dp))
 
-                    Text(stringResource(R.string.profile_calendar_type), style = MaterialTheme.typography.titleSmall)
-                    SelectableChipRow(
-                        options = CalendarType.entries.toList(),
-                        selectedOption = viewModel.calendarType,
-                        onOptionSelected = { viewModel.updateCalendarType(it) },
-                        labelProvider = { it.displayName }
-                    )
+                OracleSectionTitle(stringResource(R.string.profile_calendar_type))
+                SelectableChipRow(
+                    options = CalendarType.entries.toList(),
+                    selectedOption = viewModel.calendarType,
+                    onOptionSelected = { viewModel.updateCalendarType(it) },
+                    labelProvider = { it.displayName }
+                )
+                
+                // 윤달 토글 (음력일 때만 표시)
+                if (viewModel.calendarType == CalendarType.LUNAR) {
+                     Spacer(modifier = Modifier.height(16.dp))
+                     Row(verticalAlignment = Alignment.CenterVertically) {
+                        Switch(
+                            checked = viewModel.isLeapMonth,
+                            onCheckedChange = { viewModel.toggleLeapMonth(it) },
+                             colors = SwitchDefaults.colors(checkedTrackColor = MaterialTheme.colorScheme.primary)
+                        )
+                        Spacer(modifier = Modifier.width(12.dp))
+                        Text("윤달 여부", style = MaterialTheme.typography.bodyMedium)
+                     }
                 }
             }
 
             // 프로필 저장 체크
-            Row(verticalAlignment = Alignment.CenterVertically) {
+            Row(
+                modifier = Modifier.padding(horizontal = 8.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
                 Checkbox(
                     checked = viewModel.isSaveProfileChecked,
-                    onCheckedChange = { viewModel.toggleSaveProfile(it) }
+                    onCheckedChange = { viewModel.toggleSaveProfile(it) },
+                    colors = CheckboxDefaults.colors(checkedColor = MaterialTheme.colorScheme.primary)
                 )
-                Text(stringResource(R.string.profile_save_for_later), style = MaterialTheme.typography.bodyMedium)
+                Text(
+                    stringResource(R.string.profile_save_for_later),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f)
+                )
             }
 
-            Button(
+            OracleButton(
+                text = stringResource(R.string.input_view_result_btn),
                 onClick = { viewModel.validateAndGenerateResult() },
-                modifier = Modifier.fillMaxWidth().height(56.dp)
-            ) {
-                Text(stringResource(R.string.input_view_result_btn))
-            }
+                modifier = Modifier.fillMaxWidth()
+            )
+            
+            Spacer(modifier = Modifier.height(32.dp))
         }
     }
 }

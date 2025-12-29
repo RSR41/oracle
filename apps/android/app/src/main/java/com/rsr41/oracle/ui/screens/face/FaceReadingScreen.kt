@@ -1,7 +1,14 @@
 package com.rsr41.oracle.ui.screens.face
 
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -10,30 +17,41 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import coil.compose.rememberAsyncImagePainter
 import com.rsr41.oracle.R
+import com.rsr41.oracle.ui.components.*
 
-/**
- * 관상 화면 - 얼굴 사진 업로드 및 분석
- */
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FaceReadingScreen(
     viewModel: FaceViewModel,
     onBack: () -> Unit
 ) {
-    Scaffold(
+    // Consent Check
+    if (!viewModel.hasConsented) {
+        FaceTermsDialog(
+            onConfirm = { viewModel.agreeConsent() },
+            onDismiss = onBack
+        )
+    }
+
+    val galleryLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        viewModel.onImageSelected(uri)
+    }
+
+    OracleScaffold(
         topBar = {
-            TopAppBar(
-                title = { Text(stringResource(R.string.home_menu_face)) },
-                navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, stringResource(R.string.common_back))
-                    }
-                }
+            OracleTopAppBar(
+                title = stringResource(R.string.home_menu_face),
+                onBack = onBack
             )
         }
     ) { padding ->
@@ -42,109 +60,214 @@ fun FaceReadingScreen(
                 .fillMaxSize()
                 .padding(padding)
                 .verticalScroll(rememberScrollState())
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(20.dp),
+                .padding(horizontal = 24.dp),
+            verticalArrangement = Arrangement.spacedBy(24.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            if (viewModel.isAnalyzed) {
-                // 분석 결과 카드
-                Card(
+            Spacer(modifier = Modifier.height(8.dp))
+            
+            // 1. 이미지 선택/프리뷰 영역
+            OracleCard {
+                Column(
                     modifier = Modifier.fillMaxWidth(),
-                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Column(modifier = Modifier.padding(16.dp)) {
-                        Text(stringResource(R.string.common_result), style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
-                        Spacer(modifier = Modifier.height(12.dp))
-                        Text(viewModel.analysisResult)
-                        Spacer(modifier = Modifier.height(16.dp))
-                        OutlinedButton(onClick = { viewModel.reset() }, modifier = Modifier.align(Alignment.End) ) {
-                            Text(stringResource(R.string.face_retake))
-                        }
-                    }
-                }
-            }
-
-            // 개인정보 보호 안내
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondaryContainer)
-            ) {
-                Row(modifier = Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
-                    Icon(Icons.Default.PrivacyTip, null, tint = MaterialTheme.colorScheme.secondary)
-                    Spacer(modifier = Modifier.width(12.dp))
-                    Column {
-                        Text(stringResource(R.string.face_privacy_title), fontWeight = FontWeight.Bold)
-                        Text(
-                            stringResource(R.string.face_privacy_desc),
-                            style = MaterialTheme.typography.bodySmall
-                        )
-                    }
-                }
-            }
-
-            // 사진 업로드 영역
-            Card(
-                modifier = Modifier.fillMaxWidth().height(260.dp),
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
-            ) {
-                if (viewModel.isAnalyzing) {
-                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            CircularProgressIndicator()
-                            Spacer(modifier = Modifier.height(16.dp))
-                            Text(stringResource(R.string.face_analyzing))
-                        }
-                    }
-                } else {
-                    Column(
-                        modifier = Modifier.fillMaxSize(),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Center
-                    ) {
-                        if (viewModel.isImageSelected) {
-                            Icon(Icons.Default.Face, null, modifier = Modifier.size(64.dp), tint = MaterialTheme.colorScheme.primary)
-                            Spacer(modifier = Modifier.height(8.dp))
-                            Text(stringResource(R.string.face_ready), style = MaterialTheme.typography.titleMedium)
-                        } else {
-                            Text(stringResource(R.string.face_upload_hint), style = MaterialTheme.typography.titleMedium)
+                    if (viewModel.selectedImageUri != null) {
+                        // 선택된 이미지 프리뷰
+                        Surface(
+                            shape = RoundedCornerShape(16.dp),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(320.dp),
+                            color = MaterialTheme.colorScheme.surfaceVariant
+                        ) {
+                            Box(contentAlignment = Alignment.Center) {
+                                Image(
+                                    painter = rememberAsyncImagePainter(viewModel.selectedImageUri),
+                                    contentDescription = "Selected Face",
+                                    modifier = Modifier.fillMaxSize(),
+                                    contentScale = ContentScale.Crop
+                                )
+                                if (viewModel.isAnalyzing) {
+                                    Surface(
+                                        color = Color.Black.copy(alpha = 0.3f),
+                                        modifier = Modifier.fillMaxSize()
+                                    ) {
+                                        Box(contentAlignment = Alignment.Center) {
+                                            CircularProgressIndicator(color = Color.White)
+                                        }
+                                    }
+                                }
+                            }
                         }
                         
+                        if (!viewModel.isAnalyzing && !viewModel.isAnalyzed) {
+                             Spacer(modifier = Modifier.height(20.dp))
+                             Text(
+                                 text = stringResource(R.string.face_ready), 
+                                 style = MaterialTheme.typography.titleMedium,
+                                 color = MaterialTheme.colorScheme.primary,
+                                 fontWeight = FontWeight.Bold
+                             )
+                        }
+                    } else {
+                        // 선택 전 placeholder
+                         Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 40.dp)
+                                .background(MaterialTheme.colorScheme.surface, RoundedCornerShape(16.dp))
+                                .padding(32.dp)
+                        ) {
+                             Surface(
+                                 shape = CircleShape,
+                                 color = MaterialTheme.colorScheme.primary.copy(alpha = 0.05f),
+                                 modifier = Modifier.size(80.dp)
+                             ) {
+                                 Box(contentAlignment = Alignment.Center) {
+                                     Icon(Icons.Default.Face, null, modifier = Modifier.size(40.dp), tint = MaterialTheme.colorScheme.primary)
+                                 }
+                             }
+                             Spacer(modifier = Modifier.height(24.dp))
+                             Text(
+                                 text = stringResource(R.string.face_upload_hint), 
+                                 style = MaterialTheme.typography.bodyLarge,
+                                 textAlign = TextAlign.Center,
+                                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                             )
+                        }
+                    }
+                    
+                    if (!viewModel.isAnalyzing && !viewModel.isAnalyzed) {
                         Spacer(modifier = Modifier.height(24.dp))
-                        Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                            Button(onClick = { viewModel.selectImage() }) {
-                                Icon(Icons.Default.CameraAlt, null)
-                                Spacer(modifier = Modifier.width(8.dp))
-                                Text(stringResource(R.string.face_camera))
-                            }
-                            Button(onClick = { viewModel.selectImage() }) {
-                                Icon(Icons.Default.PhotoLibrary, null)
-                                Spacer(modifier = Modifier.width(8.dp))
-                                Text(stringResource(R.string.face_gallery))
-                            }
+                        OracleSecondaryButton(
+                            text = stringResource(R.string.face_gallery),
+                            onClick = { galleryLauncher.launch("image/*") },
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                        Spacer(modifier = Modifier.height(16.dp))
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                             Icon(Icons.Default.Info, null, modifier = Modifier.size(14.dp), tint = MaterialTheme.colorScheme.secondary)
+                             Spacer(modifier = Modifier.width(6.dp))
+                             Text(
+                                 text = stringResource(R.string.face_guide_photo), 
+                                 style = MaterialTheme.typography.labelSmall, 
+                                 color = MaterialTheme.colorScheme.secondary
+                             )
                         }
                     }
                 }
             }
 
-            // 안내사항
-            Card(modifier = Modifier.fillMaxWidth()) {
-                Column(modifier = Modifier.padding(16.dp)) {
-                    Text(stringResource(R.string.face_guide_title), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-                    Spacer(modifier = Modifier.height(12.dp))
-                    Text(stringResource(R.string.face_guide_1))
-                    Text(stringResource(R.string.face_guide_2))
-                    Text(stringResource(R.string.face_guide_3))
-                    Text(stringResource(R.string.face_guide_4))
-                }
+            // 2. 분석 버튼
+             if (viewModel.selectedImageUri != null && !viewModel.isAnalyzed && !viewModel.isAnalyzing) {
+                OracleButton(
+                    text = stringResource(R.string.face_analyze_btn),
+                    onClick = { viewModel.analyze() },
+                    modifier = Modifier.fillMaxWidth()
+                )
             }
 
-            Button(
-                onClick = { viewModel.analyze() },
-                modifier = Modifier.fillMaxWidth().height(56.dp),
-                enabled = viewModel.isImageSelected && !viewModel.isAnalyzing && !viewModel.isAnalyzed
-            ) {
-                Text(stringResource(R.string.face_analyze_btn))
+            // 3. 분석 결과
+            if (viewModel.isAnalyzed) {
+                OracleCard(
+                    backgroundColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.05f)
+                ) {
+                    OracleSectionTitle(stringResource(R.string.common_result), color = MaterialTheme.colorScheme.primary)
+                    Text(
+                        text = viewModel.analysisResult,
+                        style = MaterialTheme.typography.bodyLarge,
+                        lineHeight = 26.sp
+                    )
+                    Spacer(modifier = Modifier.height(24.dp))
+                    OracleSecondaryButton(
+                        text = stringResource(R.string.face_retake),
+                        onClick = { viewModel.reset() },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
             }
+            
+            // 4. 보안 안내
+            OracleCard(
+                backgroundColor = MaterialTheme.colorScheme.secondary.copy(alpha = 0.05f)
+            ) {
+                Row(verticalAlignment = Alignment.Top) {
+                    Icon(
+                        Icons.Default.Security, 
+                        null, 
+                        tint = MaterialTheme.colorScheme.secondary,
+                        modifier = Modifier.size(20.dp)
+                    )
+                    Spacer(modifier = Modifier.width(12.dp))
+                    Text(
+                        text = stringResource(R.string.face_security_full), 
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
+                        lineHeight = 18.sp
+                    )
+                }
+            }
+            
+            Spacer(modifier = Modifier.height(32.dp))
         }
+    }
+}
+
+@Composable
+fun FaceTermsDialog(
+    onConfirm: () -> Unit,
+    onDismiss: () -> Unit
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { 
+            Text(
+                stringResource(R.string.face_terms_title), 
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Bold
+            ) 
+        },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                Text(
+                    stringResource(R.string.face_terms_intro),
+                    style = MaterialTheme.typography.bodyMedium
+                )
+                Surface(
+                    color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+                    shape = RoundedCornerShape(12.dp)
+                ) {
+                    Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        TermsBulletPoint(stringResource(R.string.face_terms_bullet_1))
+                        TermsBulletPoint(stringResource(R.string.face_terms_bullet_2))
+                        TermsBulletPoint(stringResource(R.string.face_terms_bullet_3))
+                    }
+                }
+                Text(stringResource(R.string.face_terms_question), style = MaterialTheme.typography.bodySmall, fontWeight = FontWeight.Bold)
+            }
+        },
+        confirmButton = {
+            OracleButton(
+                text = stringResource(R.string.face_terms_agree),
+                onClick = onConfirm
+            )
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text(stringResource(R.string.common_cancel), color = MaterialTheme.colorScheme.outline)
+            }
+        },
+        containerColor = MaterialTheme.colorScheme.surface,
+        shape = RoundedCornerShape(24.dp)
+    )
+}
+
+@Composable
+private fun TermsBulletPoint(text: String) {
+    Row(verticalAlignment = Alignment.Top) {
+        Text("• ", style = MaterialTheme.typography.bodySmall, fontWeight = FontWeight.Bold)
+        Text(text, style = MaterialTheme.typography.bodySmall)
     }
 }

@@ -1,22 +1,27 @@
 package com.rsr41.oracle.ui.screens
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.rsr41.oracle.R
 import com.rsr41.oracle.core.util.DateTimeUtil
 import com.rsr41.oracle.domain.model.CalendarType
 import com.rsr41.oracle.domain.model.Gender
-import com.rsr41.oracle.ui.components.SectionCard
-import androidx.compose.ui.res.stringResource
+import com.rsr41.oracle.ui.components.*
 
 /**
  * 결과 화면
@@ -32,123 +37,147 @@ fun ResultScreen(
 ) {
     val historyItem = viewModel.historyItem
 
-    Scaffold(
+    OracleScaffold(
         topBar = {
-            TopAppBar(
-                title = { Text(stringResource(R.string.result_title)) },
-                navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = stringResource(R.string.common_back)
-                        )
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer
-                )
+            OracleTopAppBar(
+                title = stringResource(R.string.result_title),
+                onBack = onBack
             )
         }
     ) { innerPadding ->
         Column(
             modifier = Modifier
                 .padding(innerPadding)
-                .padding(16.dp)
                 .fillMaxSize()
-                .verticalScroll(rememberScrollState()),
+                .verticalScroll(rememberScrollState())
+                .padding(horizontal = 24.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            verticalArrangement = Arrangement.spacedBy(24.dp)
         ) {
+            Spacer(modifier = Modifier.height(8.dp))
+
             if (viewModel.isLoading) {
-                CircularProgressIndicator()
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
+                }
             } else if (historyItem != null) {
                 val item = historyItem
                 val birthInfo = item.birthInfo
                 val result = item.result
 
-                // 입력 정보 요약
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.secondaryContainer
-                    )
+                // 오늘의 총운 (Hero)
+                OracleCard(
+                    backgroundColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.05f)
                 ) {
-                    Column(modifier = Modifier.padding(16.dp)) {
-                        Text(
-                            stringResource(R.string.result_input_summary),
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.Bold
-                        )
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Text(stringResource(R.string.result_birth_date, birthInfo.date))
-                        Text(stringResource(R.string.result_birth_time, birthInfo.time.ifBlank { stringResource(R.string.common_not_entered) }))
-                        Text(stringResource(R.string.result_gender, if (birthInfo.gender == Gender.MALE) stringResource(R.string.common_male) else stringResource(R.string.common_female)))
-                        Text(stringResource(R.string.result_calendar, if (birthInfo.calendarType == CalendarType.SOLAR) stringResource(R.string.common_solar) else stringResource(R.string.common_lunar)))
+                   OracleSectionTitle(
+                       text = stringResource(R.string.result_summary_title),
+                       color = MaterialTheme.colorScheme.primary
+                   )
+                   Text(
+                       text = result.summaryToday,
+                       style = MaterialTheme.typography.bodyLarge,
+                       lineHeight = 26.sp
+                    )
+                }
+
+                // 사주 기둥 (Pillars)
+                OracleCard {
+                   OracleSectionTitle(stringResource(R.string.result_pillars_title))
+                   Box(
+                       modifier = Modifier
+                           .fillMaxWidth()
+                           .padding(vertical = 8.dp)
+                           .background(MaterialTheme.colorScheme.secondary.copy(alpha = 0.05f), RoundedCornerShape(12.dp))
+                           .padding(16.dp),
+                       contentAlignment = Alignment.Center
+                   ) {
+                       Text(
+                           text = result.pillars,
+                           style = MaterialTheme.typography.headlineSmall,
+                           fontWeight = FontWeight.Bold,
+                           color = MaterialTheme.colorScheme.secondary,
+                           textAlign = TextAlign.Center
+                       )
+                   }
+                }
+
+                // 입력 정보 요약
+                OracleCard {
+                    OracleSectionTitle(stringResource(R.string.result_input_summary))
+                    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                        ResultDetailRow(stringResource(R.string.profile_birth_date), birthInfo.date)
+                        ResultDetailRow(stringResource(R.string.profile_birth_time), birthInfo.time.ifBlank { stringResource(R.string.common_not_entered) })
+                        ResultDetailRow(stringResource(R.string.profile_gender), if (birthInfo.gender == Gender.MALE) stringResource(R.string.common_male) else stringResource(R.string.common_female))
+                        ResultDetailRow(stringResource(R.string.profile_calendar_type), if (birthInfo.calendarType == CalendarType.SOLAR) stringResource(R.string.common_solar) else stringResource(R.string.common_lunar))
+                        
+                        Divider(modifier = Modifier.padding(vertical = 12.dp), color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f))
+                        
                         Text(
                             stringResource(R.string.result_generated_at, DateTimeUtil.formatMillisToDateTime(result.generatedAtMillis)),
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.outline
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
                         )
                     }
                 }
-
-                // 사주 기둥
-                SectionCard(
-                    title = stringResource(R.string.result_pillars_title),
-                    content = result.pillars
-                )
-
-                // 오늘의 총운
-                SectionCard(
-                    title = stringResource(R.string.result_summary_title),
-                    content = result.summaryToday
-                )
-
-                Spacer(modifier = Modifier.height(16.dp))
 
                 // 하단 버튼들
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    horizontalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
-                    OutlinedButton(
+                    OracleSecondaryButton(
+                        text = stringResource(R.string.result_retry_btn),
                         onClick = onBack,
                         modifier = Modifier.weight(1f)
-                    ) {
-                        Text(stringResource(R.string.result_retry_btn))
-                    }
-                    Button(
+                    )
+                    OracleButton(
+                        text = stringResource(R.string.common_history),
                         onClick = { onNavigate("HISTORY") },
                         modifier = Modifier.weight(1f)
-                    ) {
-                        Text(stringResource(R.string.common_history))
-                    }
+                    )
                 }
             } else {
                 // 결과 없음
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.errorContainer
-                    )
-                ) {
+                OracleCard {
                     Column(
-                        modifier = Modifier.padding(16.dp),
+                        modifier = Modifier.fillMaxWidth(),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
+                        Icon(Icons.Default.Info, null, tint = MaterialTheme.colorScheme.error, modifier = Modifier.size(48.dp))
+                        Spacer(modifier = Modifier.height(16.dp))
                         Text(
                             stringResource(R.string.result_not_found),
-                            style = MaterialTheme.typography.titleMedium
+                            style = MaterialTheme.typography.titleLarge,
+                            color = MaterialTheme.colorScheme.error
                         )
                         Spacer(modifier = Modifier.height(8.dp))
-                        Text(stringResource(R.string.result_not_found_desc))
+                        Text(
+                            stringResource(R.string.result_not_found_desc),
+                            style = MaterialTheme.typography.bodyMedium,
+                            textAlign = TextAlign.Center
+                        )
                     }
                 }
 
-                Button(onClick = onBack) {
-                    Text(stringResource(R.string.result_go_to_input))
-                }
+                OracleButton(
+                     text = stringResource(R.string.result_go_to_input),
+                     onClick = onBack,
+                     modifier = Modifier.fillMaxWidth()
+                )
             }
+            
+            Spacer(modifier = Modifier.height(32.dp))
         }
+    }
+}
+
+@Composable
+private fun ResultDetailRow(label: String, value: String) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Text(label, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f))
+        Text(value, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.SemiBold)
     }
 }

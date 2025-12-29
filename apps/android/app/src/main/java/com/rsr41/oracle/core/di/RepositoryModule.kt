@@ -39,4 +39,12 @@ object RepositoryModule {
     ): SajuRepository {
         return SajuRepositoryImpl(preferencesManager, buildMockSajuUseCase)
     }
+
+    @Provides
+    @Singleton
+    fun provideHistoryRepository(
+        historyDao: com.rsr41.oracle.data.local.HistoryDao
+    ): com.rsr41.oracle.data.repository.HistoryRepository {
+        return com.rsr41.oracle.data.repository.HistoryRepositoryImpl(historyDao)
+    }
 }

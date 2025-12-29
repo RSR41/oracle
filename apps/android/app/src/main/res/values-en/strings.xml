@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">ORACLE</string>
+    
+    <!-- Common -->
+    <string name="common_back">Back</string>
+    <string name="common_save">Save</string>
+    <string name="common_delete">Delete</string>
+    <string name="common_cancel">Cancel</string>
+    <string name="common_confirm">Confirm</string>
+    <string name="common_history">History</string>
+    <string name="common_settings">Settings</string>
+    <string name="common_save_history">Save to History</string>
+    <string name="common_saved">Saved</string>
+    <string name="common_profile_select">Select Profile</string>
+    <string name="common_profile_none">Select a Profile</string>
+    <string name="common_profile_empty_error">No profiles. Create one in Saju menu.</string>
+    <string name="common_analyze">Analyze</string>
+    <string name="common_result">Result</string>
+    <string name="common_retry">Start Over</string>
+    <string name="common_not_entered">None</string>
+    <string name="common_male">Male</string>
+    <string name="common_female">Female</string>
+    <string name="common_male_short">M</string>
+    <string name="common_female_short">F</string>
+    <string name="common_solar">Solar</string>
+    <string name="common_lunar">Lunar</string>
+    <string name="common_selected">Selected</string>
+    <string name="common_already_saved">Saved</string>
+    
+    <!-- Home -->
+    <string name="home_title">Oracle</string>
+    <string name="home_today_fortune">🔮 Today\'s Fortune</string>
+    <string name="home_today_fortune_desc">Check your destiny for today.</string>
+    <string name="home_view_fortune">View Fortune</string>
+    <string name="home_menu">Menu</string>
+    
+    <!-- Menu Names -->
+    <string name="menu_saju">Saju</string>
+    <string name="menu_manse">Manse</string>
+    <string name="menu_compatibility">Compatibility</string>
+    <string name="menu_face">Face Reading</string>
+    <string name="menu_tarot">Tarot</string>
+    <string name="menu_dream">Dream</string>
+    <string name="menu_not_ready">Coming Soon!</string>
+    
+    <string name="home_menu_fortune">Manse/Fortune</string>
+    <string name="home_menu_compatibility">Compatibility</string>
+    <string name="home_menu_face">Face Reading</string>
+    
+    <string name="compatibility_type_select">Select Type</string>
+    <string name="compatibility_my_profile">My Profile</string>
+    <string name="compatibility_partner_profile">Partner Profile</string>
+    <string name="compatibility_analyze_btn">Analyze Compatibility</string>
+    
+    <!-- History -->
+    <string name="history_clear_all_desc">Clear All History</string>
+    <string name="history_empty_state">No history found</string>
+    <string name="history_clear_title">Clear All</string>
+    <string name="history_clear_confirm">Delete all history?</string>
+    <string name="history_legacy_title">Legacy Records</string>
+    <string name="history_legacy_item_title">Legacy Saju Record</string>
+    
+    <!-- Face -->
+    <string name="face_privacy_title">Privacy Notice</string>
+    <string name="face_privacy_desc">Photos are deleted immediately after analysis.</string>
+    <string name="face_guide_title">Guide</string>
+    <string name="face_guide_1">1. Look straight ahead in good light.</string>
+    <string name="face_guide_2">2. Remove glasses or hats.</string>
+    <string name="face_guide_3">3. Show forehead and eyebrows.</string>
+    <string name="face_guide_4">4. For entertainment purposes only.</string>
+    
+    <string name="face_analyzing">Analyzing...</string>
+    <string name="face_ready">Photo Ready</string>
+    <string name="face_upload_hint">Upload a front-facing photo</string>
+    <string name="face_camera">Camera</string>
+    <string name="face_gallery">Gallery</string>
+    <string name="face_analyze_btn">Start Analysis</string>
+    <string name="face_retake">Try Again</string>
+    <string name="face_guide_photo">Frontal photo and bright lighting recommended</string>
+    <string name="face_security_full">Photos are destroyed immediately after analysis and never stored on the server or device.</string>
+    <string name="face_terms_title">Face Reading Consent</string>
+    <string name="face_terms_intro">This feature is for entertainment purposes only and has no scientific basis.</string>
+    <string name="face_terms_bullet_1">Uploaded photos are destroyed immediately after analysis.</string>
+    <string name="face_terms_bullet_2">Sensitive info (race, health, etc.) is not collected or estimated.</string>
+    <string name="face_terms_bullet_3">Only analysis results are saved as text in history.</string>
+    <string name="face_terms_question">Do you agree to use the service?</string>
+    <string name="face_terms_agree">Agree and Start</string>
+    
+    <!-- Input/Profile -->
+    <string name="profile_setup_title">Profile Setup</string>
+    <string name="profile_nickname">Nickname</string>
+    <string name="profile_birth_date">Date of Birth (yyyy-MM-dd)</string>
+    <string name="profile_birth_time">Time of Birth (HH:mm)</string>
+    <string name="profile_birth_time_unknown">Unknown Time</string>
+    <string name="profile_gender">Gender</string>
+    <string name="profile_calendar_type">Calendar Type</string>
+    <string name="profile_save_for_later">Save for later use</string>
+    
+    <!-- Input Messages -->
+    <string name="input_view_result_btn">View Result</string>
+    <string name="input_error_nickname_short">Nickname too short</string>
+    <string name="input_error_date_format">Invalid date format</string>
+    <string name="input_error_time_format">Invalid time format</string>
+    
+    <!-- Tarot -->
+    <string name="tarot_title">Tarot</string>
+    <string name="tarot_instruction">Clear your mind and pick 3 cards</string>
+    <string name="tarot_selection_count">%1$d/%2$d Selected</string>
+    <string name="tarot_view_result">View Result</string>
+    <string name="tarot_result_title">Tarot Interpretation</string>
+    <string name="tarot_summary_label">Summary</string>
+    <string name="tarot_detail_label">Detail</string>
+    <string name="tarot_reversed">Reversed</string>
+    <string name="tarot_upright">Upright</string>
+    <string name="tarot_deep_analysis">Deep Analysis</string>
+    <string name="tarot_pros">Pros ✨</string>
+    <string name="tarot_cons">Cons ⚠️</string>
+    <string name="tarot_advice_title">Oracle\'s Advice 💌</string>
+    
+    <!-- Fortune -->
+    <string name="fortune_tab_daeun">Daeun</string>
+    <string name="fortune_tab_saeun">Saeun</string>
+    <string name="fortune_tab_wolun">Wolun</string>
+    <string name="fortune_select_profile_hint">Select a profile above to view Manse.</string>
+    <string name="fortune_profile_to_analyze">Profile</string>
+    <string name="profile_none_saved">No profiles saved</string>
+    
+    <!-- Result -->
+    <string name="result_title">Saju Result</string>
+    <string name="result_input_summary">Input Info</string>
+    <string name="result_birth_date">DOB: %1$s</string>
+    <string name="result_birth_time">Time: %1$s</string>
+    <string name="result_gender">Gender: %1$s</string>
+    <string name="result_calendar">Calendar: %1$s</string>
+    <string name="result_generated_at">Generated: %1$s</string>
+    <string name="result_pillars_title">📊 Four Pillars</string>
+    <string name="result_summary_title">🔮 Today\'s Fortune</string>
+    <string name="result_retry_btn">Retry</string>
+    <string name="result_not_found">Result Not Found</string>
+    <string name="result_not_found_desc">Please enter info in the input screen.</string>
+    <string name="result_go_to_input">Go to Input</string>
+    
+    <!-- Settings -->
+    <string name="settings_default_calendar_title">Default Calendar</string>
+    <string name="settings_default_calendar_desc">Default calendar type for input.</string>
+    <string name="settings_calendar_solar">Solar</string>
+    <string name="settings_calendar_lunar">Lunar</string>
+    <string name="settings_upcoming_title">Upcoming Settings</string>
+    <string name="settings_upcoming_gender">• Default Gender</string>
+    <string name="settings_upcoming_time">• Time Input Preference</string>
+    <string name="settings_upcoming_theme">• Theme Settings</string>
+    <string name="settings_info_title">App Info</string>
+    <string name="settings_info_version">Version: 1.0.0 (MVP)</string>
+    <string name="settings_info_package">Package: com.rsr41.oracle</string>
+</resources>

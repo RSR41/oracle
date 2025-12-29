@@ -11,6 +11,7 @@ import com.rsr41.oracle.domain.model.HistoryRecord
 import com.rsr41.oracle.domain.model.HistoryType
 import com.rsr41.oracle.domain.model.Profile
 import com.rsr41.oracle.domain.model.SajuResult
+import java.util.UUID
 import org.json.JSONArray
 import org.json.JSONObject
 
@@ -49,6 +50,15 @@ class PreferencesManager(context: Context) {
     fun saveDefaultCalendarType(type: CalendarType) {
         prefs.edit().putString(KEY_CALENDAR_TYPE, type.name).apply()
         Log.d(TAG, "Saved default calendar type: $type")
+    }
+
+    // ===== Face Consent =====
+    fun loadFaceConsent(): Boolean {
+        return prefs.getBoolean("face_analysis_consent", false)
+    }
+
+    fun saveFaceConsent(consented: Boolean) {
+        prefs.edit().putBoolean("face_analysis_consent", consented).apply()
     }
 
     // ===== 프로필 (Local only) =====
@@ -109,16 +119,29 @@ class PreferencesManager(context: Context) {
     }
 
     private fun parseProfile(obj: JSONObject): Profile {
-        return Profile(
-            id = obj.getString("id"),
-            nickname = obj.getString("nickname"),
-            birthDate = obj.getString("birthDate"),
-            birthTime = obj.optString("birthTime", null),
-            timeUnknown = obj.optBoolean("timeUnknown", false),
-            calendarType = CalendarType.valueOf(obj.getString("calendarType")),
-            gender = Gender.valueOf(obj.getString("gender")),
-            createdAt = obj.optLong("createdAt", System.currentTimeMillis())
-        )
+        return try {
+            Profile(
+                id = obj.optString("id", UUID.randomUUID().toString()),
+                nickname = obj.optString("nickname", "Unknown"),
+                birthDate = obj.optString("birthDate", "1990-01-01"),
+                birthTime = if (obj.isNull("birthTime")) null else obj.optString("birthTime"),
+                timeUnknown = obj.optBoolean("timeUnknown", false),
+                calendarType = try { CalendarType.valueOf(obj.optString("calendarType", CalendarType.SOLAR.name)) } catch(e:Exception) { CalendarType.SOLAR },
+                gender = try { Gender.valueOf(obj.optString("gender", Gender.MALE.name)) } catch(e:Exception) { Gender.MALE },
+                createdAt = obj.optLong("createdAt", System.currentTimeMillis())
+            )
+        } catch (e: Exception) {
+            Log.e(TAG, "Error parsing Profile", e)
+            Profile(
+                id = UUID.randomUUID().toString(),
+                nickname = "Error",
+                birthDate = "1990-01-01",
+                birthTime = null,
+                timeUnknown = true,
+                calendarType = CalendarType.SOLAR,
+                gender = Gender.MALE
+            )
+        }
     }
 
     // ===== 히스토리 (Enhanced) =====
@@ -181,16 +204,30 @@ class PreferencesManager(context: Context) {
     }
 
     private fun parseHistoryRecord(obj: JSONObject): HistoryRecord {
-        return HistoryRecord(
-            id = obj.getString("id"),
-            type = HistoryType.fromString(obj.getString("type")),
-            title = obj.getString("title"),
-            summary = obj.getString("summary"),
-            payload = obj.getString("payload"),
-            profileId = obj.optString("profileId", null),
-            partnerProfileId = obj.optString("partnerProfileId", null),
-            createdAt = obj.getLong("createdAt")
-        )
+        return try {
+            HistoryRecord(
+                id = obj.optString("id", System.currentTimeMillis().toString()),
+                type = HistoryType.fromString(obj.optString("type", HistoryType.SAJU_FORTUNE.name)),
+                title = obj.optString("title", "No Title"),
+                summary = obj.optString("summary", ""),
+                payload = obj.optString("payload", "{}"),
+                inputSnapshot = obj.optString("inputSnapshot", "{}"),
+                profileId = obj.optString("profileId", null),
+                partnerProfileId = obj.optString("partnerProfileId", null),
+                createdAt = obj.optLong("createdAt", System.currentTimeMillis())
+            )
+        } catch (e: Exception) {
+            Log.e(TAG, "Error parsing HistoryRecord", e)
+            // Return a minimal fallback record instead of crashing
+            HistoryRecord(
+                id = "error_${System.currentTimeMillis()}",
+                type = HistoryType.SAJU_FORTUNE,
+                title = "Error Loading",
+                summary = "Could not parse this record",
+                payload = "{}",
+                profileId = null
+            )
+        }
     }
 
     // ===== 레거시 히스토리 (Compatibility) =====

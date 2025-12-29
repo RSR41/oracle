@@ -61,4 +61,12 @@ class SajuRepositoryImpl(
     override fun saveLastResult(item: HistoryItem) {
         preferencesManager.saveLastResult(item)
     }
+
+    override fun getFaceConsent(): Boolean {
+        return preferencesManager.loadFaceConsent()
+    }
+
+    override fun setFaceConsent(consented: Boolean) {
+        preferencesManager.saveFaceConsent(consented)
+    }
 }

@@ -1,10 +1,14 @@
 package com.rsr41.oracle.ui.screens.tarot
 
 import android.widget.Toast
-import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -13,39 +17,34 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.rsr41.oracle.R
+import com.rsr41.oracle.ui.components.*
 
 /**
- * 타로 화면 - 카드 선택 및 결과 표시
+ * 타로 화면 - 카드 선택 및 결과 표시 (36장 Deck, 12장/Page)
  */
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TarotScreen(
     onBack: () -> Unit,
     viewModel: TarotViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
-    val selectedIds = viewModel.selectedIds
+    val selectedCards = viewModel.selectedCards
     val maxCards = 3
 
-    Scaffold(
+    OracleScaffold(
         topBar = {
-            TopAppBar(
-                title = { Text(stringResource(R.string.tarot_title)) },
-                navigationIcon = {
-                    IconButton(onClick = if (viewModel.showResult) viewModel::reset else onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, stringResource(R.string.common_back))
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer
-                )
+            OracleTopAppBar(
+                title = stringResource(R.string.tarot_title),
+                onBack = if (viewModel.showResult) viewModel::reset else onBack
             )
         }
     ) { padding ->
@@ -63,77 +62,107 @@ fun TarotScreen(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(padding)
-                    .padding(16.dp),
+                    .padding(horizontal = 24.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text(
-                    stringResource(R.string.tarot_selection_count, selectedIds.size, maxCards),
-                    style = MaterialTheme.typography.titleMedium
-                )
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // 상단 선택 상태 (Premium Card Header)
+                Surface(
+                    color = MaterialTheme.colorScheme.primary.copy(alpha = 0.05f),
+                    shape = RoundedCornerShape(16.dp),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Column(
+                        modifier = Modifier.padding(16.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text(
+                            stringResource(R.string.tarot_instruction),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
+                            textAlign = TextAlign.Center
+                        )
+                        Spacer(modifier = Modifier.height(12.dp))
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            (0 until maxCards).forEach { i ->
+                                Surface(
+                                    shape = CircleShape,
+                                    color = if (i < selectedCards.size) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline.copy(alpha = 0.2f),
+                                    modifier = Modifier.size(10.dp)
+                                ) {}
+                                if (i < maxCards - 1) Spacer(modifier = Modifier.width(12.dp))
+                            }
+                        }
+                    }
+                }
                 
-                Spacer(modifier = Modifier.height(8.dp))
-                
-                Text(
-                    stringResource(R.string.tarot_instruction),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.outline
-                )
+                Spacer(modifier = Modifier.height(24.dp))
+
+                // 페이지 선택 (Premium Style)
+                Row(
+                   modifier = Modifier
+                       .background(MaterialTheme.colorScheme.surface, RoundedCornerShape(12.dp))
+                       .padding(4.dp),
+                   horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    (0..2).forEach { page ->
+                        Surface(
+                            onClick = { viewModel.currentPage = page },
+                            shape = RoundedCornerShape(8.dp),
+                            color = if (viewModel.currentPage == page) MaterialTheme.colorScheme.primary else Color.Transparent,
+                            modifier = Modifier.size(48.dp, 36.dp)
+                        ) {
+                            Box(contentAlignment = Alignment.Center) {
+                                Text(
+                                    "${page + 1}", 
+                                    style = MaterialTheme.typography.labelLarge,
+                                    fontWeight = FontWeight.Bold,
+                                    color = if (viewModel.currentPage == page) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f)
+                                )
+                            }
+                        }
+                    }
+                }
 
                 Spacer(modifier = Modifier.height(24.dp))
 
-                // 페이지 선택 (1 2 3)
-                Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                    (0..2).forEach { page ->
-                        FilterChip(
-                            selected = viewModel.currentPage == page,
-                            onClick = { viewModel.currentPage = page },
-                            label = { Text("${page + 1}") }
+                // 카드 그리드
+                val startIndex = viewModel.currentPage * 12
+                val endIndex = minOf(startIndex + 12, viewModel.deck.size)
+                val cardsOnPage = try {
+                    viewModel.deck.subList(startIndex, endIndex)
+                } catch (e: Exception) {
+                    emptyList()
+                }
+                
+                LazyVerticalGrid(
+                    columns = GridCells.Fixed(4),
+                    modifier = Modifier.weight(1f),
+                    horizontalArrangement = Arrangement.spacedBy(10.dp),
+                    verticalArrangement = Arrangement.spacedBy(10.dp)
+                ) {
+                    items(cardsOnPage.size) { index ->
+                        val cardState = cardsOnPage[index]
+                        val isSelected = viewModel.isSelected(cardState)
+                        
+                        TarotCardItem(
+                            cardState = cardState,
+                            isSelected = isSelected,
+                            onSelect = { viewModel.toggleCard(cardState) }
                         )
                     }
                 }
 
-                Spacer(modifier = Modifier.height(16.dp))
-
-                // 카드 그리드 (4장씩)
-                val cardsOnPage = (viewModel.currentPage * 4 until (viewModel.currentPage + 1) * 4)
-                
-                Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.Center) {
-                    Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                        Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                            TarotCardItem(
-                                cardNumber = cardsOnPage.elementAt(0),
-                                isSelected = selectedIds.contains(cardsOnPage.elementAt(0)),
-                                onSelect = { viewModel.toggleCard(cardsOnPage.elementAt(0)) }
-                            )
-                            TarotCardItem(
-                                cardNumber = cardsOnPage.elementAt(1),
-                                isSelected = selectedIds.contains(cardsOnPage.elementAt(1)),
-                                onSelect = { viewModel.toggleCard(cardsOnPage.elementAt(1)) }
-                            )
-                        }
-                        Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                            TarotCardItem(
-                                cardNumber = cardsOnPage.elementAt(2),
-                                isSelected = selectedIds.contains(cardsOnPage.elementAt(2)),
-                                onSelect = { viewModel.toggleCard(cardsOnPage.elementAt(2)) }
-                            )
-                            TarotCardItem(
-                                cardNumber = cardsOnPage.elementAt(3),
-                                isSelected = selectedIds.contains(cardsOnPage.elementAt(3)),
-                                onSelect = { viewModel.toggleCard(cardsOnPage.elementAt(3)) }
-                            )
-                        }
-                    }
-                }
-
                 // 결과 보기 버튼
-                Button(
+                Spacer(modifier = Modifier.height(16.dp))
+                OracleButton(
+                    text = stringResource(R.string.tarot_view_result),
                     onClick = { viewModel.generateResult() },
                     modifier = Modifier.fillMaxWidth().height(56.dp),
-                    enabled = selectedIds.size == maxCards
-                ) {
-                    Text(stringResource(R.string.tarot_view_result))
-                }
+                    enabled = selectedCards.size == maxCards
+                )
+                Spacer(modifier = Modifier.height(32.dp))
             }
         }
     }
@@ -141,23 +170,20 @@ fun TarotScreen(
 
 @Composable
 private fun TarotCardItem(
-    cardNumber: Int,
+    cardState: TarotCardState,
     isSelected: Boolean,
     onSelect: () -> Unit
 ) {
-    Card(
+    val cardColor = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface
+    val contentColor = if (isSelected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface
+
+    Surface(
         onClick = onSelect,
-        modifier = Modifier.size(100.dp, 150.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = if (isSelected) {
-                MaterialTheme.colorScheme.primaryContainer
-            } else {
-                MaterialTheme.colorScheme.surfaceVariant
-            }
-        ),
-        border = if (isSelected) {
-            BorderStroke(2.dp, MaterialTheme.colorScheme.primary)
-        } else null
+        modifier = Modifier.aspectRatio(0.62f), 
+        shape = RoundedCornerShape(8.dp),
+        color = cardColor,
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.2f)),
+        shadowElevation = if (isSelected) 8.dp else 2.dp
     ) {
         Box(
             modifier = Modifier.fillMaxSize(),
@@ -165,12 +191,17 @@ private fun TarotCardItem(
         ) {
             if (isSelected) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text("🔮", style = MaterialTheme.typography.headlineMedium)
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Text(stringResource(R.string.common_selected), style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Bold)
+                    Text("✨", style = MaterialTheme.typography.titleLarge)
+                    if (cardState.isReversed) {
+                        Text(
+                            text = stringResource(R.string.tarot_reversed), 
+                            style = MaterialTheme.typography.labelSmall, 
+                            color = contentColor.copy(alpha = 0.7f)
+                        )
+                    }
                 }
             } else {
-                Text("🂠", style = MaterialTheme.typography.displayMedium, color = MaterialTheme.colorScheme.outline)
+                Text("🔮", style = MaterialTheme.typography.headlineSmall, color = MaterialTheme.colorScheme.outline.copy(alpha = 0.5f))
             }
         }
     }
@@ -188,64 +219,100 @@ private fun TarotResultView(
         modifier = modifier
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
-            .padding(16.dp),
+            .padding(horizontal = 24.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+        verticalArrangement = Arrangement.spacedBy(24.dp)
     ) {
-        Text(stringResource(R.string.tarot_result_title), style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
+        Spacer(modifier = Modifier.height(16.dp))
         
-        // 선택된 카드들
+        // 선택된 카드들 상세 표시
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
+            horizontalArrangement = Arrangement.spacedBy(10.dp)
         ) {
-            interpretation.selectedCards.forEach { card ->
-                Card(
-                    modifier = Modifier.weight(1f).height(120.dp),
-                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondaryContainer)
+            interpretation.selectedCards.forEach { cardState ->
+                Surface(
+                    modifier = Modifier.weight(1f).height(180.dp),
+                    shape = RoundedCornerShape(12.dp),
+                    color = MaterialTheme.colorScheme.surface,
+                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.2f)),
+                    shadowElevation = 2.dp
                 ) {
                     Column(
                         modifier = Modifier.fillMaxSize().padding(8.dp),
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.Center
                     ) {
-                        Text("🃏", style = MaterialTheme.typography.titleLarge)
-                        Text(card.name, style = MaterialTheme.typography.labelSmall, textAlign = TextAlign.Center, maxLines = 1)
-                        Text(card.keyword, style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
+                         Surface(
+                             shape = CircleShape,
+                             color = MaterialTheme.colorScheme.primary.copy(alpha = 0.05f),
+                             modifier = Modifier.size(56.dp)
+                         ) {
+                             Box(contentAlignment = Alignment.Center) {
+                                 Text(
+                                    "🎴", 
+                                    style = MaterialTheme.typography.headlineLarge,
+                                    modifier = Modifier.graphicsLayer {
+                                        rotationZ = if (cardState.isReversed) 180f else 0f
+                                    }
+                                )
+                             }
+                         }
+                        Spacer(modifier = Modifier.height(12.dp))
+                        Text(
+                            text = cardState.card.nameKo, 
+                            style = MaterialTheme.typography.labelMedium, 
+                            textAlign = TextAlign.Center, 
+                            maxLines = 1, 
+                            fontWeight = FontWeight.Bold
+                        )
+                        Text(
+                            text = if (cardState.isReversed) stringResource(R.string.tarot_reversed) else stringResource(R.string.tarot_upright), 
+                            style = MaterialTheme.typography.labelSmall, 
+                            color = if (cardState.isReversed) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary
+                        )
                     }
                 }
             }
         }
 
-        // 해석 요약
-        Card(modifier = Modifier.fillMaxWidth()) {
-            Column(modifier = Modifier.padding(16.dp)) {
-                Text(stringResource(R.string.tarot_summary_label), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-                Spacer(modifier = Modifier.height(8.dp))
-                Text(interpretation.summary, style = MaterialTheme.typography.bodyLarge)
-            }
+        // 해석 요약 (Hero Card)
+        OracleCard(
+            backgroundColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.05f)
+        ) {
+            OracleSectionTitle(stringResource(R.string.tarot_summary_label), color = MaterialTheme.colorScheme.primary)
+            Text(
+                text = interpretation.summary, 
+                style = MaterialTheme.typography.bodyLarge,
+                fontWeight = FontWeight.Bold,
+                lineHeight = 26.sp
+            )
         }
 
         // 상세 해석
-        Card(modifier = Modifier.fillMaxWidth()) {
-            Column(modifier = Modifier.padding(16.dp)) {
-                Text(stringResource(R.string.tarot_detail_label), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-                Spacer(modifier = Modifier.height(8.dp))
-                Text(interpretation.detail, style = MaterialTheme.typography.bodyMedium)
-            }
+        OracleCard {
+            OracleSectionTitle(stringResource(R.string.tarot_detail_label))
+            
+            Text(stringResource(R.string.tarot_pros), style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.primary)
+            Spacer(modifier = Modifier.height(8.dp))
+            // Assuming we use interpretation.pros/cons if available, but for now just text
+            Text(
+                text = interpretation.detail, 
+                style = MaterialTheme.typography.bodyMedium,
+                lineHeight = 24.sp
+            )
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Button(
+        OracleButton(
+            text = if (isSaved) stringResource(R.string.common_already_saved) else stringResource(R.string.common_save_history),
             onClick = { 
                 onSave()
                 isSaved = true
             },
-            modifier = Modifier.fillMaxWidth().height(56.dp),
-            enabled = !isSaved
-        ) {
-            Text(if (isSaved) stringResource(R.string.common_already_saved) else stringResource(R.string.common_save_history))
-        }
+            enabled = !isSaved,
+            modifier = Modifier.fillMaxWidth()
+        )
+        
+        Spacer(modifier = Modifier.height(32.dp))
     }
 }

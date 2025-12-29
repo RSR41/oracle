@@ -26,51 +26,56 @@ class BuildMockSajuUseCase {
     fun execute(birthInfo: BirthInfo): SajuResult {
         Log.d(TAG, "Generating mock saju for: date=${birthInfo.date}, gender=${birthInfo.gender}, calendar=${birthInfo.calendarType}")
         
-        val genderText = when (birthInfo.gender) {
-            Gender.MALE -> "남성"
-            Gender.FEMALE -> "여성"
-        }
-        
-        val calendarText = when (birthInfo.calendarType) {
-            CalendarType.SOLAR -> "양력"
-            CalendarType.LUNAR -> "음력"
-        }
+        // Deterministic Seed based on input
+        val seed = (birthInfo.date + birthInfo.time + birthInfo.gender.name + birthInfo.calendarType.name).hashCode().toLong()
+        val random = java.util.Random(seed)
 
-        // 날짜에서 월 추출하여 계절별 운세 생성
-        val month = try {
-            birthInfo.date.split("-")[1].toInt()
-        } catch (e: Exception) {
-            1
-        }
+        val genderText = if (birthInfo.gender == Gender.MALE) "남성" else "여성"
+        val calendarText = if (birthInfo.calendarType == CalendarType.SOLAR) "양력" else "음력"
 
-        val seasonalFortune = when (month) {
-            in 3..5 -> "봄의 기운이 가득하여 새로운 시작에 유리합니다."
-            in 6..8 -> "여름의 열정이 넘쳐 활발한 활동이 기대됩니다."
-            in 9..11 -> "가을의 결실을 맺을 수 있는 시기입니다."
-            else -> "겨울의 인내가 빛을 발할 때입니다."
-        }
+        val seasons = listOf(
+            "봄의 따스한 기운이 당신을 감싸고 있습니다. 새로운 시작을 하기에 더할 나위 없이 좋은 시기입니다.",
+            "여름의 열정적인 에너지가 넘칩니다. 추진하고 있는 일이 있다면 거침없이 나아가세요.",
+            "가을의 풍요로움이 깃들어 있습니다. 그동안의 노력이 결실을 맺을 것입니다.",
+            "겨울의 지혜와 인내가 필요합니다. 잠시 멈춰 내면을 단단히 다지는 것이 좋습니다."
+        )
+        val seasonalFortune = seasons[random.nextInt(seasons.size)]
+
+        val adviceList = listOf(
+            "오늘은 주변 사람들에게 귀를 기울이세요.",
+            "독단적인 결정보다는 협력이 중요한 하루입니다.",
+            "재물운이 상승하고 있으니 투자를 고려해보세요.",
+            "건강에 유의하시고 충분한 휴식을 취하세요.",
+            "예기치 않은 행운이 찾아올 수 있습니다.",
+            "이동수가 있으니 여행이나 출장을 계획해보세요."
+        )
+        val dailyAdvice = adviceList[random.nextInt(adviceList.size)]
 
         val summaryToday = """
-            |$genderText ($calendarText 기준)
-            |$seasonalFortune
-            |오늘은 차분하게 계획을 세우면 좋은 결과가 있을 것입니다.
-        """.trimMargin()
+            $genderText ($calendarText) - 오늘 당신의 운세
+            
+            $seasonalFortune
+            
+            핵심 조언: $dailyAdvice
+        """.trimIndent()
 
-        // Mock 사주 기둥 (실제 계산은 추후 구현)
+        // Mock Pillars (Random but deterministic)
+        val stems = listOf("甲", "乙", "丙", "丁", "戊", "己", "庚", "辛", "壬", "癸")
+        val branches = listOf("子", "丑", "寅", "卯", "辰", "巳", "午", "未", "申", "酉", "戌", "亥")
+        
+        fun getPillar() = "${stems[random.nextInt(10)]}${branches[random.nextInt(12)]}"
+        
         val pillars = """
-            |년주: 甲子 (갑자) [Mock]
-            |월주: 乙丑 (을축) [Mock]
-            |일주: 丙寅 (병인) [Mock]
-            |시주: ${if (birthInfo.time.isNotBlank()) "丁卯 (정묘) [Mock]" else "시간 미입력"}
-        """.trimMargin()
+            년주: ${getPillar()} (Your Year)
+            월주: ${getPillar()} (Your Month)
+            일주: ${getPillar()} (Your Day)
+            시주: ${if (birthInfo.time.isNotBlank()) getPillar() else "미입력"} (Your Time)
+        """.trimIndent()
 
-        val result = SajuResult(
+        return SajuResult(
             summaryToday = summaryToday,
             pillars = pillars,
             generatedAtMillis = System.currentTimeMillis()
         )
-
-        Log.d(TAG, "Mock saju generated successfully")
-        return result
     }
 }

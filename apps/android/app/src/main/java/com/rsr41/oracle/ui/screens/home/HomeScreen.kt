@@ -14,7 +14,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import android.widget.Toast
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.style.TextAlign
 import com.rsr41.oracle.R
+import com.rsr41.oracle.ui.components.*
 
 /**
  * 홈 화면 - 오늘의 운세 프리뷰 + 기능 메뉴
@@ -31,59 +33,51 @@ fun HomeScreen(
     onNavigateToFace: () -> Unit,
     onNavigateToTarot: () -> Unit
 ) {
-    val context = LocalContext.current
-    Scaffold(
+    OracleScaffold(
         topBar = {
-            TopAppBar(
-                title = { Text(stringResource(R.string.home_title), fontWeight = FontWeight.Bold) },
+            OracleTopAppBar(
+                title = stringResource(R.string.home_title),
                 actions = {
                     IconButton(onClick = onNavigateToHistory) {
-                        Icon(Icons.Default.History, stringResource(R.string.common_history))
+                        Icon(Icons.Default.History, stringResource(R.string.common_history), tint = MaterialTheme.colorScheme.onSurface)
                     }
                     IconButton(onClick = onNavigateToSettings) {
-                        Icon(Icons.Default.Settings, stringResource(R.string.common_settings))
+                        Icon(Icons.Default.Settings, stringResource(R.string.common_settings), tint = MaterialTheme.colorScheme.onSurface)
                     }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer
-                )
+                }
             )
         }
-    ) { padding ->
+    ) {
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(padding)
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+                .padding(horizontal = 24.dp),
+            contentPadding = PaddingValues(bottom = 32.dp),
+            verticalArrangement = Arrangement.spacedBy(24.dp)
         ) {
-            // 오늘의 운세 카드
+            item { Spacer(modifier = Modifier.height(8.dp)) }
+
+            // Today's Fortune (Main Hero)
             item {
                 TodayFortuneCard(
                     onClick = onNavigateToInput
                 )
             }
 
-            // 기능 메뉴 타이틀
+            // Menu Section
             item {
-                Text(
-                    stringResource(R.string.home_menu),
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold
+                OracleSectionTitle(
+                    text = stringResource(R.string.home_menu)
                 )
             }
 
-            // 기능 그리드
             item {
                 FeatureGrid(
                     onNavigateToInput = onNavigateToInput,
                     onNavigateToFortune = onNavigateToFortune,
                     onNavigateToCompatibility = onNavigateToCompatibility,
                     onNavigateToFace = onNavigateToFace,
-                    onNavigateToTarot = onNavigateToTarot,
-                    onNotReady = {
-                        Toast.makeText(context, R.string.menu_not_ready, Toast.LENGTH_SHORT).show()
-                    }
+                    onNavigateToTarot = onNavigateToTarot
                 )
             }
         }
@@ -92,31 +86,42 @@ fun HomeScreen(
 
 @Composable
 private fun TodayFortuneCard(onClick: () -> Unit) {
-    Card(
+    OracleCard(
         onClick = onClick,
         modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.primaryContainer
-        )
+        backgroundColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.05f)
     ) {
-        Column(modifier = Modifier.padding(20.dp)) {
-            Text(
-                stringResource(R.string.home_today_fortune),
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Bold
-            )
-            Spacer(modifier = Modifier.height(12.dp))
-            Text(
-                stringResource(R.string.home_today_fortune_desc),
-                style = MaterialTheme.typography.bodyLarge
-            )
-            Spacer(modifier = Modifier.height(16.dp))
-            Button(onClick = onClick) {
-                Icon(Icons.Default.ArrowForward, null)
-                Spacer(modifier = Modifier.width(8.dp))
-                Text(stringResource(R.string.home_view_fortune))
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    stringResource(R.string.home_today_fortune),
+                    style = MaterialTheme.typography.headlineMedium,
+                    color = MaterialTheme.colorScheme.primary
+                )
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    stringResource(R.string.home_today_fortune_desc),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+                )
             }
+            Icon(
+                imageVector = Icons.Default.AutoAwesome,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.size(48.dp)
+            )
         }
+        Spacer(modifier = Modifier.height(24.dp))
+        OracleButton(
+            text = stringResource(R.string.home_view_fortune),
+            onClick = onClick,
+            modifier = Modifier.fillMaxWidth()
+        )
     }
 }
 
@@ -126,73 +131,67 @@ private fun FeatureGrid(
     onNavigateToFortune: () -> Unit,
     onNavigateToCompatibility: () -> Unit,
     onNavigateToFace: () -> Unit,
-    onNavigateToTarot: () -> Unit,
-    onNotReady: () -> Unit
+    onNavigateToTarot: () -> Unit
 ) {
-    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            FeatureCard(
+    Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+        Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+            FeatureItem(
                 modifier = Modifier.weight(1f),
                 title = stringResource(R.string.menu_saju),
                 icon = Icons.Default.AutoAwesome,
                 onClick = onNavigateToInput
             )
-            FeatureCard(
+            FeatureItem(
                 modifier = Modifier.weight(1f),
                 title = stringResource(R.string.menu_manse),
                 icon = Icons.Default.Timeline,
                 onClick = onNavigateToFortune
             )
         }
-        Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            FeatureCard(
+        Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+            FeatureItem(
                 modifier = Modifier.weight(1f),
                 title = stringResource(R.string.menu_compatibility),
                 icon = Icons.Default.Favorite,
                 onClick = onNavigateToCompatibility
             )
-            FeatureCard(
+            FeatureItem(
                 modifier = Modifier.weight(1f),
                 title = stringResource(R.string.menu_face),
                 icon = Icons.Default.Face,
                 onClick = onNavigateToFace
             )
         }
-        Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            FeatureCard(
+        Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+            FeatureItem(
                 modifier = Modifier.weight(1f),
                 title = stringResource(R.string.menu_tarot),
                 icon = Icons.Default.Style,
                 onClick = onNavigateToTarot
             )
-            FeatureCard(
+            FeatureItem(
                 modifier = Modifier.weight(1f),
                 title = stringResource(R.string.menu_dream),
                 icon = Icons.Default.Nightlight,
-                onClick = onNotReady
+                onClick = { /* Not ready */ }
             )
         }
     }
 }
 
 @Composable
-private fun FeatureCard(
+private fun FeatureItem(
     modifier: Modifier = Modifier,
     title: String,
     icon: ImageVector,
     onClick: () -> Unit
 ) {
-    Card(
+    OracleCard(
         onClick = onClick,
-        modifier = modifier.height(100.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant
-        )
+        modifier = modifier.height(110.dp)
     ) {
         Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp),
+            modifier = Modifier.fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
@@ -200,12 +199,13 @@ private fun FeatureCard(
                 imageVector = icon,
                 contentDescription = title,
                 tint = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.size(32.dp)
+                modifier = Modifier.size(28.dp)
             )
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(12.dp))
             Text(
                 title,
-                style = MaterialTheme.typography.titleMedium
+                style = MaterialTheme.typography.titleMedium,
+                textAlign = TextAlign.Center
             )
         }
     }

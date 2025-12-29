@@ -26,14 +26,25 @@ class SettingsViewModel @Inject constructor(
         loadSettings()
     }
 
-    fun loadSettings() {
-        calendarType = repository.loadDefaultCalendarType()
-        Log.d(TAG, "Loaded settings: calendarType=$calendarType")
-    }
-
     fun updateCalendarType(newType: CalendarType) {
         calendarType = newType
         repository.saveDefaultCalendarType(newType)
         Log.d(TAG, "Saved calendarType: $newType")
+    }
+
+    // Face Consent
+    var faceConsent by mutableStateOf(false)
+        private set
+
+    fun updateFaceConsent(consented: Boolean) {
+        faceConsent = consented
+        repository.setFaceConsent(consented)
+    }
+    
+    // Override loadSettings to include face consent
+    fun loadSettings() {
+        calendarType = repository.loadDefaultCalendarType()
+        faceConsent = repository.getFaceConsent()
+        Log.d(TAG, "Loaded settings: calendarType=$calendarType, faceConsent=$faceConsent")
     }
 }

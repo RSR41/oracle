@@ -76,7 +76,16 @@
     <string name="face_camera">카메라</string>
     <string name="face_gallery">갤러리</string>
     <string name="face_analyze_btn">분석 시작하기</string>
-    <string name="face_retake">다시 촬영하기</string>
+    <string name="face_retake">다시 해보기</string>
+    <string name="face_guide_photo">정면 사진, 밝은 조명을 권장합니다</string>
+    <string name="face_security_full">사진은 분석 즉시 파기되며, 서버나 기기에 절대 저장되지 않으니 안심하고 이용하세요.</string>
+    <string name="face_terms_title">관상 분석 이용 동의</string>
+    <string name="face_terms_intro">본 기능은 과학적 근거가 없는 오락용 서비스입니다. 결과에 너무 의존하지 마세요.</string>
+    <string name="face_terms_bullet_1">업로드된 사진은 분석 즉시 파기됩니다.</string>
+    <string name="face_terms_bullet_2">민감 정보(인종, 건강 등)는 수집하거나 추정하지 않습니다.</string>
+    <string name="face_terms_bullet_3">분석 결과만 히스토리에 텍스트로 저장됩니다.</string>
+    <string name="face_terms_question">서비스 이용에 동의하시겠습니까?</string>
+    <string name="face_terms_agree">동의 및 시작하기</string>
     
     <!-- 입력/프로필 -->
     <string name="profile_setup_title">프로필 설정</string>
@@ -102,6 +111,12 @@
     <string name="tarot_result_title">오늘의 타로 해석</string>
     <string name="tarot_summary_label">한줄 요약</string>
     <string name="tarot_detail_label">상세 해설</string>
+    <string name="tarot_reversed">역방향</string>
+    <string name="tarot_upright">정방향</string>
+    <string name="tarot_deep_analysis">심층 분석</string>
+    <string name="tarot_pros">좋은 점 ✨</string>
+    <string name="tarot_cons">주의할 점 ⚠️</string>
+    <string name="tarot_advice_title">Oracle의 조언 💌</string>
     
     <!-- 만세력/운세 추가 -->
     <string name="fortune_tab_daeun">대운</string>

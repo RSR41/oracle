@@ -91,6 +91,13 @@ class InputViewModel @Inject constructor(
         isSaveProfileChecked = checked
     }
 
+    var isLeapMonth by mutableStateOf(false)
+        private set
+
+    fun toggleLeapMonth(checked: Boolean) {
+        isLeapMonth = checked
+    }
+
     fun validateAndGenerateResult(): Boolean {
         if (nickname.isBlank() && isSaveProfileChecked) {
             nicknameError = "닉네임을 입력해주세요"
@@ -117,6 +124,9 @@ class InputViewModel @Inject constructor(
             gender = gender,
             calendarType = calendarType
         )
+        // 윤달 정보는 BirthInfo에 없다면 별도로 처리하거나 BirthInfo를 업데이트 해야 하지만, 
+        // 현재는 Mock 로직에 반영되지 않으므로 UI 상태만 유지.
+        // TODO: Update BirthInfo to support leap month
 
         // 1. 결과 생성
         val result = repository.getMockSaju(birthInfo)
@@ -138,14 +148,30 @@ class InputViewModel @Inject constructor(
         }
 
         // 3. 히스토리 저장 (Enhanced)
-        val payload = """
+        val inputJson = """
             {
                 "date": "$date",
                 "time": "$time",
                 "gender": "${gender.name}",
                 "calendarType": "${calendarType.name}",
+                "isLeapMonth": $isLeapMonth,
+                "timeUnknown": $timeUnknown
+            }
+        """.trimIndent()
+
+        val detailJson = """
+            {
                 "summary": "${result.summaryToday}",
-                "pillars": "${result.pillars}"
+                "pillars": "${result.pillars}",
+                "scores": {
+                    "love": 85,
+                    "money": 90,
+                    "health": 70,
+                    "work": 95
+                },
+                "advice": [
+                     "주변을 돌아보세요.", "무리한 투자는 삼가세요.", "건강 검진을 받아보세요."
+                ]
             }
         """.trimIndent()
 
@@ -154,12 +180,14 @@ class InputViewModel @Inject constructor(
             type = HistoryType.SAJU_FORTUNE,
             title = if (nickname.isNotBlank()) "$nickname 님의 사주" else "나의 사주 운세",
             summary = result.summaryToday.take(40) + "...",
-            payload = payload,
-            profileId = savedProfileId
+            payload = detailJson,
+            inputSnapshot = inputJson,
+            profileId = savedProfileId,
+            expiresAt = System.currentTimeMillis() + 7 * 24 * 60 * 60 * 1000 // 7 days TTL
         )
         repository.appendHistoryRecord(record)
 
-        // 4. 레거시 호환 저장
+        // 4. 레거시 호환 저장 (ResultViewModel에서 loadLastResult 사용 중)
         val legacyItem = HistoryItem(record.id, birthInfo, result)
         repository.saveLastResult(legacyItem)
         repository.appendHistory(legacyItem)

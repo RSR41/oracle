@@ -22,6 +22,9 @@ android {
 
         // API Base URL from local.properties (default for development)
         buildConfigField("String", "API_BASE_URL", "\"${findProperty("API_BASE_URL") ?: "https://api.example.com"}\"")
+        
+        // Mock API 사용 여부 (개발 중에는 true, 백엔드 연동 시 false로 전환)
+        buildConfigField("boolean", "USE_MOCK_API", "true")
     }
 
     buildTypes {
@@ -76,6 +79,19 @@ dependencies {
 
     // Logging
     implementation(libs.timber)
+
+    // Image Loading
+    implementation(libs.coil.compose)
+
+    // Room Database
+    implementation(libs.room.runtime)
+    implementation(libs.room.ktx)
+    ksp(libs.room.compiler)
+
+    // WorkManager
+    implementation(libs.work.runtime.ktx)
+    implementation(libs.hilt.work)
+    ksp(libs.hilt.work.compiler)
 
     // Testing
     testImplementation(libs.junit)

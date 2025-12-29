@@ -1,11 +1,18 @@
 package com.rsr41.oracle.ui.screens.face
 
+import android.net.Uri
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.rsr41.oracle.domain.model.HistoryRecord
+import com.rsr41.oracle.domain.model.HistoryType
 import com.rsr41.oracle.repository.SajuRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import java.util.UUID
 import javax.inject.Inject
 
 @HiltViewModel
@@ -13,7 +20,10 @@ class FaceViewModel @Inject constructor(
     private val repository: SajuRepository
 ) : ViewModel() {
 
-    var isImageSelected by mutableStateOf(false)
+    var hasConsented by mutableStateOf(false)
+        private set
+
+    var selectedImageUri by mutableStateOf<Uri?>(null)
         private set
 
     var isAnalyzing by mutableStateOf(false)
@@ -25,49 +35,77 @@ class FaceViewModel @Inject constructor(
     var analysisResult by mutableStateOf("")
         private set
 
-    fun selectImage() {
-        // 실제로는 런처를 통해 이미지를 받지만, 여기서는 선택된 것으로 시뮬레이션
-        isImageSelected = true
+    init {
+        checkConsent()
+    }
+
+    fun checkConsent() {
+        hasConsented = repository.getFaceConsent()
+    }
+
+    fun agreeConsent() {
+        repository.setFaceConsent(true)
+        hasConsented = true
+    }
+
+    fun onImageSelected(uri: Uri?) {
+        selectedImageUri = uri
         isAnalyzed = false
     }
 
     fun analyze() {
-        if (!isImageSelected) return
+        if (selectedImageUri == null) return
         
-        isAnalyzing = true
-        // 2초 후 분석 완료 시뮬레이션
-        // 실제 앱에서는 repository를 통해 서버와 통신하거나 로컬 모델 실행
-        
-        isAnalyzing = false
-        analysisResult = """
-            [관상 분석 결과]
+        viewModelScope.launch {
+            isAnalyzing = true
+            delay(2000) // Simulate processing time
             
-            전체적으로 명궁(이마 사이)이 밝고 깨끗하여 초년운이 좋고 학문적 성취가 높을 상입니다.
-            눈매가 깊고 수려하여 통찰력이 뛰어나며, 주변 사람들에게 신뢰를 주는 인상입니다.
+            // Mock Analysis (Neutral, Non-sensitive)
+            // In real app, this would process the file at 'selectedImageUri'
+            // and THEN DELETE IT immediately.
             
-            재백궁(코)의 모양이 견실하여 중년 이후 재무적인 흐름이 안정적일 것으로 보입니다.
-            입매가 분명하여 자기 주관이 뚜렷하고 말에 힘이 실려 리더로서의 자질이 충분합니다.
+            analysisResult = """
+                [관상 분석 결과]
+                
+                품질: 양호 (OK)
+                분위기: 차분함 (Calm), 신뢰감 (Trustworthy)
+                
+                [대화/첫인상 팁]
+                눈매가 부드러워 상대방에게 편안한 인상을 줍니다.
+                대화 시 미소를 유지하면 더욱 좋은 관계를 형성할 수 있습니다.
+                이마가 단정하여 논리적인 이미지를 풍깁니다.
+                
+                *본 결과는 오락 목적으로 제공되며 과학적 근거가 없습니다.
+                *사진은 분석 후 즉시 삭제되었습니다.
+            """.trimIndent()
             
-            주의할 점은 눈썹 끝이 약간 흐린 편이니 결단력이 필요한 순간에 주저하지 않도록 마음을 다스리는 것이 좋습니다.
-        """.trimIndent()
-        
-        isAnalyzed = true
-        
-        // 히스토리 저장
+            // Delete simulated temp file (Conceptual)
+            selectedImageUri = null // Remove reference from UI immediately
+            
+            isAnalyzing = false
+            isAnalyzed = true
+            
+            saveHistory()
+        }
+    }
+
+    private fun saveHistory() {
+        // 이미지 경로는 절대 저장하지 않음. 텍스트 결과만 저장.
         repository.appendHistoryRecord(
-            com.rsr41.oracle.domain.model.HistoryRecord(
-                id = java.util.UUID.randomUUID().toString(),
-                type = com.rsr41.oracle.domain.model.HistoryType.FACE,
-                title = "관상 분석 결과",
-                summary = "명궁이 밝고 중년운이 길한 상",
+            HistoryRecord(
+                id = UUID.randomUUID().toString(),
+                type = HistoryType.FACE,
+                title = "관상 분석 (이미지 삭제됨)",
+                summary = "차분하고 신뢰감을 주는 인상",
                 payload = analysisResult,
-                profileId = null
+                profileId = null, // 익명 분석
+                expiresAt = System.currentTimeMillis() + 7 * 24 * 60 * 60 * 1000
             )
         )
     }
 
     fun reset() {
-        isImageSelected = false
+        selectedImageUri = null
         isAnalyzed = false
         isAnalyzing = false
         analysisResult = ""

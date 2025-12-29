@@ -36,4 +36,8 @@ interface SajuRepository {
     // 마지막 결과
     fun loadLastResult(): HistoryItem?
     fun saveLastResult(item: HistoryItem)
+
+    // Face Consent
+    fun getFaceConsent(): Boolean
+    fun setFaceConsent(consented: Boolean)
 }

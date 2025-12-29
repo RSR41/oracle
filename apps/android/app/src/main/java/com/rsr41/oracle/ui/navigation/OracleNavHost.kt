@@ -1,6 +1,7 @@
 package com.rsr41.oracle.ui.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -39,26 +40,27 @@ fun OracleNavHost(
     navController: NavHostController = rememberNavController(),
     initialToken: String? = null
 ) {
-    // ViewModels (공유가 필요한 경우 여기서 관리)
-    val inputViewModel: InputViewModel = hiltViewModel()
-    val resultViewModel: ResultViewModel = hiltViewModel()
-    val historyViewModel: HistoryViewModel = hiltViewModel()
-    val settingsViewModel: SettingsViewModel = hiltViewModel()
-    val compatibilityViewModel: com.rsr41.oracle.ui.screens.compatibility.CompatibilityViewModel = hiltViewModel()
-    val fortuneViewModel: com.rsr41.oracle.ui.screens.fortune.FortuneViewModel = hiltViewModel()
-    val faceViewModel: com.rsr41.oracle.ui.screens.face.FaceViewModel = hiltViewModel()
+    // 딥링크 토큰 처리
+    LaunchedEffect(initialToken) {
+        if (!initialToken.isNullOrBlank()) {
+            // 토큰이 있으면 결과 화면으로 즉시 이동하거나 특정 로직 수행
+            // navController.navigate("${Routes.RESULT}?token=$initialToken")
+        }
+    }
 
     NavHost(
         navController = navController,
         startDestination = Routes.HOME
     ) {
         composable(Routes.HOME) {
+            val historyViewModel: HistoryViewModel = hiltViewModel()
+            val settingsViewModel: SettingsViewModel = hiltViewModel()
+            val fortuneViewModel: FortuneViewModel = hiltViewModel()
+            val compatibilityViewModel: CompatibilityViewModel = hiltViewModel()
+            
             HomeScreen(
                 onNavigateToInput = { navController.navigate(Routes.INPUT) },
-                onNavigateToResult = { 
-                    resultViewModel.loadLastResult()
-                    navController.navigate(Routes.RESULT) 
-                },
+                onNavigateToResult = { navController.navigate(Routes.RESULT) },
                 onNavigateToHistory = { 
                     historyViewModel.loadHistory()
                     navController.navigate(Routes.HISTORY) 
@@ -81,6 +83,9 @@ fun OracleNavHost(
         }
         
         composable(Routes.INPUT) {
+            val inputViewModel: InputViewModel = hiltViewModel()
+            val resultViewModel: ResultViewModel = hiltViewModel()
+            
             InputScreen(
                 viewModel = inputViewModel,
                 onNavigate = { route ->
@@ -95,6 +100,8 @@ fun OracleNavHost(
         }
         
         composable(Routes.RESULT) {
+            val resultViewModel: ResultViewModel = hiltViewModel()
+            
             ResultScreen(
                 viewModel = resultViewModel,
                 onNavigate = { route -> navController.navigate(route) },
@@ -103,6 +110,9 @@ fun OracleNavHost(
         }
         
         composable(Routes.HISTORY) {
+            val historyViewModel: HistoryViewModel = hiltViewModel()
+            val resultViewModel: ResultViewModel = hiltViewModel()
+            
             HistoryScreen(
                 viewModel = historyViewModel,
                 onNavigate = { route -> 
@@ -118,6 +128,8 @@ fun OracleNavHost(
         }
         
         composable(Routes.SETTINGS) {
+            val settingsViewModel: SettingsViewModel = hiltViewModel()
+            
             SettingsScreen(
                 viewModel = settingsViewModel,
                 onBack = { navController.popBackStack() }
@@ -125,13 +137,18 @@ fun OracleNavHost(
         }
         
         composable(Routes.FORTUNE) {
+            val fortuneViewModel: FortuneViewModel = hiltViewModel()
+            
             FortuneScreen(
                 viewModel = fortuneViewModel,
-                onBack = { navController.popBackStack() }
+                onBack = { navController.popBackStack() },
+                onNavigateToInput = { navController.navigate(Routes.INPUT) }
             )
         }
         
         composable(Routes.COMPATIBILITY) {
+            val compatibilityViewModel: CompatibilityViewModel = hiltViewModel()
+            
             CompatibilityScreen(
                 viewModel = compatibilityViewModel,
                 onBack = { navController.popBackStack() }
@@ -139,6 +156,8 @@ fun OracleNavHost(
         }
         
         composable(Routes.FACE) {
+            val faceViewModel: FaceViewModel = hiltViewModel()
+            
             FaceReadingScreen(
                 viewModel = faceViewModel,
                 onBack = { navController.popBackStack() }

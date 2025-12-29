@@ -8,9 +8,12 @@ data class HistoryRecord(
     val id: String,
     val type: HistoryType,
     val title: String,
-    val summary: String,
-    val payload: String, // JSON string
+    val summary: String, // resultSummary
+    val payload: String, // resultDetail (JSON), kept name for compatibility but used as detail
+    val inputSnapshot: String = "{}", // New field for input JSON
     val profileId: String?,
     val partnerProfileId: String? = null,
-    val createdAt: Long = System.currentTimeMillis()
+    val createdAt: Long = System.currentTimeMillis(),
+    val expiresAt: Long? = null, // New field for TTL
+    val locale: String = "ko"
 )

@@ -2,18 +2,22 @@ package com.rsr41.oracle.ui.screens
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Pending
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.rsr41.oracle.R
 import com.rsr41.oracle.domain.model.CalendarType
-import com.rsr41.oracle.ui.components.SelectableChipRow
-import androidx.compose.ui.res.stringResource
+import com.rsr41.oracle.ui.components.*
 
 /**
  * 설정 화면
@@ -26,117 +30,106 @@ fun SettingsScreen(
     viewModel: SettingsViewModel,
     onBack: () -> Unit
 ) {
-    Scaffold(
+    OracleScaffold(
         topBar = {
-            TopAppBar(
-                title = { Text(stringResource(R.string.common_settings)) },
-                navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = stringResource(R.string.common_back)
-                        )
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer
-                )
+            OracleTopAppBar(
+                title = stringResource(R.string.common_settings),
+                onBack = onBack
             )
         }
     ) { innerPadding ->
         Column(
             modifier = Modifier
                 .padding(innerPadding)
-                .padding(16.dp)
                 .fillMaxSize()
-                .verticalScroll(rememberScrollState()),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+                .verticalScroll(rememberScrollState())
+                .padding(horizontal = 24.dp),
+            verticalArrangement = Arrangement.spacedBy(24.dp)
         ) {
+            Spacer(modifier = Modifier.height(8.dp))
+
             // 기본 달력 설정
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceVariant
+            OracleCard {
+                OracleSectionTitle(stringResource(R.string.settings_default_calendar_title))
+                Text(
+                    stringResource(R.string.settings_default_calendar_desc),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
                 )
-            ) {
-                Column(modifier = Modifier.padding(16.dp)) {
-                    Text(
-                        stringResource(R.string.settings_default_calendar_title),
-                        style = MaterialTheme.typography.titleMedium,
-                        color = MaterialTheme.colorScheme.primary
-                    )
-                    Text(
-                        stringResource(R.string.settings_default_calendar_desc),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.outline
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    SelectableChipRow(
-                        options = CalendarType.entries.toList(),
-                        selectedOption = viewModel.calendarType,
-                        onOptionSelected = { viewModel.updateCalendarType(it) },
-                        labelProvider = { if (it == CalendarType.SOLAR) stringResource(R.string.settings_calendar_solar) else stringResource(R.string.settings_calendar_lunar) }
-                    )
-                }
+                Spacer(modifier = Modifier.height(16.dp))
+                SelectableChipRow(
+                    options = CalendarType.entries.toList(),
+                    selectedOption = viewModel.calendarType,
+                    onOptionSelected = { viewModel.updateCalendarType(it) },
+                    labelProvider = { if (it == CalendarType.SOLAR) stringResource(R.string.settings_calendar_solar) else stringResource(R.string.settings_calendar_lunar) }
+                )
             }
 
-            // 확장 포인트: 추후 추가할 수 있는 설정 영역
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.surface
-                )
+            // 개인정보 및 유의사항 (NEW: Relocated Face Caution)
+            OracleCard(
+                backgroundColor = MaterialTheme.colorScheme.secondary.copy(alpha = 0.05f)
             ) {
-                Column(modifier = Modifier.padding(16.dp)) {
-                    Text(
-                        stringResource(R.string.settings_upcoming_title),
-                        style = MaterialTheme.typography.titleMedium,
-                        color = MaterialTheme.colorScheme.outline
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text(
-                        stringResource(R.string.settings_upcoming_gender),
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.outline
-                    )
-                    Text(
-                        stringResource(R.string.settings_upcoming_time),
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.outline
-                    )
-                    Text(
-                        stringResource(R.string.settings_upcoming_theme),
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.outline
-                    )
+                OracleSectionTitle(
+                    text = stringResource(R.string.face_privacy_title),
+                    color = MaterialTheme.colorScheme.secondary
+                )
+                Text(
+                    text = stringResource(R.string.face_privacy_desc),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f)
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+                Text(
+                    text = "• 관상 서비스는 오락 목적으로만 제공됩니다.\n• 민감한 개인 속성(인종, 건강 등) 추정은 수행하지 않습니다.",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
+                    lineHeight = 20.sp
+                )
+            }
+
+            // 확장 포인트
+            OracleCard {
+                OracleSectionTitle(stringResource(R.string.settings_upcoming_title))
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    SettingUpcomingItem(stringResource(R.string.settings_upcoming_gender))
+                    SettingUpcomingItem(stringResource(R.string.settings_upcoming_time))
+                    SettingUpcomingItem(stringResource(R.string.settings_upcoming_theme))
                 }
             }
 
             // 앱 정보
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.surface
-                )
-            ) {
-                Column(modifier = Modifier.padding(16.dp)) {
-                    Text(
-                        stringResource(R.string.settings_info_title),
-                        style = MaterialTheme.typography.titleMedium
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text(
-                        stringResource(R.string.settings_info_version),
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.outline
-                    )
+            OracleCard {
+                OracleSectionTitle(stringResource(R.string.settings_info_title))
+                Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                        Text(stringResource(R.string.settings_info_version), style = MaterialTheme.typography.bodyMedium)
+                        Text("v1.0.0", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold)
+                    }
                     Text(
                         stringResource(R.string.settings_info_package),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.outline
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f)
                     )
                 }
             }
+            
+            Spacer(modifier = Modifier.height(32.dp))
         }
+    }
+}
+
+@Composable
+private fun SettingUpcomingItem(text: String) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Icon(Icons.Default.Pending, null, tint = MaterialTheme.colorScheme.outline, modifier = Modifier.size(16.dp))
+        Spacer(modifier = Modifier.width(12.dp))
+        Text(
+            text = text.removePrefix("• "),
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
+        )
     }
 }
