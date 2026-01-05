@@ -101,6 +101,43 @@ fun ResultScreen(
                    }
                 }
 
+                // 행운 아이템 (Lucky)
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    val luckyColor = try {
+                        androidx.compose.ui.graphics.Color(android.graphics.Color.parseColor(result.luckyColor))
+                    } catch (e: Exception) {
+                        MaterialTheme.colorScheme.primary
+                    }
+                    
+                    OracleCard(modifier = Modifier.weight(1f)) {
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                             Text(stringResource(R.string.result_lucky_color), style = MaterialTheme.typography.labelMedium)
+                             Spacer(modifier = Modifier.height(8.dp))
+                             Box(
+                                 modifier = Modifier
+                                     .size(40.dp)
+                                     .background(luckyColor, androidx.compose.foundation.shape.CircleShape)
+                             )
+                        }
+                    }
+                    
+                    OracleCard(modifier = Modifier.weight(1f)) {
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                             Text(stringResource(R.string.result_lucky_number), style = MaterialTheme.typography.labelMedium)
+                             Spacer(modifier = Modifier.height(8.dp))
+                             Text(
+                                 text = "${result.luckyNumber}",
+                                 style = MaterialTheme.typography.headlineMedium,
+                                 fontWeight = FontWeight.Bold,
+                                 color = MaterialTheme.colorScheme.primary
+                             )
+                        }
+                    }
+                }
+
                 // 입력 정보 요약
                 OracleCard {
                     OracleSectionTitle(stringResource(R.string.result_input_summary))

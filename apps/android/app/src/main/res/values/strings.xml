@@ -140,6 +140,11 @@
     <string name="result_not_found">결과를 찾을 수 없습니다</string>
     <string name="result_not_found_desc">입력 화면에서 정보를 입력해주세요</string>
     <string name="result_go_to_input">입력 화면으로</string>
+    <string name="result_lucky_color">🍀 행운의 색상</string>
+    <string name="result_lucky_number">🔢 행운의 숫자</string>
+    
+    <string name="home_lucky_today_title">오늘의 행운 코디</string>
+    <string name="home_lucky_item_fmt">오늘은 \'%1$s\' 색상이 행운을 가져다 줍니다.</string>
     
     <!-- 설정 화면 추가 -->
     <string name="settings_default_calendar_title">기본 달력 설정</string>

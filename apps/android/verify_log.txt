@@ -1,0 +1,216 @@
+﻿--------- beginning of system
+01-05 14:48:47.593   583  1627 I ActivityManager: Force stopping com.rsr41.oracle appid=10205 user=0: from pid 10243
+--------- beginning of main
+01-05 14:48:47.601   961   961 D CarrierSvcBindHelper: onHandleForceStop: [com.rsr41.oracle]
+01-05 14:48:47.601   961   961 D CarrierSvcBindHelper: No carrier app for: 0
+01-05 14:48:47.650   583  1627 W ActivityTaskManager: callingPackage for (uid=2000, pid=10248) has no WPC
+01-05 14:48:47.651   583  1627 W OptProp : Cannot read opt property android.window.PROPERTY_COMPAT_ALLOW_USER_ASPECT_RATIO_OVERRIDE
+01-05 14:48:47.651   583  1627 W OptProp : Cannot read opt property android.window.PROPERTY_COMPAT_ALLOW_USER_ASPECT_RATIO_FULLSCREEN_OVERRIDE
+01-05 14:48:47.651   583  1627 W OptProp : Cannot read opt property android.window.PROPERTY_COMPAT_ALLOW_ORIENTATION_OVERRIDE
+01-05 14:48:47.652   583  1627 V GrammaticalInflectionUtils: AttributionSource: android.content.AttributionSource@68b28588 does not have READ_SYSTEM_GRAMMATICAL_GENDER permission.
+01-05 14:48:47.652   583  1627 W OptProp : Cannot read opt property android.window.PROPERTY_COMPAT_ALLOW_RESIZEABLE_ACTIVITY_OVERRIDES
+01-05 14:48:47.652   583  1627 W OptProp : Cannot read opt property android.window.PROPERTY_COMPAT_ALLOW_MIN_ASPECT_RATIO_OVERRIDE
+01-05 14:48:47.665   583  1627 I ActivityTaskManager: START u0 {flg=0x10000000 cmp=com.rsr41.oracle/.MainActivity} with LAUNCH_MULTIPLE from uid 2000 (BAL_ALLOW_PERMISSION) result code=0
+01-05 14:48:47.666   836   937 V WindowManagerShell: Transition requested (#70): android.os.BinderProxy@cd7b024 TransitionRequestInfo { type = OPEN, triggerTask = TaskInfo{userId=0 taskId=41 displayId=0 isRunning=true baseIntent=Intent { flg=0x10000000 cmp=com.rsr41.oracle/.MainActivity } baseActivity=ComponentInfo{com.rsr41.oracle/com.rsr41.oracle.MainActivity} topActivity=ComponentInfo{com.rsr41.oracle/com.rsr41.oracle.MainActivity} origActivity=null realActivity=ComponentInfo{com.rsr41.oracle/com.rsr41.oracle.MainActivity} numActivities=1 lastActiveTime=4701958 supportsMultiWindow=true resizeMode=1 isResizeable=true minWidth=-1 minHeight=-1 defaultMinSize=220 token=WCT{android.window.IWindowContainerToken$Stub$Proxy@f59278d} topActivityType=1 pictureInPictureParams=null shouldDockBigOverlays=false launchIntoPipHostTaskId=-1 lastParentTaskIdBeforePip=-1 displayCutoutSafeInsets=Rect(0, 136 - 0, 0) topActivityInfo=ActivityInfo{710fd42 com.rsr41.oracle.MainActivity} launchCookies=[] positionInParent=Point(0, 0) parentTaskId=-1 isFocused=false isVisible=false isVisibleRequested=false isSleeping=false locusId=null displayAreaFeatureId=1 isTopActivityTransparent=false appCompatTaskInfo=AppCompatTaskInfo { topActivityInSizeCompat=false topActivityEligibleForLetterboxEducation= falseisLetterboxEducationEnabled= true isLetterboxDoubleTapEnabled= false topActivityEligibleForUserAspectRatioButton= false topActivityBoundsLetterboxed= false isFromLetterboxDoubleTap= false topActivityLetterboxVerticalPosition= -1 topActivityLetterboxHorizontalPosition= -1 topActivityLetterboxWidth=1080 topActivityLetterboxHeight=2400 isUserFullscreenOverrideEnabled=false isSystemFullscreenOverrideEnabled=false cameraCompatTaskInfo=CameraCompatTaskInfo { cameraCompatControlState=hidden freeformCameraCompatMode=inactive}}}, pipTask = null, remoteTransition = null, displayChange = null, flags = 0, debugId = 70 }
+01-05 14:48:47.669   583   611 V GrammaticalInflectionUtils: AttributionSource: android.content.AttributionSource@68b28588 does not have READ_SYSTEM_GRAMMATICAL_GENDER permission.
+01-05 14:48:47.670   490   555 W IPCThreadState: Sending oneway calls to frozen process.
+01-05 14:48:47.672  2570  2570 W SplitSelectStateCtor: Missing session instanceIds
+01-05 14:48:47.673  2570  2570 D StatsLog: LAUNCHER_SPLIT_SELECTION_EXIT_INTERRUPTED
+01-05 14:48:47.682   453   453 I BpBinder: onLastStrongRef automatically unlinking death recipients: 
+01-05 14:48:47.694   836   937 D WindowManagerShell: setLauncherKeepClearAreaHeight: visible=false, height=527
+01-05 14:48:47.694   384   384 D Zygote  : Forked child process 10251
+01-05 14:48:47.695   583   620 I ActivityManager: Start proc 10251:com.rsr41.oracle/u0a205 for next-top-activity {com.rsr41.oracle/com.rsr41.oracle.MainActivity}
+01-05 14:48:47.704 10251 10251 I om.rsr41.oracle: Late-enabling -Xcheck:jni
+01-05 14:48:47.705  2570  2570 I TopTaskTracker: onTaskMovedToFront: (moved taskInfo to front) taskId=41, baseIntent=Intent { flg=0x10000000 cmp=com.rsr41.oracle/.MainActivity }
+01-05 14:48:47.710   583   603 D CoreBackPreview: Window{f5080b7 u0 Splash Screen com.rsr41.oracle}: Setting back callback OnBackInvokedCallbackInfo{mCallback=android.window.IOnBackInvokedCallback$Stub$Proxy@823ba90, mPriority=0, mIsAnimationCallback=false}
+01-05 14:48:47.749 10251 10251 I om.rsr41.oracle: Using CollectorTypeCMC GC.
+01-05 14:48:47.750 10251 10251 W om.rsr41.oracle: Unexpected CPU variant for x86: x86_64.
+01-05 14:48:47.750 10251 10251 W om.rsr41.oracle: Known variants: atom, sandybridge, silvermont, goldmont, goldmont-plus, goldmont-without-sha-xsaves, tremont, kabylake, default
+01-05 14:48:47.758   463   478 I adbd    : jdwp connection from 10251
+01-05 14:48:47.761   583   608 V WindowManager: Sent Transition (#70) createdAt=01-05 14:48:47.653 via request=TransitionRequestInfo { type = OPEN, triggerTask = TaskInfo{userId=0 taskId=41 displayId=0 isRunning=true baseIntent=Intent { flg=0x10000000 cmp=com.rsr41.oracle/.MainActivity } baseActivity=ComponentInfo{com.rsr41.oracle/com.rsr41.oracle.MainActivity} topActivity=ComponentInfo{com.rsr41.oracle/com.rsr41.oracle.MainActivity} origActivity=null realActivity=ComponentInfo{com.rsr41.oracle/com.rsr41.oracle.MainActivity} numActivities=1 lastActiveTime=4701958 supportsMultiWindow=true resizeMode=1 isResizeable=true minWidth=-1 minHeight=-1 defaultMinSize=220 token=WCT{RemoteToken{506829a Task{11e42d5 #41 type=standard A=10205:com.rsr41.oracle}}} topActivityType=1 pictureInPictureParams=null shouldDockBigOverlays=false launchIntoPipHostTaskId=-1 lastParentTaskIdBeforePip=-1 displayCutoutSafeInsets=Rect(0, 136 - 0, 0) topActivityInfo=ActivityInfo{cacb7cb com.rsr41.oracle.MainActivity} launchCookies=[] positionInParent=Point(0, 0) parentTaskId=-1 isFocused=false isVisible=false isVisibleRequested=false isSleeping=false locusId=null displayAreaFeatureId=1 isTopActivityTransparent=false appCompatTaskInfo=AppCompatTaskInfo { topActivityInSizeCompat=false topActivityEligibleForLetterboxEducation= falseisLetterboxEducationEnabled= true isLetterboxDoubleTapEnabled= false topActivityEligibleForUserAspectRatioButton= false topActivityBoundsLetterboxed= false isFromLetterboxDoubleTap= false topActivityLetterboxVerticalPosition= -1 topActivityLetterboxHorizontalPosition= -1 topActivityLetterboxWidth=1080 topActivityLetterboxHeight=2400 isUserFullscreenOverrideEnabled=false isSystemFullscreenOverrideEnabled=false cameraCompatTaskInfo=CameraCompatTaskInfo { cameraCompatControlState=hidden freeformCameraCompatMode=inactive}}}, pipTask = null, remoteTransition = null, displayChange = null, flags = 0, debugId = 70 }
+01-05 14:48:47.761   583   608 V WindowManager:     startWCT=WindowContainerTransaction { changes = {} hops = [] errorCallbackToken=null taskFragmentOrganizer=null }
+01-05 14:48:47.762   583   608 V WindowManager:     info={id=70 t=OPEN f=0x0 trk=0 r=[0@Point(0, 0)] c=[
+01-05 14:48:47.762   583   608 V WindowManager:         {WCT{RemoteToken{506829a Task{11e42d5 #41 type=standard A=10205:com.rsr41.oracle}}} m=OPEN f=NONE leash=Surface(name=Task=41)/@0x9b1efbc sb=Rect(0, 0 - 1080, 2400) eb=Rect(0, 0 - 1080, 2400) d=0 taskParent=-1},
+01-05 14:48:47.762   583   608 V WindowManager:         {WCT{RemoteToken{2f5bbd9 Task{ba57e01 #1 type=home}}} m=TO_BACK f=SHOW_WALLPAPER leash=Surface(name=Task=1)/@0x9c107c6 sb=Rect(0, 0 - 1080, 2400) eb=Rect(0, 0 - 1080, 2400) d=0 taskParent=-1}
+01-05 14:48:47.762   583   608 V WindowManager:     ]}
+01-05 14:48:47.763   836  3167 V WindowManagerShell: onTransitionReady(transaction=2503965937131)
+01-05 14:48:47.765 10251 10251 D nativeloader: Load libframework-connectivity-tiramisu-jni.so using APEX ns com_android_tethering for caller /apex/com.android.tethering/javalib/framework-connectivity-t.jar: ok
+01-05 14:48:47.765   836   937 V WindowManagerShell: onTransitionReady (#70) android.os.BinderProxy@cd7b024: {id=70 t=OPEN f=0x0 trk=0 r=[0@Point(0, 0)] c=[{WCT{android.window.IWindowContainerToken$Stub$Proxy@607afec} m=OPEN f=NONE leash=Surface(name=Task=41)/@0xd4cd7c0 sb=Rect(0, 0 - 1080, 2400) eb=Rect(0, 0 - 1080, 2400) d=0 taskParent=-1},{WCT{android.window.IWindowContainerToken$Stub$Proxy@567ffb5} m=TO_BACK f=SHOW_WALLPAPER leash=Surface(name=Task=1)/@0x1f48cf9 sb=Rect(0, 0 - 1080, 2400) eb=Rect(0, 0 - 1080, 2400) d=0 taskParent=-1}]}
+01-05 14:48:47.766   836   937 V WindowManagerShell: Playing animation for (#70) android.os.BinderProxy@cd7b024@0
+01-05 14:48:47.766   836   937 V WindowManagerShell:  try handler com.android.wm.shell.transition.DefaultMixedHandler@cccf8c2
+01-05 14:48:47.766   836   937 V WindowManagerShell:  try handler com.android.wm.shell.keyguard.KeyguardTransitionHandler@f1d36d3
+01-05 14:48:47.768   836   937 V WindowManagerShell:  try handler com.android.wm.shell.pip.PipTransition@56d210
+01-05 14:48:47.768   836   937 V WindowManagerShell:  try handler com.android.wm.shell.activityembedding.ActivityEmbeddingController@1588109
+01-05 14:48:47.769   836   937 V WindowManagerShell:  try handler com.android.wm.shell.recents.RecentsTransitionHandler@ff5df0e
+01-05 14:48:47.769   836   937 V ShellRecents: RecentsTransitionHandler.startAnimation: no controller found
+01-05 14:48:47.769   836   937 V WindowManagerShell:  try handler com.android.wm.shell.splitscreen.StageCoordinator@87a6d2f
+01-05 14:48:47.769   836   937 V WindowManagerShell:  try handler com.android.wm.shell.transition.RemoteTransitionHandler@abeff3c
+01-05 14:48:47.769   836   937 V WindowManagerShell: Transition doesn't have explicit remote, search filters for match for {id=70 t=OPEN f=0x0 trk=0 r=[0@Point(0, 0)] c=[{WCT{android.window.IWindowContainerToken$Stub$Proxy@607afec} m=OPEN f=NONE leash=Surface(name=Task=41)/@0xd4cd7c0 sb=Rect(0, 0 - 1080, 2400) eb=Rect(0, 0 - 1080, 2400) d=0 taskParent=-1},{WCT{android.window.IWindowContainerToken$Stub$Proxy@567ffb5} m=TO_BACK f=SHOW_WALLPAPER leash=Surface(name=Task=1)/@0x1f48cf9 sb=Rect(0, 0 - 1080, 2400) eb=Rect(0, 0 - 1080, 2400) d=0 taskParent=-1}]}
+01-05 14:48:47.769   836   937 V WindowManagerShell:  Checking filter Pair{{types=[] flags=0x0] notFlags=0x0 checks=[{atype=undefined independent=true modes=[OPEN,TO_FRONT] flags=IN_TASK_WITH_EMBEDDED_ACTIVITY mustBeTask=false order=ANY topActivity=ComponentInfo{com.google.android.apps.nexuslauncher/com.google.android.apps.nexuslauncher.NexusLauncherActivity} launchCookie=null},{atype=undefined independent=true modes=[CLOSE,TO_BACK] flags=IN_TASK_WITH_EMBEDDED_ACTIVITY mustBeTask=false order=ANY topActivity=null launchCookie=null}]} RemoteTransition { remoteTransition = android.window.IRemoteTransition$Stub$Proxy@1299a10, appThread = android.app.IApplicationThread$Stub$Proxy@407a909, debugName = OverlaySwipeBack }}
+01-05 14:48:47.769   836   937 V WindowManagerShell:  Checking filter Pair{{types=[] flags=0x0] notFlags=0x0 checks=[{atype=dream independent=true modes=[OPEN,TO_FRONT] flags=NONE mustBeTask=false order=ANY topActivity=null launchCookie=null},{atype=home independent=true modes=[CLOSE,TO_BACK] flags=NONE mustBeTask=false order=ANY topActivity=null launchCookie=null}]} RemoteTransition { remoteTransition = android.window.IRemoteTransition$Stub$Proxy@2b9e70e, appThread = android.app.IApplicationThread$Stub$Proxy@61d52f, debugName = LauncherToDream }}
+01-05 14:48:47.769   836   937 V WindowManagerShell:  Checking filter Pair{{types=[] flags=0x0] notFlags=0x100 checks=[{atype=home independent=true modes=[OPEN,TO_FRONT] flags=NONE mustBeTask=false order=TOP topActivity=ComponentInfo{com.google.android.apps.nexuslauncher/com.google.android.apps.nexuslauncher.NexusLauncherActivity} launchCookie=null},{atype=standard independent=true modes=[CLOSE,TO_BACK] flags=NONE mustBeTask=false order=ANY topActivity=null launchCookie=null}]} RemoteTransition { remoteTransition = android.window.IRemoteTransition$Stub$Proxy@9f6473c, appThread = android.app.IApplicationThread$Stub$Proxy@bf8ccc5, debugName = QuickstepLaunchHome }}
+01-05 14:48:47.769   836   937 V WindowManagerShell:  Delegate animation for (#70) to null
+01-05 14:48:47.769   836   937 V WindowManagerShell:  try handler com.android.wm.shell.transition.DefaultTransitionHandler@c94d327
+01-05 14:48:47.769   836   937 V WindowManagerShell: start default transition animation, info = {id=70 t=OPEN f=0x0 trk=0 r=[0@Point(0, 0)] c=[{WCT{android.window.IWindowContainerToken$Stub$Proxy@607afec} m=OPEN f=NONE leash=Surface(name=Task=41)/@0xd4cd7c0 sb=Rect(0, 0 - 1080, 2400) eb=Rect(0, 0 - 1080, 2400) d=0 taskParent=-1},{WCT{android.window.IWindowContainerToken$Stub$Proxy@567ffb5} m=TO_BACK f=SHOW_WALLPAPER leash=Surface(name=Task=1)/@0x1f48cf9 sb=Rect(0, 0 - 1080, 2400) eb=Rect(0, 0 - 1080, 2400) d=0 taskParent=-1}]}
+01-05 14:48:47.770   836   937 V WindowManagerShell: loadAnimation: anim=android.view.animation.AnimationSet@82f364a animAttr=0x13 type=OPEN isEntrance=false
+01-05 14:48:47.770   836   937 V WindowManagerShell: loadAnimation: anim=android.view.animation.AnimationSet@5e0d9bb animAttr=0x12 type=OPEN isEntrance=true
+01-05 14:48:47.771   583   953 W UserManagerService: Requested status bar icon for non-badged user 0
+01-05 14:48:47.771   836   937 V WindowManagerShell:  animated by com.android.wm.shell.transition.DefaultTransitionHandler@c94d327
+01-05 14:48:47.790  2570  2612 D EGL_emulation: app_time_stats: avg=23800.92ms min=45.71ms max=47556.14ms count=2
+01-05 14:48:47.796   836  1036 D EGL_emulation: app_time_stats: avg=47673.94ms min=47673.94ms max=47673.94ms count=1
+01-05 14:48:47.810   453   453 E SurfaceFlinger: Out of order buffers detected for RequestedLayerState{com.google.android.apps.nexuslauncher/com.google.android.apps.nexuslauncher.NexusLauncherActivity#428 parentId=116} producedId=26 frameNumber=55 -> producedId=26 frameNumber=21
+01-05 14:48:47.840   453   453 E SurfaceFlinger: Out of order buffers detected for RequestedLayerState{com.google.android.apps.nexuslauncher/com.google.android.apps.nexuslauncher.NexusLauncherActivity#428 parentId=116} producedId=26 frameNumber=55 -> producedId=26 frameNumber=22
+01-05 14:48:47.846 10251 10251 W ziparchive: Unable to open '/data/app/~~y-maAyGjsOxiOO0ODgAOfg==/com.rsr41.oracle-D0NSBLbDp2zkkLTuyAjzjQ==/base.dm': No such file or directory
+01-05 14:48:47.846 10251 10251 W ziparchive: Unable to open '/data/app/~~y-maAyGjsOxiOO0ODgAOfg==/com.rsr41.oracle-D0NSBLbDp2zkkLTuyAjzjQ==/base.dm': No such file or directory
+01-05 14:48:47.890  2570  2612 D EGL_emulation: app_time_stats: avg=22639.34ms min=2.11ms max=180791.81ms count=8
+01-05 14:48:47.897   453   453 E SurfaceFlinger: Out of order buffers detected for RequestedLayerState{com.google.android.apps.nexuslauncher/com.google.android.apps.nexuslauncher.NexusLauncherActivity#428 parentId=116} producedId=26 frameNumber=55 -> producedId=26 frameNumber=23
+01-05 14:48:47.929   453   453 E SurfaceFlinger: Out of order buffers detected for RequestedLayerState{com.google.android.apps.nexuslauncher/com.google.android.apps.nexuslauncher.NexusLauncherActivity#428 parentId=116} producedId=26 frameNumber=55 -> producedId=26 frameNumber=24
+01-05 14:48:48.061   836   937 V WindowManagerShell: Transition animation finished (aborted=false), notifying core (#70) android.os.BinderProxy@cd7b024@0
+01-05 14:48:48.063   583   608 V WindowManager: Finish Transition (#70): created at 01-05 14:48:47.653 collect-started=0.046ms request-sent=8.778ms started=20.33ms ready=104.965ms sent=107.732ms finished=409.024ms
+01-05 14:48:48.067   836   937 V WindowManagerShell: Track 0 became idle
+01-05 14:48:48.067   836   937 V WindowManagerShell: All active transition animations finished
+01-05 14:48:48.067   583   603 W UserManagerService: Requested status bar icon for non-badged user 0
+01-05 14:48:48.072   583   603 W UserManagerService: Requested status bar icon for non-badged user 0
+01-05 14:48:48.119  2570  2570 D VRI[NexusLauncherActivity]: visibilityChanged oldVisibility=true newVisibility=false
+01-05 14:48:48.120  2570  2570 D NexusLauncherModelDelegate: notifySmartspaceEvent: SmartspaceTargetEvent{mSmartspaceTarget=null, mSmartspaceActionId='null', mEventType=7}
+01-05 14:48:48.436 10251 10251 D nativeloader: Configuring clns-7 for other apk /data/app/~~y-maAyGjsOxiOO0ODgAOfg==/com.rsr41.oracle-D0NSBLbDp2zkkLTuyAjzjQ==/base.apk. target_sdk_version=36, uses_libraries=, library_path=/data/app/~~y-maAyGjsOxiOO0ODgAOfg==/com.rsr41.oracle-D0NSBLbDp2zkkLTuyAjzjQ==/lib/x86_64:/data/app/~~y-maAyGjsOxiOO0ODgAOfg==/com.rsr41.oracle-D0NSBLbDp2zkkLTuyAjzjQ==/base.apk!/lib/x86_64, permitted_path=/data:/mnt/expand:/data/user/0/com.rsr41.oracle
+01-05 14:48:48.462 10251 10251 V GraphicsEnvironment: Currently set values for:
+01-05 14:48:48.462 10251 10251 V GraphicsEnvironment:   angle_gl_driver_selection_pkgs=[]
+01-05 14:48:48.462 10251 10251 V GraphicsEnvironment:   angle_gl_driver_selection_values=[]
+01-05 14:48:48.462 10251 10251 V GraphicsEnvironment: Global.Settings values are invalid: number of packages: 0, number of values: 0
+01-05 14:48:48.462 10251 10251 V GraphicsEnvironment: Neither updatable production driver nor prerelease driver is supported.
+01-05 14:48:48.481 10251 10251 D WM-WrkMgrInitializer: Initializing WorkManager with default configuration.
+01-05 14:48:48.555 10251 10251 D WM-PackageManagerHelper: Skipping component enablement for androidx.work.impl.background.systemjob.SystemJobService
+01-05 14:48:48.555 10251 10251 D WM-Schedulers: Created SystemJobScheduler and enabled SystemJobService
+01-05 14:48:48.704 10251 10251 D HistoryCleanupWorker$Companion: HistoryCleanupWorker scheduled with 14 days retention
+01-05 14:48:48.705 10251 10251 D OracleApplication: OracleApplication initialized
+01-05 14:48:48.706   583   603 W OptProp : Cannot read opt property android.window.PROPERTY_COMPAT_ENABLE_FAKE_FOCUS
+01-05 14:48:48.825 10251 10251 D MainActivity: MainActivity created, deepLinkToken: null
+01-05 14:48:48.841 10251 10269 E WM-WorkerFactory: Could not instantiate com.rsr41.oracle.core.worker.HistoryCleanupWorker
+01-05 14:48:48.841 10251 10269 E WM-WorkerFactory: java.lang.NoSuchMethodException: com.rsr41.oracle.core.worker.HistoryCleanupWorker.<init> [class android.content.Context, class androidx.work.WorkerParameters]
+01-05 14:48:48.841 10251 10269 E WM-WorkerFactory: 	at java.lang.Class.getConstructor0(Class.java:3395)
+01-05 14:48:48.841 10251 10269 E WM-WorkerFactory: 	at java.lang.Class.getDeclaredConstructor(Class.java:3077)
+01-05 14:48:48.841 10251 10269 E WM-WorkerFactory: 	at androidx.work.WorkerFactory.createWorkerWithDefaultFallback(WorkerFactory.java:94)
+01-05 14:48:48.841 10251 10269 E WM-WorkerFactory: 	at androidx.work.impl.WorkerWrapper.runWorker(WorkerWrapper.java:243)
+01-05 14:48:48.841 10251 10269 E WM-WorkerFactory: 	at androidx.work.impl.WorkerWrapper.run(WorkerWrapper.java:144)
+01-05 14:48:48.841 10251 10269 E WM-WorkerFactory: 	at androidx.work.impl.utils.SerialExecutorImpl$Task.run(SerialExecutorImpl.java:96)
+01-05 14:48:48.841 10251 10269 E WM-WorkerFactory: 	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1145)
+01-05 14:48:48.841 10251 10269 E WM-WorkerFactory: 	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:644)
+01-05 14:48:48.841 10251 10269 E WM-WorkerFactory: 	at java.lang.Thread.run(Thread.java:1012)
+01-05 14:48:48.841 10251 10269 E WM-WorkerWrapper: Could not create Worker com.rsr41.oracle.core.worker.HistoryCleanupWorker
+01-05 14:48:48.870 10251 10251 W HWUI    : Unknown dataspace 0
+01-05 14:48:49.202 10251 10256 I om.rsr41.oracle: Compiler allocated 5174KB to compile void android.view.ViewRootImpl.performTraversals()
+01-05 14:48:49.277 10251 10251 W om.rsr41.oracle: Accessing hidden method Landroid/os/SystemProperties;->addChangeCallback(Ljava/lang/Runnable;)V (unsupported, reflection, allowed)
+01-05 14:48:49.485 10251 10251 D HistoryViewModel: Loaded history: 0 records
+01-05 14:48:49.487 10251 10251 D PreferencesManager: Loaded default calendar type: SOLAR
+01-05 14:48:49.488 10251 10251 D SettingsViewModel: Loaded settings: calendarType=SOLAR, faceConsent=false
+01-05 14:48:49.565   583   603 D CoreBackPreview: Window{55298ee u0 com.rsr41.oracle/com.rsr41.oracle.MainActivity}: Setting back callback OnBackInvokedCallbackInfo{mCallback=android.window.IOnBackInvokedCallback$Stub$Proxy@509f7ab, mPriority=0, mIsAnimationCallback=false}
+01-05 14:48:49.737   961   961 D CarrierSvcBindHelper: onPackageModified: com.rsr41.oracle
+01-05 14:48:49.737   961   961 D CarrierSvcBindHelper: No carrier app for: 0
+01-05 14:48:49.740   583   781 D ShortcutService: received package broadcast intent: Intent { act=android.intent.action.PACKAGE_CHANGED dat=package: flg=0x45000010 (has extras) }
+01-05 14:48:49.740   583   781 D ShortcutService: changing package: com.rsr41.oracle userId0
+01-05 14:48:49.741   583   781 D ShortcutService: handlePackageChanged: com.rsr41.oracle user=0
+01-05 14:48:49.741   583   781 D ShortcutService: rescanPackageIfNeeded 0@com.rsr41.oracle, forceRescan=true , isNewApp=true
+01-05 14:48:49.741   583   781 D ShortcutService: Package com.rsr41.oracle has 0 manifest shortcut(s), and 0 share target(s)
+01-05 14:48:49.746   836   836 D ControlsListingControllerImpl: ServiceConfig reloaded, count: 0
+01-05 14:48:49.751   961   961 E SmsApplication: com.google.android.apps.messaging lost android:read_cell_broadcasts:  (fixing)
+01-05 14:48:49.752   583   815 D ActivityManager: sync unfroze 5369 com.google.android.permissioncontroller for 6
+01-05 14:48:49.752   583   953 W AppOpService: Ignored setUidMode call for runtime permission app op: uid = 10141, code = READ_CELL_BROADCASTS, mode = allow, callingUid = 1001, oldMode = allow
+01-05 14:48:49.757  5369  7358 I PermissionControllerServiceImpl: Updating user sensitive for uid 10205
+01-05 14:48:49.760   961   961 E CellBroadcastUtils: getDefaultCellBroadcastReceiverPackageName: no package found
+01-05 14:48:49.760   583  1432 W AppOpService: Ignored setUidMode call for runtime permission app op: uid = 1001, code = READ_SMS, mode = allow, callingUid = 1001, oldMode = allow
+01-05 14:48:49.762   583  1432 W AppOpService: Ignored setUidMode call for runtime permission app op: uid = 1001, code = RECEIVE_SMS, mode = allow, callingUid = 1001, oldMode = allow
+01-05 14:48:49.763   583  1432 W AppOpService: Ignored setUidMode call for runtime permission app op: uid = 1001, code = RECEIVE_WAP_PUSH, mode = allow, callingUid = 1001, oldMode = allow
+01-05 14:48:49.763   583  1432 W AppOpService: Ignored setUidMode call for runtime permission app op: uid = 1001, code = SEND_SMS, mode = allow, callingUid = 1001, oldMode = allow
+01-05 14:48:49.763   583  1432 W AppOpService: Ignored setUidMode call for runtime permission app op: uid = 1001, code = READ_CELL_BROADCASTS, mode = allow, callingUid = 1001, oldMode = allow
+01-05 14:48:49.768   961  1161 D ImsResolver: maybeAddedImsService, packageName: com.rsr41.oracle
+01-05 14:48:49.773   583   618 W MagnificationConnectionManager: requestConnection duplicated request: connect=false, mConnectionState=DISCONNECTED
+01-05 14:48:49.773   583   583 W IPCThreadState: Sending oneway calls to frozen process.
+01-05 14:48:49.773   583   583 W IPCThreadState: Sending oneway calls to frozen process.
+01-05 14:48:49.773   583   583 W IPCThreadState: Sending oneway calls to frozen process.
+01-05 14:48:49.773   583   583 W IPCThreadState: Sending oneway calls to frozen process.
+01-05 14:48:49.775  2570  2630 D PackageUpdatedTask: Package updated: mOp=UPDATE packages=[com.rsr41.oracle]
+01-05 14:48:49.775  5229  5229 I AiAiEcho: AppFetcherImpl onPackageChanged com.rsr41.oracle.
+01-05 14:48:49.776  5229 10132 I AiAiEcho: AppIndexer Package:[com.rsr41.oracle] UserProfile:[0] Enabled:[true].
+01-05 14:48:49.777  5229 10132 I AiAiEcho: AppFetcherImplV2 updateApps package:[com.rsr41.oracle], userId:[0], reason:[package is updated.].
+01-05 14:48:49.799  2570  2570 D StatsLog: LAUNCHER_ALLAPPS_COUNT
+01-05 14:48:49.962   453   526 W ServiceManagerCppClient: Permission failure: android.permission.ACCESS_SURFACE_FLINGER from uid=10205 pid=0
+01-05 14:48:49.963   453   526 D PermissionCache: checking android.permission.ACCESS_SURFACE_FLINGER for uid=10205 => denied (295 us)
+01-05 14:48:49.963   453   526 W ServiceManagerCppClient: Permission failure: android.permission.ROTATE_SURFACE_FLINGER from uid=10205 pid=0
+01-05 14:48:49.963   453   526 D PermissionCache: checking android.permission.ROTATE_SURFACE_FLINGER for uid=10205 => denied (240 us)
+01-05 14:48:49.963   453   526 W ServiceManagerCppClient: Permission failure: android.permission.INTERNAL_SYSTEM_WINDOW from uid=10205 pid=0
+01-05 14:48:49.963   453   526 D PermissionCache: checking android.permission.INTERNAL_SYSTEM_WINDOW for uid=10205 => denied (171 us)
+01-05 14:48:49.964 10251 10270 I EGL_emulation: Opening libGLESv1_CM_emulation.so
+01-05 14:48:49.965 10251 10270 I EGL_emulation: Opening libGLESv2_emulation.so
+01-05 14:48:49.972 10251 10270 W HWUI    : Failed to initialize 101010-2 format, error = EGL_SUCCESS
+01-05 14:48:50.033   171   171 I hwservicemanager: getTransport: Cannot find entry android.hardware.graphics.mapper@4.0::IMapper/default in either framework or device VINTF manifest.
+01-05 14:48:50.033 10251 10270 I Gralloc4: mapper 4.x is not supported
+01-05 14:48:50.357   583  1432 W ServiceManagerCppClient: Permission failure: android.permission.ACCESS_SURFACE_FLINGER from uid=10205 pid=0
+01-05 14:48:50.357   583  1432 D PermissionCache: checking android.permission.ACCESS_SURFACE_FLINGER for uid=10205 => denied (314 us)
+01-05 14:48:50.357   583  1432 W ServiceManagerCppClient: Permission failure: android.permission.ROTATE_SURFACE_FLINGER from uid=10205 pid=0
+01-05 14:48:50.357   583  1432 D PermissionCache: checking android.permission.ROTATE_SURFACE_FLINGER for uid=10205 => denied (84 us)
+01-05 14:48:50.357   583  1432 W ServiceManagerCppClient: Permission failure: android.permission.INTERNAL_SYSTEM_WINDOW from uid=10205 pid=0
+01-05 14:48:50.357   583  1432 D PermissionCache: checking android.permission.INTERNAL_SYSTEM_WINDOW for uid=10205 => denied (74 us)
+01-05 14:48:50.377 10251 10262 I HWUI    : Davey! duration=1484ms; Flags=1, FrameTimelineVsyncId=93538, IntendedVsync=4703170897734, Vsync=4703170897734, InputEventId=0, HandleInputStart=4703181642600, AnimationStart=4703181655300, PerformTraversalsStart=4703181673900, DrawStart=4704344762100, FrameDeadline=4703187564400, FrameInterval=4703181634600, FrameStartTime=16666666, SyncQueued=4704372791400, SyncStart=4704373155900, IssueDrawCommandsStart=4704374704700, SwapBuffers=4704576426800, FrameCompleted=4704655687600, DequeueBufferDuration=19000, QueueBufferDuration=262100, GpuCompleted=4704655687600, SwapBuffersCompleted=4704649309000, DisplayPresentTime=0, CommandSubmissionCompleted=4704576426800, 
+01-05 14:48:50.381   583   608 W ziparchive: Unable to open '/data/app/~~y-maAyGjsOxiOO0ODgAOfg==/com.rsr41.oracle-D0NSBLbDp2zkkLTuyAjzjQ==/base.dm': No such file or directory
+01-05 14:48:50.383   583   608 I ActivityTaskManager: Displayed com.rsr41.oracle/.MainActivity for user 0: +2s726ms
+01-05 14:48:50.384 10251 10251 I Choreographer: Skipped 85 frames!  The application may be doing too much work on its main thread.
+01-05 14:48:50.423   583  1432 W JobScheduler: Job didn't exist in JobStore: ea3029f #u0a205/19 com.rsr41.oracle/androidx.work.impl.background.systemjob.SystemJobService
+01-05 14:48:50.463  5701  5755 I FontLog : (REDACTED) Received query %s, URI %s
+01-05 14:48:50.464  5701  5755 I FontLog : (REDACTED) Query [%s] resolved to %s
+01-05 14:48:50.474   583   698 I ImeTracker: com.rsr41.oracle:39fac557: onRequestHide at ORIGIN_SERVER reason HIDE_UNSPECIFIED_WINDOW fromUser false
+01-05 14:48:50.474   583   698 I ImeTracker: com.rsr41.oracle:39fac557: onCancelled at PHASE_SERVER_SHOULD_HIDE
+01-05 14:48:50.480  5701  5755 I FontLog : (REDACTED) Fetch %s end status %s
+01-05 14:48:50.485  5701  5886 I FontLog : (REDACTED) Pulling font file for id = %d, cache size = %d
+01-05 14:48:50.496  5701  5886 I FontLog : (REDACTED) Pulling font file for id = %d, cache size = %d
+01-05 14:48:50.540  2570  2570 D BaseDepthController: setSurface:
+01-05 14:48:50.540  2570  2570 D BaseDepthController: 	mWaitingOnSurfaceValidity: false
+01-05 14:48:50.540  2570  2570 D BaseDepthController: 	mSurface: null
+01-05 14:48:50.540  2570  2570 D BaseDepthController: mSurface is null and mCurrentBlur is: 0
+01-05 14:48:50.542  2570  2570 D StateManager: goToState - fromState: Normal, toState: Normal, partial trace:
+01-05 14:48:50.542  2570  2570 D StateManager: 	at com.android.launcher3.statemanager.StateManager.moveToRestState(go/retraceme 2855a437b73635ce9cad76b9289087e631bbb67fc90008a0da13d343a00e5041:4)
+01-05 14:48:50.542  2570  2570 D StateManager: 	at com.android.launcher3.statemanager.StateManager.moveToRestState(go/retraceme 2855a437b73635ce9cad76b9289087e631bbb67fc90008a0da13d343a00e5041:1)
+01-05 14:48:50.542  2570  2570 D StateManager: 	at com.android.launcher3.statemanager.StatefulActivity.onStop(go/retraceme 2855a437b73635ce9cad76b9289087e631bbb67fc90008a0da13d343a00e5041:34)
+01-05 14:48:50.542  2570  2570 D StatsLog: LAUNCHER_ONSTOP
+01-05 14:48:50.544  2570  2570 D StatsLog: LAUNCHER_GOOGLE_SEARCH_RESTORE_LIST_SIZE_AFTER_ACTIVITY_RESTART
+01-05 14:48:50.546  2570  2745 D OneSearchSuggestProvider: Shut down the binder channel
+01-05 14:48:50.587  5668  5668 I GoogleInputMethodService: GoogleInputMethodService.onFinishInput():3157 
+01-05 14:48:50.593  5668  5668 I GoogleInputMethodService: GoogleInputMethodService.updateDeviceLockedStatus():2248 repeatCheckTimes = 0, locked = false
+01-05 14:48:50.594  5668  5668 I GoogleInputMethodService: GoogleInputMethodService.onStartInput():1986 onStartInput(EditorInfo{EditorInfo{packageName=com.rsr41.oracle, inputType=0, inputTypeString=NULL, enableLearning=false, autoCorrection=false, autoComplete=false, imeOptions=0, privateImeOptions=null, actionName=UNSPECIFIED, actionLabel=null, initialSelStart=-1, initialSelEnd=-1, initialCapsMode=0, label=null, fieldId=0, fieldName=null, extras=null, hintText=null, hintLocales=[]}}, false)
+01-05 14:48:50.602  5668  5668 I GoogleInputMethodService: GoogleInputMethodService.updateDeviceLockedStatus():2248 repeatCheckTimes = 1, locked = false
+01-05 14:48:50.602  5668  5668 I AndroidIME: InputBundleManager.loadActiveInputBundleId():450 loadActiveInputBundleId: und-Latn-x-password, password
+01-05 14:48:50.605   583  1432 W PackageConfigPersister: App-specific configuration not found for packageName: com.rsr41.oracle and userId: 0
+01-05 14:48:50.777   490   555 W IPCThreadState: Sending oneway calls to frozen process.
+01-05 14:48:50.799   836  1011 W WindowOnBackDispatcher: sendCancelIfRunning: isInProgress=false callback=android.view.ViewRootImpl$$ExternalSyntheticLambda11@34db5a7
+01-05 14:48:50.800   583  1627 D CoreBackPreview: Window{f5080b7 u0 Splash Screen com.rsr41.oracle EXITING}: Setting back callback null
+01-05 14:48:50.801   583  1432 W InputManager-JNI: Input channel object 'f5080b7 Splash Screen com.rsr41.oracle (client)' was disposed without first being removed with the input manager!
+01-05 14:48:50.850   836  1011 W FrameTracker: Missed App frame:UNKNOWN: 10, 93625, 0, CUJ=J<SPLASHSCREEN_EXIT_ANIM>
+01-05 14:48:50.850   836  1011 W FrameTracker: Missed SF frame:UNKNOWN: 10, 93625, 0, CUJ=J<SPLASHSCREEN_EXIT_ANIM>
+01-05 14:48:50.850   836  1011 W FrameTracker: Missing HWUI jank callback for vsyncId: 93625, CUJ=J<SPLASHSCREEN_EXIT_ANIM>
+01-05 14:48:50.850   836  1011 W FrameTracker: Missed App frame:UNKNOWN: 10, 93652, 0, CUJ=J<SPLASHSCREEN_EXIT_ANIM>
+01-05 14:48:50.851   836  1011 W FrameTracker: Missed SF frame:UNKNOWN: 10, 93652, 0, CUJ=J<SPLASHSCREEN_EXIT_ANIM>
+01-05 14:48:50.851   836  1011 W FrameTracker: Missing HWUI jank callback for vsyncId: 93652, CUJ=J<SPLASHSCREEN_EXIT_ANIM>
+01-05 14:48:50.851   836  1011 W FrameTracker: Missed SF frame:UNKNOWN: 66, 93659, 48607928, CUJ=J<SPLASHSCREEN_EXIT_ANIM>
+01-05 14:48:50.851   836  1011 W FrameTracker: Missed SF frame:UNKNOWN: 66, 93667, 0, CUJ=J<SPLASHSCREEN_EXIT_ANIM>
+01-05 14:48:50.851   836  1011 W FrameTracker: Missing HWUI jank callback for vsyncId: 93667, CUJ=J<SPLASHSCREEN_EXIT_ANIM>
+01-05 14:48:50.851   836  1011 W FrameTracker: Missed App frame:UNKNOWN: 74, 93681, 0, CUJ=J<SPLASHSCREEN_EXIT_ANIM>
+01-05 14:48:50.851   836  1011 W FrameTracker: Missed SF frame:UNKNOWN: 74, 93681, 0, CUJ=J<SPLASHSCREEN_EXIT_ANIM>
+01-05 14:48:50.851   836  1011 W FrameTracker: Missing HWUI jank callback for vsyncId: 93681, CUJ=J<SPLASHSCREEN_EXIT_ANIM>
+01-05 14:48:50.851   836  1011 W FrameTracker: Missed App frame:UNKNOWN: 74, 93689, 122594830, CUJ=J<SPLASHSCREEN_EXIT_ANIM>
+01-05 14:48:50.851   836  1011 W FrameTracker: Missed SF frame:UNKNOWN: 74, 93689, 122594830, CUJ=J<SPLASHSCREEN_EXIT_ANIM>
+01-05 14:48:50.851   836  1011 W FrameTracker: Missed App frame:UNKNOWN: 74, 93697, 106610332, CUJ=J<SPLASHSCREEN_EXIT_ANIM>
+01-05 14:48:50.851   836  1011 W FrameTracker: Missed SF frame:UNKNOWN: 74, 93697, 106610332, CUJ=J<SPLASHSCREEN_EXIT_ANIM>
+01-05 14:48:50.851   836  1011 W FrameTracker: Missed App frame:UNKNOWN: 74, 93713, 88726734, CUJ=J<SPLASHSCREEN_EXIT_ANIM>
+01-05 14:48:50.851   836  1011 W FrameTracker: Missed SF frame:UNKNOWN: 74, 93713, 88726734, CUJ=J<SPLASHSCREEN_EXIT_ANIM>
+01-05 14:48:50.851   836  1011 W FrameTracker: Missed App frame:UNKNOWN: 74, 93729, 86729902, CUJ=J<SPLASHSCREEN_EXIT_ANIM>
+01-05 14:48:50.851   836  1011 W FrameTracker: Missed SF frame:UNKNOWN: 74, 93729, 86729902, CUJ=J<SPLASHSCREEN_EXIT_ANIM>
+01-05 14:48:50.851   836  1011 W FrameTracker: Missed App frame:UNKNOWN: 74, 93743, 84852170, CUJ=J<SPLASHSCREEN_EXIT_ANIM>
+01-05 14:48:50.851   836  1011 W FrameTracker: Missed SF frame:UNKNOWN: 74, 93743, 84852170, CUJ=J<SPLASHSCREEN_EXIT_ANIM>
+01-05 14:48:50.851   836  1011 W FrameTracker: Missed App frame:UNKNOWN: 74, 93751, 83292738, CUJ=J<SPLASHSCREEN_EXIT_ANIM>
+01-05 14:48:50.851   836  1011 W FrameTracker: Missed SF frame:UNKNOWN: 74, 93751, 83292738, CUJ=J<SPLASHSCREEN_EXIT_ANIM>
+01-05 14:48:50.851   836  1011 W FrameTracker: Missed App frame:UNKNOWN: 74, 93759, 0, CUJ=J<SPLASHSCREEN_EXIT_ANIM>
+01-05 14:48:50.851   836  1011 W FrameTracker: Missed SF frame:UNKNOWN: 74, 93759, 0, CUJ=J<SPLASHSCREEN_EXIT_ANIM>
+01-05 14:48:50.851   836  1011 W FrameTracker: Missing HWUI jank callback for vsyncId: 93759, CUJ=J<SPLASHSCREEN_EXIT_ANIM>
+01-05 14:48:50.923   583   682 D ActivityManager: freezing 5363 com.google.android.gms.unstable
+01-05 14:48:51.174   583  1405 E TaskPersister: File error accessing recents directory (directory doesn't exist?).
+01-05 14:48:52.432  5598  5661 I BistoHotwordHelper: (REDACTED) getHotwordActive::active query: %s, watch: %s, devices connected: %s

@@ -22,9 +22,7 @@ class SettingsViewModel @Inject constructor(
     var calendarType by mutableStateOf(CalendarType.SOLAR)
         private set
 
-    init {
-        loadSettings()
-    }
+
 
     fun updateCalendarType(newType: CalendarType) {
         calendarType = newType
@@ -46,5 +44,9 @@ class SettingsViewModel @Inject constructor(
         calendarType = repository.loadDefaultCalendarType()
         faceConsent = repository.getFaceConsent()
         Log.d(TAG, "Loaded settings: calendarType=$calendarType, faceConsent=$faceConsent")
+    }
+
+    init {
+        loadSettings()
     }
 }

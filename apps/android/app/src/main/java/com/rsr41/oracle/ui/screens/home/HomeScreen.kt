@@ -1,5 +1,6 @@
 package com.rsr41.oracle.ui.screens.home
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
@@ -62,6 +63,11 @@ fun HomeScreen(
                 TodayFortuneCard(
                     onClick = onNavigateToInput
                 )
+            }
+
+            // Daily Lucky Color (New)
+            item {
+                DailyLuckyCard()
             }
 
             // Menu Section
@@ -206,6 +212,49 @@ private fun FeatureItem(
                 title,
                 style = MaterialTheme.typography.titleMedium,
                 textAlign = TextAlign.Center
+            )
+        }
+    }
+}
+
+@Composable
+private fun DailyLuckyCard() {
+    // Simple deterministic daily color
+    val today = java.time.LocalDate.now()
+    val colors = listOf(
+        "황금색" to androidx.compose.ui.graphics.Color(0xFFFFD700),
+        "붉은색" to androidx.compose.ui.graphics.Color(0xFFFF4500),
+        "파란색" to androidx.compose.ui.graphics.Color(0xFF4169E1),
+        "초록색" to androidx.compose.ui.graphics.Color(0xFF228B22),
+        "은색" to androidx.compose.ui.graphics.Color(0xFFC0C0C0)
+    )
+    val index = Math.abs(today.hashCode()) % colors.size
+    val (colorName, colorValue) = colors[index]
+
+    OracleCard(
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    stringResource(R.string.home_lucky_today_title),
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.primary
+                )
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    stringResource(R.string.home_lucky_item_fmt, colorName),
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
+            Box(
+                modifier = Modifier
+                    .size(48.dp)
+                    .background(colorValue, androidx.compose.foundation.shape.CircleShape)
             )
         }
     }

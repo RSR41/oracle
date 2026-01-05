@@ -72,9 +72,20 @@ class BuildMockSajuUseCase {
             시주: ${if (birthInfo.time.isNotBlank()) getPillar() else "미입력"} (Your Time)
         """.trimIndent()
 
+        val luckyColors = listOf(
+            "#FFD700" to "황금", // Gold
+            "#FF4500" to "주황", // Red-Orange
+            "#4169E1" to "파랑", // Royal Blue
+            "#228B22" to "초록", // Forest Green
+            "#C0C0C0" to "은색"  // Silver
+        )
+        val selectedColor = luckyColors[random.nextInt(luckyColors.size)]
+        
         return SajuResult(
             summaryToday = summaryToday,
             pillars = pillars,
+            luckyColor = selectedColor.first,
+            luckyNumber = random.nextInt(9) + 1,
             generatedAtMillis = System.currentTimeMillis()
         )
     }
