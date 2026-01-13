@@ -13,6 +13,7 @@ import com.rsr41.oracle.ui.screens.fortune.FortuneScreen
 import com.rsr41.oracle.ui.screens.compatibility.CompatibilityScreen
 import com.rsr41.oracle.ui.screens.face.FaceReadingScreen
 import com.rsr41.oracle.ui.screens.tarot.TarotScreen
+import com.rsr41.oracle.ui.screens.dream.DreamScreen
 import com.rsr41.oracle.ui.screens.fortune.FortuneViewModel
 import com.rsr41.oracle.ui.screens.face.FaceViewModel
 import com.rsr41.oracle.ui.screens.compatibility.CompatibilityViewModel
@@ -30,6 +31,7 @@ object Routes {
     const val COMPATIBILITY = "COMPATIBILITY"
     const val FACE = "FACE"
     const val TAROT = "TAROT"
+    const val DREAM = "DREAM"
 }
 
 /**
@@ -78,7 +80,8 @@ fun OracleNavHost(
                     navController.navigate(Routes.COMPATIBILITY) 
                 },
                 onNavigateToFace = { navController.navigate(Routes.FACE) },
-                onNavigateToTarot = { navController.navigate(Routes.TAROT) }
+                onNavigateToTarot = { navController.navigate(Routes.TAROT) },
+                onNavigateToDream = { navController.navigate(Routes.DREAM) }
             )
         }
         
@@ -166,6 +169,10 @@ fun OracleNavHost(
         
         composable(Routes.TAROT) {
             TarotScreen(onBack = { navController.popBackStack() })
+        }
+        
+        composable(Routes.DREAM) {
+            DreamScreen(onBack = { navController.popBackStack() })
         }
     }
 }

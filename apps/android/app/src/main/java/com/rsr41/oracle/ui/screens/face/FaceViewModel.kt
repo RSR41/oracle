@@ -1,24 +1,33 @@
 package com.rsr41.oracle.ui.screens.face
 
+import android.content.Context
 import android.net.Uri
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.rsr41.oracle.data.local.OracleDatabase
+import com.rsr41.oracle.data.local.entity.FaceAnalysisResultEntity
+import com.rsr41.oracle.domain.engine.FaceAnalyzer
 import com.rsr41.oracle.domain.model.HistoryRecord
 import com.rsr41.oracle.domain.model.HistoryType
 import com.rsr41.oracle.repository.SajuRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.delay
+import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.util.UUID
 import javax.inject.Inject
 
 @HiltViewModel
 class FaceViewModel @Inject constructor(
-    private val repository: SajuRepository
+    private val repository: SajuRepository,
+    @ApplicationContext private val context: Context
 ) : ViewModel() {
+
+    private val faceAnalyzer = FaceAnalyzer(context)
+    private val faceAnalysisDao = OracleDatabase.getInstance(context).faceAnalysisDao()
 
     var hasConsented by mutableStateOf(false)
         private set
@@ -33,6 +42,12 @@ class FaceViewModel @Inject constructor(
         private set
 
     var analysisResult by mutableStateOf("")
+        private set
+    
+    var analysisResultEntity by mutableStateOf<FaceAnalysisResultEntity?>(null)
+        private set
+    
+    var errorMessage by mutableStateOf<String?>(null)
         private set
 
     init {
@@ -51,53 +66,53 @@ class FaceViewModel @Inject constructor(
     fun onImageSelected(uri: Uri?) {
         selectedImageUri = uri
         isAnalyzed = false
+        errorMessage = null
     }
 
     fun analyze() {
-        if (selectedImageUri == null) return
+        val uri = selectedImageUri ?: return
         
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             isAnalyzing = true
-            delay(2000) // Simulate processing time
+            errorMessage = null
             
-            // Mock Analysis (Neutral, Non-sensitive)
-            // In real app, this would process the file at 'selectedImageUri'
-            // and THEN DELETE IT immediately.
-            
-            analysisResult = """
-                [관상 분석 결과]
+            try {
+                // ML Kit을 사용한 실제 얼굴 분석
+                val result = faceAnalyzer.analyzeFromUri(uri)
                 
-                품질: 양호 (OK)
-                분위기: 차분함 (Calm), 신뢰감 (Trustworthy)
-                
-                [대화/첫인상 팁]
-                눈매가 부드러워 상대방에게 편안한 인상을 줍니다.
-                대화 시 미소를 유지하면 더욱 좋은 관계를 형성할 수 있습니다.
-                이마가 단정하여 논리적인 이미지를 풍깁니다.
-                
-                *본 결과는 오락 목적으로 제공되며 과학적 근거가 없습니다.
-                *사진은 분석 후 즉시 삭제되었습니다.
-            """.trimIndent()
-            
-            // Delete simulated temp file (Conceptual)
-            selectedImageUri = null // Remove reference from UI immediately
-            
-            isAnalyzing = false
-            isAnalyzed = true
-            
-            saveHistory()
+                if (result != null) {
+                    analysisResultEntity = result
+                    analysisResult = result.overallInterpretationKo
+                    
+                    // DB에 결과 저장
+                    faceAnalysisDao.insert(result)
+                    
+                    // 히스토리에 추가
+                    saveHistory(result)
+                    
+                    isAnalyzed = true
+                } else {
+                    errorMessage = "얼굴을 감지할 수 없습니다. 정면 사진을 사용해 주세요."
+                }
+            } catch (e: Exception) {
+                errorMessage = "분석 중 오류가 발생했습니다: ${e.message}"
+            } finally {
+                // 개인정보 보호: UI에서 URI 참조 제거
+                selectedImageUri = null
+                isAnalyzing = false
+            }
         }
     }
 
-    private fun saveHistory() {
+    private fun saveHistory(result: FaceAnalysisResultEntity) {
         // 이미지 경로는 절대 저장하지 않음. 텍스트 결과만 저장.
         repository.appendHistoryRecord(
             HistoryRecord(
                 id = UUID.randomUUID().toString(),
                 type = HistoryType.FACE,
-                title = "관상 분석 (이미지 삭제됨)",
-                summary = "차분하고 신뢰감을 주는 인상",
-                payload = analysisResult,
+                title = "관상 분석 (${result.faceShape})",
+                summary = "얼굴형: ${result.faceShape}",
+                payload = result.overallInterpretationKo,
                 profileId = null, // 익명 분석
                 expiresAt = System.currentTimeMillis() + 7 * 24 * 60 * 60 * 1000
             )
@@ -109,5 +124,7 @@ class FaceViewModel @Inject constructor(
         isAnalyzed = false
         isAnalyzing = false
         analysisResult = ""
+        analysisResultEntity = null
+        errorMessage = null
     }
 }

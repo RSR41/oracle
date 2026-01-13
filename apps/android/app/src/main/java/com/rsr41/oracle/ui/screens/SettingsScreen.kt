@@ -2,10 +2,8 @@ package com.rsr41.oracle.ui.screens
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Pending
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -16,13 +14,16 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.rsr41.oracle.R
+import com.rsr41.oracle.domain.model.AppLanguage
 import com.rsr41.oracle.domain.model.CalendarType
+import com.rsr41.oracle.domain.model.ThemeMode
 import com.rsr41.oracle.ui.components.*
 
 /**
  * 설정 화면
  * - 기본 달력 타입(양력/음력) 설정
- * - 추후 확장 가능한 설정 UI
+ * - 언어 설정 (한국어/English/시스템)
+ * - 테마 설정 (라이트/다크/시스템)
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -48,6 +49,68 @@ fun SettingsScreen(
         ) {
             Spacer(modifier = Modifier.height(8.dp))
 
+            // 언어 설정 (NEW)
+            OracleCard {
+                OracleSectionTitle(stringResource(R.string.settings_language_title))
+                Text(
+                    stringResource(R.string.settings_language_desc),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    AppLanguage.entries.forEach { language ->
+                        FilterChip(
+                            selected = viewModel.appLanguage == language,
+                            onClick = { viewModel.updateAppLanguage(language) },
+                            label = {
+                                Text(
+                                    when (language) {
+                                        AppLanguage.KOREAN -> stringResource(R.string.settings_language_korean)
+                                        AppLanguage.ENGLISH -> stringResource(R.string.settings_language_english)
+                                        AppLanguage.SYSTEM -> stringResource(R.string.settings_language_system)
+                                    }
+                                )
+                            }
+                        )
+                    }
+                }
+            }
+
+            // 테마 설정 (NEW)
+            OracleCard {
+                OracleSectionTitle(stringResource(R.string.settings_theme_title))
+                Text(
+                    stringResource(R.string.settings_theme_desc),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    ThemeMode.entries.forEach { theme ->
+                        FilterChip(
+                            selected = viewModel.themeMode == theme,
+                            onClick = { viewModel.updateThemeMode(theme) },
+                            label = {
+                                Text(
+                                    when (theme) {
+                                        ThemeMode.LIGHT -> stringResource(R.string.settings_theme_light)
+                                        ThemeMode.DARK -> stringResource(R.string.settings_theme_dark)
+                                        ThemeMode.SYSTEM -> stringResource(R.string.settings_theme_system)
+                                    }
+                                )
+                            }
+                        )
+                    }
+                }
+            }
+
             // 기본 달력 설정
             OracleCard {
                 OracleSectionTitle(stringResource(R.string.settings_default_calendar_title))
@@ -65,7 +128,7 @@ fun SettingsScreen(
                 )
             }
 
-            // 개인정보 및 유의사항 (NEW: Relocated Face Caution)
+            // 개인정보 및 유의사항
             OracleCard(
                 backgroundColor = MaterialTheme.colorScheme.secondary.copy(alpha = 0.05f)
             ) {
@@ -87,13 +150,12 @@ fun SettingsScreen(
                 )
             }
 
-            // 확장 포인트
+            // 추가 설정 (예정) - 성별/시간만 남김
             OracleCard {
                 OracleSectionTitle(stringResource(R.string.settings_upcoming_title))
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     SettingUpcomingItem(stringResource(R.string.settings_upcoming_gender))
                     SettingUpcomingItem(stringResource(R.string.settings_upcoming_time))
-                    SettingUpcomingItem(stringResource(R.string.settings_upcoming_theme))
                 }
             }
 

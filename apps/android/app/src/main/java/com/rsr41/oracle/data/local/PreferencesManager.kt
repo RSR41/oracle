@@ -3,6 +3,7 @@ package com.rsr41.oracle.data.local
 import android.content.Context
 import android.content.SharedPreferences
 import android.util.Log
+import com.rsr41.oracle.domain.model.AppLanguage
 import com.rsr41.oracle.domain.model.BirthInfo
 import com.rsr41.oracle.domain.model.CalendarType
 import com.rsr41.oracle.domain.model.Gender
@@ -11,6 +12,7 @@ import com.rsr41.oracle.domain.model.HistoryRecord
 import com.rsr41.oracle.domain.model.HistoryType
 import com.rsr41.oracle.domain.model.Profile
 import com.rsr41.oracle.domain.model.SajuResult
+import com.rsr41.oracle.domain.model.ThemeMode
 import java.util.UUID
 import org.json.JSONArray
 import org.json.JSONObject
@@ -30,6 +32,8 @@ class PreferencesManager(context: Context) {
         private const val KEY_LAST_RESULT = "last_result"
         private const val KEY_PROFILES = "profiles_list"
         private const val KEY_HISTORY_RECORDS = "history_records_list"
+        private const val KEY_LANGUAGE = "app_language"
+        private const val KEY_THEME_MODE = "theme_mode"
         private const val MAX_HISTORY_SIZE = 10
     }
 
@@ -50,6 +54,44 @@ class PreferencesManager(context: Context) {
     fun saveDefaultCalendarType(type: CalendarType) {
         prefs.edit().putString(KEY_CALENDAR_TYPE, type.name).apply()
         Log.d(TAG, "Saved default calendar type: $type")
+    }
+
+    // ===== 앱 언어 설정 =====
+    
+    fun loadAppLanguage(): AppLanguage {
+        val langStr = prefs.getString(KEY_LANGUAGE, AppLanguage.SYSTEM.name)
+        return try {
+            val language = AppLanguage.valueOf(langStr ?: AppLanguage.SYSTEM.name)
+            Log.d(TAG, "Loaded app language: $language")
+            language
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to load app language, using default SYSTEM", e)
+            AppLanguage.SYSTEM
+        }
+    }
+
+    fun saveAppLanguage(language: AppLanguage) {
+        prefs.edit().putString(KEY_LANGUAGE, language.name).apply()
+        Log.d(TAG, "Saved app language: $language")
+    }
+
+    // ===== 테마 모드 설정 =====
+    
+    fun loadThemeMode(): ThemeMode {
+        val themeStr = prefs.getString(KEY_THEME_MODE, ThemeMode.SYSTEM.name)
+        return try {
+            val theme = ThemeMode.valueOf(themeStr ?: ThemeMode.SYSTEM.name)
+            Log.d(TAG, "Loaded theme mode: $theme")
+            theme
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to load theme mode, using default SYSTEM", e)
+            ThemeMode.SYSTEM
+        }
+    }
+
+    fun saveThemeMode(theme: ThemeMode) {
+        prefs.edit().putString(KEY_THEME_MODE, theme.name).apply()
+        Log.d(TAG, "Saved theme mode: $theme")
     }
 
     // ===== Face Consent =====

@@ -40,4 +40,12 @@ interface SajuRepository {
     // Face Consent
     fun getFaceConsent(): Boolean
     fun setFaceConsent(consented: Boolean)
+
+    // 앱 언어 설정
+    fun loadAppLanguage(): AppLanguage
+    fun saveAppLanguage(language: AppLanguage)
+
+    // 테마 모드 설정
+    fun loadThemeMode(): ThemeMode
+    fun saveThemeMode(theme: ThemeMode)
 }

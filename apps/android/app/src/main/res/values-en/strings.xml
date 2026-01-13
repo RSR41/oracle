@@ -153,4 +153,19 @@
     <string name="settings_info_title">App Info</string>
     <string name="settings_info_version">Version: 1.0.0 (MVP)</string>
     <string name="settings_info_package">Package: com.rsr41.oracle</string>
+    
+    <!-- Language Settings -->
+    <string name="settings_language_title">Language</string>
+    <string name="settings_language_desc">Choose the app language.</string>
+    <string name="settings_language_korean">한국어</string>
+    <string name="settings_language_english">English</string>
+    <string name="settings_language_system">System</string>
+    
+    <!-- Theme Settings -->
+    <string name="settings_theme_title">Theme</string>
+    <string name="settings_theme_desc">Choose the app theme.</string>
+    <string name="settings_theme_light">Light</string>
+    <string name="settings_theme_dark">Dark</string>
+    <string name="settings_theme_system">System</string>
 </resources>
+

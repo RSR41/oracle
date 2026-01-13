@@ -32,7 +32,8 @@ fun HomeScreen(
     onNavigateToFortune: () -> Unit,
     onNavigateToCompatibility: () -> Unit,
     onNavigateToFace: () -> Unit,
-    onNavigateToTarot: () -> Unit
+    onNavigateToTarot: () -> Unit,
+    onNavigateToDream: () -> Unit
 ) {
     OracleScaffold(
         topBar = {
@@ -83,7 +84,8 @@ fun HomeScreen(
                     onNavigateToFortune = onNavigateToFortune,
                     onNavigateToCompatibility = onNavigateToCompatibility,
                     onNavigateToFace = onNavigateToFace,
-                    onNavigateToTarot = onNavigateToTarot
+                    onNavigateToTarot = onNavigateToTarot,
+                    onNavigateToDream = onNavigateToDream
                 )
             }
         }
@@ -137,7 +139,8 @@ private fun FeatureGrid(
     onNavigateToFortune: () -> Unit,
     onNavigateToCompatibility: () -> Unit,
     onNavigateToFace: () -> Unit,
-    onNavigateToTarot: () -> Unit
+    onNavigateToTarot: () -> Unit,
+    onNavigateToDream: () -> Unit
 ) {
     Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
         Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
@@ -179,7 +182,7 @@ private fun FeatureGrid(
                 modifier = Modifier.weight(1f),
                 title = stringResource(R.string.menu_dream),
                 icon = Icons.Default.Nightlight,
-                onClick = { /* Not ready */ }
+                onClick = onNavigateToDream
             )
         }
     }

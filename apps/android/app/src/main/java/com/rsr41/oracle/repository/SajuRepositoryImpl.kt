@@ -69,4 +69,22 @@ class SajuRepositoryImpl(
     override fun setFaceConsent(consented: Boolean) {
         preferencesManager.saveFaceConsent(consented)
     }
+
+    // 앱 언어 설정
+    override fun loadAppLanguage(): AppLanguage {
+        return preferencesManager.loadAppLanguage()
+    }
+
+    override fun saveAppLanguage(language: AppLanguage) {
+        preferencesManager.saveAppLanguage(language)
+    }
+
+    // 테마 모드 설정
+    override fun loadThemeMode(): ThemeMode {
+        return preferencesManager.loadThemeMode()
+    }
+
+    override fun saveThemeMode(theme: ThemeMode) {
+        preferencesManager.saveThemeMode(theme)
+    }
 }
