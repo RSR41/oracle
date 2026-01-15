@@ -5,10 +5,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.rsr41.oracle.core.util.ValidationUtil
 import com.rsr41.oracle.domain.model.*
 import com.rsr41.oracle.repository.SajuRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.launch
 import java.util.UUID
 import javax.inject.Inject
 
@@ -18,7 +20,8 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class InputViewModel @Inject constructor(
-    private val repository: SajuRepository
+    private val sajuRepository: SajuRepository,
+    private val settingsRepository: com.rsr41.oracle.repository.SettingsRepository
 ) : ViewModel() {
     
     companion object {
@@ -40,6 +43,9 @@ class InputViewModel @Inject constructor(
         private set
     var isSaveProfileChecked by mutableStateOf(true)
         private set
+        
+    var isLeapMonth by mutableStateOf(false)
+        private set
 
     // 에러 상태
     var nicknameError by mutableStateOf<String?>(null)
@@ -54,9 +60,12 @@ class InputViewModel @Inject constructor(
         private set
 
     init {
-        // 설정에서 기본 달력 타입 로드
-        calendarType = repository.loadDefaultCalendarType()
-        Log.d(TAG, "Initialized with calendarType: $calendarType")
+        // 설정에서 기본 달력 타입 로드 (Reactive)
+        viewModelScope.launch {
+            settingsRepository.defaultCalendarType.collect {
+                calendarType = it
+            }
+        }
     }
 
     fun updateNickname(newNickname: String) {
@@ -77,30 +86,30 @@ class InputViewModel @Inject constructor(
     fun updateGender(newGender: Gender) {
         gender = newGender
     }
-
+    
     fun updateCalendarType(newType: CalendarType) {
         calendarType = newType
     }
-
-    fun toggleTimeUnknown(unknown: Boolean) {
-        timeUnknown = unknown
-        if (unknown) time = ""
+    
+    fun updateTimeUnknown(checked: Boolean) {
+        timeUnknown = checked
+        if (checked) {
+            time = ""
+            timeError = null
+        }
     }
-
-    fun toggleSaveProfile(checked: Boolean) {
+    
+    fun updateSaveProfile(checked: Boolean) {
         isSaveProfileChecked = checked
     }
-
-    var isLeapMonth by mutableStateOf(false)
-        private set
-
-    fun toggleLeapMonth(checked: Boolean) {
+    
+    fun updateIsLeapMonth(checked: Boolean) {
         isLeapMonth = checked
     }
 
     fun validateAndGenerateResult(): Boolean {
         if (nickname.isBlank() && isSaveProfileChecked) {
-            nicknameError = "닉네임을 입력해주세요"
+            nicknameError = "Please enter a nickname"
             return false
         }
 
@@ -117,19 +126,47 @@ class InputViewModel @Inject constructor(
                 return false
             }
         }
+        
+        // 날짜 변환 로직 (음력 -> 양력)
+        // User Requirement: "Lunar 기준 입력 -> Solar 변환(또는 내부 표준화)까지 정상 동작"
+        var analysisDate = date
+        var analysisCalendarType = calendarType
+        
+        if (calendarType == CalendarType.LUNAR) {
+            try {
+                // 입력된 date "yyyy-MM-dd" 파싱
+                val parts = date.split("-")
+                if (parts.size == 3) {
+                    val y = parts[0].toInt()
+                    val m = parts[1].toInt()
+                    val d = parts[2].toInt()
+                    
+                    // 변환: Lunar -> Solar
+                    val solarDate = com.rsr41.oracle.util.LunarCalendarUtil.lunarToSolar(y, m, d, isLeapMonth)
+                    
+                    // 엔진 및 저장용 데이터 표준화 (Solar로 변환)
+                    analysisDate = solarDate.toString()
+                    analysisCalendarType = CalendarType.SOLAR // 엔진에는 양력으로 전달
+                    
+                    Log.d(TAG, "Converted Lunar $date (Leap: $isLeapMonth) -> Solar $analysisDate")
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "Lunar conversion failed", e)
+                // 변환 실패 시 원본 사용 (Fallback)
+                // TODO: 에러 처리 강화 (사용자 알림 등)
+            }
+        }
 
+        // 엔진 분석용 Info (Solar로 변환된 값 사용)
         val birthInfo = BirthInfo(
-            date = date,
+            date = analysisDate,
             time = if (timeUnknown) "" else time,
             gender = gender,
-            calendarType = calendarType
+            calendarType = analysisCalendarType
         )
-        // 윤달 정보는 BirthInfo에 없다면 별도로 처리하거나 BirthInfo를 업데이트 해야 하지만, 
-        // 현재는 Mock 로직에 반영되지 않으므로 UI 상태만 유지.
-        // TODO: Update BirthInfo to support leap month
 
         // 1. 결과 생성
-        val result = repository.getMockSaju(birthInfo)
+        val result = sajuRepository.getMockSaju(birthInfo)
         
         // 2. 프로필 저장 (체크 시)
         var savedProfileId: String? = null
@@ -143,11 +180,11 @@ class InputViewModel @Inject constructor(
                 calendarType = calendarType,
                 gender = gender
             )
-            repository.saveProfile(profile)
+            sajuRepository.saveProfile(profile)
             savedProfileId = profile.id
         }
 
-        // 3. 히스토리 저장 (Enhanced)
+        // 3. 히스토리 저장
         val inputJson = """
             {
                 "date": "$date",
@@ -163,15 +200,8 @@ class InputViewModel @Inject constructor(
             {
                 "summary": "${result.summaryToday}",
                 "pillars": "${result.pillars}",
-                "scores": {
-                    "love": 85,
-                    "money": 90,
-                    "health": 70,
-                    "work": 95
-                },
-                "advice": [
-                     "주변을 돌아보세요.", "무리한 투자는 삼가세요.", "건강 검진을 받아보세요."
-                ]
+                "scores": { "love": 85, "money": 90, "health": 70, "work": 95 },
+                "advice": ["주변을 돌아보세요.", "무리한 투자는 삼가세요.", "건강 검진을 받아보세요."]
             }
         """.trimIndent()
 
@@ -183,14 +213,14 @@ class InputViewModel @Inject constructor(
             payload = detailJson,
             inputSnapshot = inputJson,
             profileId = savedProfileId,
-            expiresAt = System.currentTimeMillis() + 7 * 24 * 60 * 60 * 1000 // 7 days TTL
+            expiresAt = System.currentTimeMillis() + 7 * 24 * 60 * 60 * 1000
         )
-        repository.appendHistoryRecord(record)
+        sajuRepository.appendHistoryRecord(record)
 
-        // 4. 레거시 호환 저장 (ResultViewModel에서 loadLastResult 사용 중)
+        // 4. 레거시 호환
         val legacyItem = HistoryItem(record.id, birthInfo, result)
-        repository.saveLastResult(legacyItem)
-        repository.appendHistory(legacyItem)
+        sajuRepository.saveLastResult(legacyItem)
+        sajuRepository.appendHistory(legacyItem)
 
         shouldNavigateToResult = true
         return true
@@ -201,7 +231,12 @@ class InputViewModel @Inject constructor(
     }
 
     fun resetToDefaults() {
-        calendarType = repository.loadDefaultCalendarType()
+        // 리셋 시에도 설정값 다시 불러오기
+        viewModelScope.launch {
+            settingsRepository.defaultCalendarType.collect {
+                calendarType = it
+            }
+        }
         nickname = ""
         date = "1990-01-01"
         time = ""

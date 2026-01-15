@@ -55,30 +55,13 @@ fun OracleNavHost(
         startDestination = Routes.HOME
     ) {
         composable(Routes.HOME) {
-            val historyViewModel: HistoryViewModel = hiltViewModel()
-            val settingsViewModel: SettingsViewModel = hiltViewModel()
-            val fortuneViewModel: FortuneViewModel = hiltViewModel()
-            val compatibilityViewModel: CompatibilityViewModel = hiltViewModel()
-            
             HomeScreen(
                 onNavigateToInput = { navController.navigate(Routes.INPUT) },
                 onNavigateToResult = { navController.navigate(Routes.RESULT) },
-                onNavigateToHistory = { 
-                    historyViewModel.loadHistory()
-                    navController.navigate(Routes.HISTORY) 
-                },
-                onNavigateToSettings = { 
-                    settingsViewModel.loadSettings()
-                    navController.navigate(Routes.SETTINGS) 
-                },
-                onNavigateToFortune = { 
-                    fortuneViewModel.loadProfiles()
-                    navController.navigate(Routes.FORTUNE) 
-                },
-                onNavigateToCompatibility = { 
-                    compatibilityViewModel.loadProfiles()
-                    navController.navigate(Routes.COMPATIBILITY) 
-                },
+                onNavigateToHistory = { navController.navigate(Routes.HISTORY) },
+                onNavigateToSettings = { navController.navigate(Routes.SETTINGS) },
+                onNavigateToFortune = { navController.navigate(Routes.FORTUNE) },
+                onNavigateToCompatibility = { navController.navigate(Routes.COMPATIBILITY) },
                 onNavigateToFace = { navController.navigate(Routes.FACE) },
                 onNavigateToTarot = { navController.navigate(Routes.TAROT) },
                 onNavigateToDream = { navController.navigate(Routes.DREAM) }

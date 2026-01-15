@@ -31,7 +31,7 @@ import javax.inject.Inject
 class MainActivity : ComponentActivity() {
     
     @Inject
-    lateinit var preferencesManager: PreferencesManager
+    lateinit var settingsRepository: com.rsr41.oracle.repository.SettingsRepository
     
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -41,19 +41,21 @@ class MainActivity : ComponentActivity() {
         val deepLinkToken = extractTokenFromIntent()
         Timber.d("MainActivity created, deepLinkToken: $deepLinkToken")
         
-        // 저장된 언어 설정 적용
-        applyLanguage(preferencesManager.loadAppLanguage())
-        
         setContent {
-            // 저장된 테마 로드 및 상태 관리
-            var themeMode by remember { mutableStateOf(preferencesManager.loadThemeMode()) }
-            
-            // ThemeMode 변경 시 즉시 반영을 위한 LaunchedEffect
-            // (SettingsScreen에서 변경 시 이 Activity가 refresh되면 자동 적용)
+            // Global Settings Observation
+            val themeMode by settingsRepository.themeMode.collectAsState(initial = ThemeMode.SYSTEM)
+            val appLanguage by settingsRepository.appLanguage.collectAsState(initial = AppLanguage.SYSTEM)
+
+            // Dynamic Theme Application
             val isDarkTheme = when (themeMode) {
                 ThemeMode.LIGHT -> false
                 ThemeMode.DARK -> true
                 ThemeMode.SYSTEM -> isSystemInDarkTheme()
+            }
+            
+            // Locale Application
+            LaunchedEffect(appLanguage) {
+                applyLanguage(appLanguage)
             }
             
             OracleTheme(darkTheme = isDarkTheme) {
@@ -67,26 +69,14 @@ class MainActivity : ComponentActivity() {
         }
     }
     
-    override fun onResume() {
-        super.onResume()
-        // 설정 화면에서 돌아올 때 언어/테마 재적용
-        applyLanguage(preferencesManager.loadAppLanguage())
-    }
-    
     private fun applyLanguage(language: AppLanguage) {
-        val locale = when (language) {
-            AppLanguage.KOREAN -> Locale.KOREAN
-            AppLanguage.ENGLISH -> Locale.ENGLISH
-            AppLanguage.SYSTEM -> Locale.getDefault()
+        val localeList = when (language) {
+            AppLanguage.KOREAN -> androidx.core.os.LocaleListCompat.create(java.util.Locale.KOREAN)
+            AppLanguage.ENGLISH -> androidx.core.os.LocaleListCompat.create(java.util.Locale.ENGLISH)
+            AppLanguage.SYSTEM -> androidx.core.os.LocaleListCompat.getEmptyLocaleList()
         }
-        
-        val config = Configuration(resources.configuration)
-        config.setLocale(locale)
-        
-        @Suppress("DEPRECATION")
-        resources.updateConfiguration(config, resources.displayMetrics)
-        
-        Timber.d("Applied language: $language, locale: $locale")
+        androidx.appcompat.app.AppCompatDelegate.setApplicationLocales(localeList)
+        Timber.d("Applied language: $language")
     }
     
     private fun extractTokenFromIntent(): String? {

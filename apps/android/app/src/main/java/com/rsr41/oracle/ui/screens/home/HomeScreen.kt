@@ -225,11 +225,11 @@ private fun DailyLuckyCard() {
     // Simple deterministic daily color
     val today = java.time.LocalDate.now()
     val colors = listOf(
-        "황금색" to androidx.compose.ui.graphics.Color(0xFFFFD700),
-        "붉은색" to androidx.compose.ui.graphics.Color(0xFFFF4500),
-        "파란색" to androidx.compose.ui.graphics.Color(0xFF4169E1),
-        "초록색" to androidx.compose.ui.graphics.Color(0xFF228B22),
-        "은색" to androidx.compose.ui.graphics.Color(0xFFC0C0C0)
+        stringResource(R.string.color_gold) to androidx.compose.ui.graphics.Color(0xFFFFD700),
+        stringResource(R.string.color_red) to androidx.compose.ui.graphics.Color(0xFFFF4500),
+        stringResource(R.string.color_blue) to androidx.compose.ui.graphics.Color(0xFF4169E1),
+        stringResource(R.string.color_green) to androidx.compose.ui.graphics.Color(0xFF228B22),
+        stringResource(R.string.color_silver) to androidx.compose.ui.graphics.Color(0xFFC0C0C0)
     )
     val index = Math.abs(today.hashCode()) % colors.size
     val (colorName, colorValue) = colors[index]

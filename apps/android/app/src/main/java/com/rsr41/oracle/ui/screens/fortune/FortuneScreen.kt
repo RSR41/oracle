@@ -8,9 +8,9 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.AccountCircle
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material3.*
 import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.runtime.*
@@ -78,7 +78,7 @@ fun FortuneScreen(
                             height = 3.dp
                         )
                     },
-                    divider = { Divider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.1f)) }
+                    divider = { HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.1f)) }
                 ) {
                     tabs.forEachIndexed { index, title ->
                         Tab(
@@ -121,9 +121,9 @@ fun FortuneScreen(
                             color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
                         )
                         Spacer(modifier = Modifier.height(24.dp))
-                        OracleButton(
+                            OracleButton(
                             onClick = onNavigateToInput, 
-                            text = "프로필 추가하기",
+                            text = stringResource(R.string.fortune_add_profile),
                             modifier = Modifier.width(200.dp)
                         )
                     }
@@ -176,7 +176,7 @@ private fun ProfileSelector(
                 value = selectedProfile?.let { "${it.nickname} (${it.birthDate})" } ?: stringResource(R.string.common_profile_none),
                 onValueChange = {},
                 readOnly = true,
-                modifier = Modifier.fillMaxWidth().menuAnchor(),
+                modifier = Modifier.fillMaxWidth().menuAnchor(MenuAnchorType.PrimaryNotEditable, true),
                 trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
                 shape = RoundedCornerShape(12.dp),
                 colors = OutlinedTextFieldDefaults.colors(
@@ -212,9 +212,9 @@ private fun ProfileSelector(
                             }
                         )
                     }
-                    Divider(modifier = Modifier.padding(vertical = 4.dp))
+                    HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
                     DropdownMenuItem(
-                        text = { Text("+ 새 프로필 입력", color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold) },
+                        text = { Text("+ " + stringResource(R.string.fortune_add_profile), color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold) },
                         onClick = {
                              expanded = false
                              onAddProfile()
@@ -240,7 +240,7 @@ fun DaeunView(result: ManseDaewunResult?, onClickSave: () -> Unit) {
                 OracleCard(
                     backgroundColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.05f)
                 ) {
-                    OracleSectionTitle("현재 내 대운", color = MaterialTheme.colorScheme.primary)
+                    OracleSectionTitle(stringResource(R.string.fortune_daewun_title), color = MaterialTheme.colorScheme.primary)
                     Text(
                         text = result.currentDaewun.ganji,
                         style = MaterialTheme.typography.headlineMedium,
@@ -257,7 +257,7 @@ fun DaeunView(result: ManseDaewunResult?, onClickSave: () -> Unit) {
             }
             
             item {
-                OracleSectionTitle("대운 흐름 파악", modifier = Modifier.padding(top = 8.dp))
+                OracleSectionTitle(stringResource(R.string.fortune_daewun_flow), modifier = Modifier.padding(top = 8.dp))
             }
 
             items(result.daewunList) { item ->
@@ -285,7 +285,7 @@ fun DaeunView(result: ManseDaewunResult?, onClickSave: () -> Unit) {
                                         shape = RoundedCornerShape(4.dp)
                                     ) {
                                         Text(
-                                            "현재", 
+                                            stringResource(R.string.fortune_current), 
                                             modifier = Modifier.padding(horizontal = 4.dp, vertical = 2.dp),
                                             style = MaterialTheme.typography.labelSmall,
                                             color = MaterialTheme.colorScheme.onSecondary
@@ -341,16 +341,16 @@ fun SaeunView(
             verticalAlignment = Alignment.CenterVertically
         ) {
             IconButton(onClick = { onYearChange(year - 1) }) { 
-                Icon(Icons.Filled.ArrowBack, null, tint = MaterialTheme.colorScheme.primary) 
+                Icon(Icons.AutoMirrored.Filled.ArrowBack, null, tint = MaterialTheme.colorScheme.primary) 
             }
             Text(
-                text = "${year}년 세운", 
+                text = stringResource(R.string.fortune_saeun_fmt, year), 
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.primary
             )
             IconButton(onClick = { onYearChange(year + 1) }) { 
-                Icon(Icons.Filled.ArrowForward, null, tint = MaterialTheme.colorScheme.primary) 
+                Icon(Icons.AutoMirrored.Filled.ArrowForward, null, tint = MaterialTheme.colorScheme.primary) 
             }
         }
 
@@ -364,7 +364,7 @@ fun SaeunView(
                     OracleCard(
                         backgroundColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.05f)
                     ) {
-                        OracleSectionTitle("${result.ganji}년 총운", color = MaterialTheme.colorScheme.primary)
+                        OracleSectionTitle(stringResource(R.string.fortune_saeun_summary_fmt, result.ganji), color = MaterialTheme.colorScheme.primary)
                         Text(
                             result.summary,
                             style = MaterialTheme.typography.bodyLarge,
@@ -429,16 +429,16 @@ fun WolunView(
             verticalAlignment = Alignment.CenterVertically
         ) {
             IconButton(onClick = { onYearChange(year - 1) }) { 
-                Icon(Icons.Filled.ArrowBack, null, tint = MaterialTheme.colorScheme.primary) 
+                Icon(Icons.AutoMirrored.Filled.ArrowBack, null, tint = MaterialTheme.colorScheme.primary) 
             }
             Text(
-                text = "${year}년 월운", 
+                text = stringResource(R.string.fortune_wolun_fmt, year), 
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.primary
             )
             IconButton(onClick = { onYearChange(year + 1) }) { 
-                Icon(Icons.Filled.ArrowForward, null, tint = MaterialTheme.colorScheme.primary) 
+                Icon(Icons.AutoMirrored.Filled.ArrowForward, null, tint = MaterialTheme.colorScheme.primary) 
             }
         }
         
@@ -478,7 +478,7 @@ fun WolunView(
                                  Spacer(modifier = Modifier.width(16.dp))
                                  Column {
                                      Text(
-                                         text = "${item.month}월 흐름", 
+                                         text = stringResource(R.string.fortune_month_flow_fmt, item.month), 
                                          style = MaterialTheme.typography.titleMedium, 
                                          fontWeight = FontWeight.Bold
                                      )
@@ -490,7 +490,7 @@ fun WolunView(
                                  }
                              }
                              Text(
-                                 text = "${item.score}점", 
+                                 text = stringResource(R.string.fortune_score_fmt, item.score), 
                                  style = MaterialTheme.typography.titleMedium,
                                  fontWeight = FontWeight.Bold,
                                  color = if(item.score > 80) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline

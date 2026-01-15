@@ -11,6 +11,8 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
+import com.rsr41.oracle.repository.SettingsRepository
+import com.rsr41.oracle.data.repository.SettingsRepositoryImpl
 
 /**
  * Hilt DI Module for Repository dependencies
@@ -38,6 +40,14 @@ object RepositoryModule {
         buildMockSajuUseCase: BuildMockSajuUseCase
     ): SajuRepository {
         return SajuRepositoryImpl(preferencesManager, buildMockSajuUseCase)
+    }
+
+    @Provides
+    @Singleton
+    fun provideSettingsRepository(
+        dataStore: androidx.datastore.core.DataStore<androidx.datastore.preferences.core.Preferences>
+    ): SettingsRepository {
+        return SettingsRepositoryImpl(dataStore)
     }
 
     @Provides

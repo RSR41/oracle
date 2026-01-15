@@ -134,7 +134,7 @@ private fun ProfileSelectField(
                 value = selectedProfile?.let { "${it.nickname} (${it.birthDate})" } ?: "선택해주세요",
                 onValueChange = {},
                 readOnly = true,
-                modifier = Modifier.fillMaxWidth().menuAnchor(),
+                modifier = Modifier.fillMaxWidth().menuAnchor(MenuAnchorType.PrimaryNotEditable, true),
                 trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
                 shape = RoundedCornerShape(12.dp),
                 colors = OutlinedTextFieldDefaults.colors(
@@ -229,7 +229,7 @@ fun CompatibilityResultView(result: CompatibilityResult) {
             }
             
             Spacer(modifier = Modifier.height(16.dp))
-            Divider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.1f))
+            HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.1f))
             Spacer(modifier = Modifier.height(16.dp))
             
             Text("주의할 점 ⚠️", style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.error)

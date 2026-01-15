@@ -78,7 +78,7 @@ fun InputScreen(
                     value = viewModel.date,
                     onValueChange = { viewModel.updateDate(it) },
                     modifier = Modifier.fillMaxWidth(),
-                    placeholder = { Text("1990-01-01", color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f)) },
+                    placeholder = { Text(stringResource(R.string.input_placeholder_date), color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f)) },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     isError = viewModel.dateError != null,
                     supportingText = viewModel.dateError?.let { { Text(it) } },
@@ -102,7 +102,7 @@ fun InputScreen(
                         onValueChange = { viewModel.updateTime(it) },
                         modifier = Modifier.weight(1f),
                         enabled = !viewModel.timeUnknown,
-                        placeholder = { Text("14:30", color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f)) },
+                        placeholder = { Text(stringResource(R.string.input_placeholder_time), color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f)) },
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                         isError = viewModel.timeError != null,
                         supportingText = viewModel.timeError?.let { { Text(it) } },
@@ -116,7 +116,7 @@ fun InputScreen(
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Checkbox(
                             checked = viewModel.timeUnknown,
-                            onCheckedChange = { viewModel.toggleTimeUnknown(it) },
+                            onCheckedChange = { viewModel.updateTimeUnknown(it) },
                             colors = CheckboxDefaults.colors(checkedColor = MaterialTheme.colorScheme.primary)
                         )
                         Text(
@@ -134,7 +134,12 @@ fun InputScreen(
                     options = Gender.entries.toList(),
                     selectedOption = viewModel.gender,
                     onOptionSelected = { viewModel.updateGender(it) },
-                    labelProvider = { it.displayName }
+                    labelProvider = { 
+                        when(it) {
+                            Gender.MALE -> stringResource(R.string.common_male)
+                            Gender.FEMALE -> stringResource(R.string.common_female)
+                        } 
+                    }
                 )
 
                 Spacer(modifier = Modifier.height(24.dp))
@@ -144,7 +149,9 @@ fun InputScreen(
                     options = CalendarType.entries.toList(),
                     selectedOption = viewModel.calendarType,
                     onOptionSelected = { viewModel.updateCalendarType(it) },
-                    labelProvider = { it.displayName }
+                    labelProvider = {
+                         if (it == CalendarType.SOLAR) stringResource(R.string.common_solar) else stringResource(R.string.common_lunar)
+                    }
                 )
                 
                 // 윤달 토글 (음력일 때만 표시)
@@ -153,11 +160,11 @@ fun InputScreen(
                      Row(verticalAlignment = Alignment.CenterVertically) {
                         Switch(
                             checked = viewModel.isLeapMonth,
-                            onCheckedChange = { viewModel.toggleLeapMonth(it) },
+                            onCheckedChange = { viewModel.updateIsLeapMonth(it) },
                              colors = SwitchDefaults.colors(checkedTrackColor = MaterialTheme.colorScheme.primary)
                         )
                         Spacer(modifier = Modifier.width(12.dp))
-                        Text("윤달 여부", style = MaterialTheme.typography.bodyMedium)
+                        Text(stringResource(R.string.input_label_leap_month), style = MaterialTheme.typography.bodyMedium)
                      }
                 }
             }
@@ -169,7 +176,7 @@ fun InputScreen(
             ) {
                 Checkbox(
                     checked = viewModel.isSaveProfileChecked,
-                    onCheckedChange = { viewModel.toggleSaveProfile(it) },
+                    onCheckedChange = { viewModel.updateSaveProfile(it) },
                     colors = CheckboxDefaults.colors(checkedColor = MaterialTheme.colorScheme.primary)
                 )
                 Text(

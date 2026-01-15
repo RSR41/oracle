@@ -31,6 +31,10 @@ fun SettingsScreen(
     viewModel: SettingsViewModel,
     onBack: () -> Unit
 ) {
+    val themeMode by viewModel.themeMode.collectAsState()
+    val appLanguage by viewModel.appLanguage.collectAsState()
+    val calendarType by viewModel.calendarType.collectAsState()
+    
     OracleScaffold(
         topBar = {
             OracleTopAppBar(
@@ -64,7 +68,7 @@ fun SettingsScreen(
                 ) {
                     AppLanguage.entries.forEach { language ->
                         FilterChip(
-                            selected = viewModel.appLanguage == language,
+                            selected = appLanguage == language,
                             onClick = { viewModel.updateAppLanguage(language) },
                             label = {
                                 Text(
@@ -95,7 +99,7 @@ fun SettingsScreen(
                 ) {
                     ThemeMode.entries.forEach { theme ->
                         FilterChip(
-                            selected = viewModel.themeMode == theme,
+                            selected = themeMode == theme,
                             onClick = { viewModel.updateThemeMode(theme) },
                             label = {
                                 Text(
@@ -122,7 +126,7 @@ fun SettingsScreen(
                 Spacer(modifier = Modifier.height(16.dp))
                 SelectableChipRow(
                     options = CalendarType.entries.toList(),
-                    selectedOption = viewModel.calendarType,
+                    selectedOption = calendarType,
                     onOptionSelected = { viewModel.updateCalendarType(it) },
                     labelProvider = { if (it == CalendarType.SOLAR) stringResource(R.string.settings_calendar_solar) else stringResource(R.string.settings_calendar_lunar) }
                 )
@@ -142,15 +146,23 @@ fun SettingsScreen(
                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f)
                 )
                 Spacer(modifier = Modifier.height(16.dp))
-                Text(
-                    text = "• 관상 서비스는 오락 목적으로만 제공됩니다.\n• 민감한 개인 속성(인종, 건강 등) 추정은 수행하지 않습니다.",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
-                    lineHeight = 20.sp
-                )
+                Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                    Text(
+                        text = "• " + stringResource(R.string.face_privacy_bullet_1),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
+                        lineHeight = 20.sp
+                    )
+                    Text(
+                        text = "• " + stringResource(R.string.face_privacy_bullet_2),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
+                        lineHeight = 20.sp
+                    )
+                }
             }
 
-            // 추가 설정 (예정) - 성별/시간만 남김
+            // 추가 설정 (예정)
             OracleCard {
                 OracleSectionTitle(stringResource(R.string.settings_upcoming_title))
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -164,8 +176,8 @@ fun SettingsScreen(
                 OracleSectionTitle(stringResource(R.string.settings_info_title))
                 Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                        Text(stringResource(R.string.settings_info_version), style = MaterialTheme.typography.bodyMedium)
-                        Text("v1.0.0", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold)
+                        Text(stringResource(R.string.settings_info_title), style = MaterialTheme.typography.bodyMedium)
+                        Text(stringResource(R.string.settings_info_version).removePrefix("Version: ").removePrefix("버전: "), style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold)
                     }
                     Text(
                         stringResource(R.string.settings_info_package),
@@ -189,7 +201,7 @@ private fun SettingUpcomingItem(text: String) {
         Icon(Icons.Default.Pending, null, tint = MaterialTheme.colorScheme.outline, modifier = Modifier.size(16.dp))
         Spacer(modifier = Modifier.width(12.dp))
         Text(
-            text = text.removePrefix("• "),
+            text = text,
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
         )

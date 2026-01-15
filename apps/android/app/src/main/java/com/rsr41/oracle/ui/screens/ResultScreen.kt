@@ -147,7 +147,7 @@ fun ResultScreen(
                         ResultDetailRow(stringResource(R.string.profile_gender), if (birthInfo.gender == Gender.MALE) stringResource(R.string.common_male) else stringResource(R.string.common_female))
                         ResultDetailRow(stringResource(R.string.profile_calendar_type), if (birthInfo.calendarType == CalendarType.SOLAR) stringResource(R.string.common_solar) else stringResource(R.string.common_lunar))
                         
-                        Divider(modifier = Modifier.padding(vertical = 12.dp), color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f))
+                        HorizontalDivider(modifier = Modifier.padding(vertical = 12.dp), color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f))
                         
                         Text(
                             stringResource(R.string.result_generated_at, DateTimeUtil.formatMillisToDateTime(result.generatedAtMillis)),

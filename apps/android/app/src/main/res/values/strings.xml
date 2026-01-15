@@ -1,175 +1,199 @@
 <resources>
     <string name="app_name">ORACLE</string>
     
-    <!-- 공통 -->
-    <string name="common_back">뒤로</string>
-    <string name="common_save">저장</string>
-    <string name="common_delete">삭제</string>
-    <string name="common_cancel">취소</string>
-    <string name="common_confirm">확인</string>
-    <string name="common_history">히스토리</string>
-    <string name="common_settings">설정</string>
-    <string name="common_save_history">히스토리에 저장</string>
-    <string name="common_saved">저장되었습니다</string>
-    <string name="common_profile_select">프로필 선택</string>
-    <string name="common_profile_none">프로필을 선택하세요</string>
-    <string name="common_profile_empty_error">등록된 프로필이 없습니다. \'운세\' 메뉴에서 프로필을 먼저 만들어주세요.</string>
-    <string name="common_analyze">분석하기</string>
-    <string name="common_result">분석 결과</string>
-    <string name="common_retry">다시 설정하기</string>
-    <string name="common_not_entered">미입력</string>
-    <string name="common_male">남성</string>
-    <string name="common_female">여성</string>
-    <string name="common_male_short">남</string>
-    <string name="common_female_short">여</string>
-    <string name="common_solar">양력</string>
-    <string name="common_lunar">음력</string>
-    <string name="common_selected">선택됨</string>
-    <string name="common_already_saved">이미 저장됨</string>
+    <!-- Common -->
+    <string name="common_back">Back</string>
+    <string name="common_save">Save</string>
+    <string name="common_delete">Delete</string>
+    <string name="common_cancel">Cancel</string>
+    <string name="common_confirm">Confirm</string>
+    <string name="common_history">History</string>
+    <string name="common_settings">Settings</string>
+    <string name="common_save_history">Save to History</string>
+    <string name="common_saved">Saved</string>
+    <string name="common_profile_select">Select Profile</string>
+    <string name="common_profile_none">Select a Profile</string>
+    <string name="common_profile_empty_error">No profiles found. Please create a profile in the \'Fortune\' menu.</string>
+    <string name="common_analyze">Analyze</string>
+    <string name="common_result">Result</string>
+    <string name="common_retry">Reset</string>
+    <string name="common_not_entered">Not Entered</string>
+    <string name="common_male">Male</string>
+    <string name="common_female">Female</string>
+    <string name="common_male_short">M</string>
+    <string name="common_female_short">F</string>
+    <string name="common_solar">Solar</string>
+    <string name="common_lunar">Lunar</string>
+    <string name="common_selected">Selected</string>
+    <string name="common_already_saved">Already Saved</string>
     
-    <!-- 홈 -->
-    <string name="home_title">오라클</string>
-    <string name="home_today_fortune">🔮 오늘의 운세</string>
-    <string name="home_today_fortune_desc">나의 사주를 확인하고 오늘의 운세를 알아보세요</string>
-    <string name="home_view_fortune">운세 보기</string>
-    <string name="home_menu">운세 메뉴</string>
+    <!-- Home -->
+    <string name="home_title">Oracle</string>
+    <string name="home_today_fortune">🔮 Today\'s Fortune</string>
+    <string name="home_today_fortune_desc">Check your Saju and today\'s fortune</string>
+    <string name="home_view_fortune">View Fortune</string>
+    <string name="home_menu">Menu</string>
     
-    <!-- 메뉴 이름 및 화면 제목 -->
-    <string name="menu_saju">사주/운세</string>
-    <string name="menu_manse">만세력</string>
-    <string name="menu_compatibility">궁합</string>
-    <string name="menu_face">관상</string>
-    <string name="menu_tarot">타로</string>
-    <string name="menu_dream">꿈해몽</string>
-    <string name="menu_not_ready">곧 준비될 예정입니다!</string>
+    <!-- Menu Names & Screen Titles -->
+    <string name="menu_saju">Saju/Fortune</string>
+    <string name="menu_manse">Manseok</string>
+    <string name="menu_compatibility">Compatibility</string>
+    <string name="menu_face">Face Reading</string>
+    <string name="menu_tarot">Tarot</string>
+    <string name="menu_dream">Dream</string>
+    <string name="menu_not_ready">Coming Soon!</string>
     
-    <string name="home_menu_fortune">만세력/대운</string>
-    <string name="home_menu_compatibility">궁합 분석</string>
-    <string name="home_menu_face">관상 분석</string>
+    <string name="home_menu_fortune">Manseok/Luck</string>
+    <string name="home_menu_compatibility">Compatibility</string>
+    <string name="home_menu_face">Face Analysis</string>
     
-    <string name="compatibility_type_select">궁합 유형 선택</string>
-    <string name="compatibility_my_profile">나의 프로필</string>
-    <string name="compatibility_partner_profile">상대방 프로필</string>
-    <string name="compatibility_analyze_btn">궁합 분석하기</string>
+    <string name="compatibility_type_select">Select Type</string>
+    <string name="compatibility_my_profile">My Profile</string>
+    <string name="compatibility_partner_profile">Partner Profile</string>
+    <string name="compatibility_analyze_btn">Analyze Compatibility</string>
     
-    <!-- 히스토리 관련 추가 -->
-    <string name="history_clear_all_desc">모든 기록 삭제</string>
-    <string name="history_empty_state">조회된 운세 내역이 없습니다</string>
-    <string name="history_clear_title">전체 삭제</string>
-    <string name="history_clear_confirm">모든 히스토리를 삭제하시겠습니까?</string>
-    <string name="history_legacy_title">이전 기록</string>
-    <string name="history_legacy_item_title">이전 사주 기록</string>
+    <!-- History -->
+    <string name="history_clear_all_desc">Delete All</string>
+    <string name="history_empty_state">No history found</string>
+    <string name="history_clear_title">Delete All</string>
+    <string name="history_clear_confirm">Delete all history records?</string>
+    <string name="history_legacy_title">Legacy Records</string>
+    <string name="history_legacy_item_title">Past Saju Record</string>
     
-    <!-- 관상 상세 -->
-    <string name="face_privacy_title">개인정보 보호 안내</string>
-    <string name="face_privacy_desc">업로드하신 사진은 분석 즉시 폐기되며, 서버에 저장되지 않습니다.</string>
-    <string name="face_guide_title">안내사항</string>
-    <string name="face_guide_1">1. 정면을 응시한 밝은 사진이 가장 정확합니다.</string>
-    <string name="face_guide_2">2. 안경이나 모자는 벗고 촬영해 주세요.</string>
-    <string name="face_guide_3">3. 이마와 눈썹이 잘 보이도록 머리를 정리해 주세요.</string>
-    <string name="face_guide_4">4. 본 서비스는 재미로 보는 용도로만 참고해 주세요.</string>
+    <!-- Face Reading -->
+    <string name="face_privacy_title">Privacy Notice</string>
+    <string name="face_privacy_desc">Uploaded photos are deleted immediately after analysis and are not saved on the server.</string>
+    <string name="face_guide_title">Guide</string>
+    <string name="face_guide_1">1. A bright front-facing photo is best.</string>
+    <string name="face_guide_2">2. Please remove glasses or hats.</string>
+    <string name="face_guide_3">3. Clear hair from forehead and eyebrows.</string>
+    <string name="face_guide_4">4. This service is for entertainment purposes only.</string>
     
-    <!-- 관상 추가 -->
-    <string name="face_analyzing">관상을 분석 중입니다...</string>
-    <string name="face_ready">사진이 준비되었습니다</string>
-    <string name="face_upload_hint">정면 얼굴 사진을 업로드하세요</string>
-    <string name="face_camera">카메라</string>
-    <string name="face_gallery">갤러리</string>
-    <string name="face_analyze_btn">분석 시작하기</string>
-    <string name="face_retake">다시 해보기</string>
-    <string name="face_guide_photo">정면 사진, 밝은 조명을 권장합니다</string>
-    <string name="face_security_full">사진은 분석 즉시 파기되며, 서버나 기기에 절대 저장되지 않으니 안심하고 이용하세요.</string>
-    <string name="face_terms_title">관상 분석 이용 동의</string>
-    <string name="face_terms_intro">본 기능은 과학적 근거가 없는 오락용 서비스입니다. 결과에 너무 의존하지 마세요.</string>
-    <string name="face_terms_bullet_1">업로드된 사진은 분석 즉시 파기됩니다.</string>
-    <string name="face_terms_bullet_2">민감 정보(인종, 건강 등)는 수집하거나 추정하지 않습니다.</string>
-    <string name="face_terms_bullet_3">분석 결과만 히스토리에 텍스트로 저장됩니다.</string>
-    <string name="face_terms_question">서비스 이용에 동의하시겠습니까?</string>
-    <string name="face_terms_agree">동의 및 시작하기</string>
+    <string name="face_analyzing">Analyzing Face...</string>
+    <string name="face_ready">Photo Ready</string>
+    <string name="face_upload_hint">Upload a front-facing photo</string>
+    <string name="face_camera">Camera</string>
+    <string name="face_gallery">Gallery</string>
+    <string name="face_analyze_btn">Start Analysis</string>
+    <string name="face_retake">Retake</string>
+    <string name="face_guide_photo">Front face, bright lighting required</string>
+    <string name="face_security_full">Photos are deleted immediately after analysis. We do not store them.</string>
+    <string name="face_terms_title">Face Analysis Consent</string>
+    <string name="face_terms_intro">This is for entertainment only. Do not rely on results.</string>
+    <string name="face_terms_bullet_1">Photos are deleted immediately.</string>
+    <string name="face_terms_bullet_2">Sensitive data (race, health) is not inferred.</string>
+    <string name="face_terms_bullet_3">Only text results are saved to history.</string>
+    <string name="face_terms_question">Do you agree?</string>
+    <string name="face_terms_agree">Agree &amp; Start</string>
+
+    <string name="face_privacy_bullet_1">Face analysis is for entertainment purposes only.</string>
+    <string name="face_privacy_bullet_2">We do not estimate sensitive personal attributes (race, health, etc).</string>
     
-    <!-- 입력/프로필 -->
-    <string name="profile_setup_title">프로필 설정</string>
-    <string name="profile_nickname">닉네임</string>
-    <string name="profile_birth_date">생년월일 (yyyy-MM-dd)</string>
-    <string name="profile_birth_time">태어난 시간 (HH:mm)</string>
-    <string name="profile_birth_time_unknown">시간 모름</string>
-    <string name="profile_gender">성별</string>
-    <string name="profile_calendar_type">달력 유형</string>
-    <string name="profile_save_for_later">프로필에 저장하여 다음에 다시 사용하기</string>
+    <!-- Input/Profile -->
+    <string name="profile_setup_title">Profile Setup</string>
+    <string name="profile_nickname">Nickname</string>
+    <string name="profile_birth_date">Birth Date (yyyy-MM-dd)</string>
+    <string name="profile_birth_time">Birth Time (HH:mm)</string>
+    <string name="profile_birth_time_unknown">Time Unknown</string>
+    <string name="profile_gender">Gender</string>
+    <string name="profile_calendar_type">Calendar Type</string>
+    <string name="profile_save_for_later">Save to profile for later</string>
     
-    <!-- 입력 화면 메시지 추가 -->
-    <string name="input_view_result_btn">결과 확인하기</string>
-    <string name="input_error_nickname_short">닉네임이 너무 짧습니다</string>
-    <string name="input_error_date_format">날짜 형식이 올바르지 않습니다</string>
-    <string name="input_error_time_format">시간 형식이 올바르지 않습니다</string>
+    <string name="input_view_result_btn">View Result</string>
+    <string name="input_error_nickname_short">Nickname is too short</string>
+    <string name="input_error_date_format">Invalid date format</string>
+    <string name="input_error_time_format">Invalid time format</string>
+    <string name="input_error_date_empty">Please enter a date</string>
+    <string name="input_error_date_year">Year must be 1900-2100</string>
+    <string name="input_error_date_month">Month must be 1-12</string>
+    <string name="input_error_date_day">Day is invalid for this month</string>
+    <string name="input_error_time_hour">Hour must be 00-23</string>
+    <string name="input_error_time_minute">Minute must be 00-59</string>
+    <string name="input_label_leap_month">Leap Month</string>
+    <string name="input_placeholder_date">1990-01-01</string>
+    <string name="input_placeholder_time">14:30</string>
     
-    <!-- 타로 -->
-    <string name="tarot_title">타로</string>
-    <string name="tarot_instruction">마음을 가다듬고 3장의 카드를 선택하세요</string>
-    <string name="tarot_selection_count">%1$d/%2$d 장 선택됨</string>
-    <string name="tarot_view_result">타로 결과 보기</string>
-    <string name="tarot_result_title">오늘의 타로 해석</string>
-    <string name="tarot_summary_label">한줄 요약</string>
-    <string name="tarot_detail_label">상세 해설</string>
-    <string name="tarot_reversed">역방향</string>
-    <string name="tarot_upright">정방향</string>
-    <string name="tarot_deep_analysis">심층 분석</string>
-    <string name="tarot_pros">좋은 점 ✨</string>
-    <string name="tarot_cons">주의할 점 ⚠️</string>
-    <string name="tarot_advice_title">Oracle의 조언 💌</string>
+    <!-- Tarot -->
+    <string name="tarot_title">Tarot</string>
+    <string name="tarot_instruction">Calm your mind and pick 3 cards</string>
+    <string name="tarot_selection_count">%1$d/%2$d Selected</string>
+    <string name="tarot_view_result">View Tarot Result</string>
+    <string name="tarot_result_title">Today\'s Tarot</string>
+    <string name="tarot_summary_label">Summary</string>
+    <string name="tarot_detail_label">Detail</string>
+    <string name="tarot_reversed">Reversed</string>
+    <string name="tarot_upright">Upright</string>
+    <string name="tarot_deep_analysis">Deep Analysis</string>
+    <string name="tarot_pros">Pros ✨</string>
+    <string name="tarot_cons">Cons ⚠️</string>
+    <string name="tarot_advice_title">Oracle\'s Advice 💌</string>
     
-    <!-- 만세력/운세 추가 -->
-    <string name="fortune_tab_daeun">대운</string>
-    <string name="fortune_tab_saeun">세운</string>
-    <string name="fortune_tab_wolun">월운</string>
-    <string name="fortune_select_profile_hint">상단의 프로필을 선택하여 만세력 결과를 확인하세요.</string>
-    <string name="fortune_profile_to_analyze">분석할 프로필</string>
-    <string name="profile_none_saved">저장된 프로필이 없습니다</string>
+    <!-- Fortune -->
+    <string name="fortune_tab_daeun">Great Luck</string>
+    <string name="fortune_tab_saeun">Yearly Luck</string>
+    <string name="fortune_tab_wolun">Monthly Luck</string>
+    <string name="fortune_select_profile_hint">Select a profile above to view Manseok results.</string>
+    <string name="fortune_profile_to_analyze">Profile to Analyze</string>
+    <string name="profile_none_saved">No profiles saved</string>
+    <string name="fortune_add_profile">Add Profile</string>
+    <string name="fortune_daewun_title">Current Luck Cycle</string>
+    <string name="fortune_daewun_flow">Luck Cycle Flow</string>
+    <string name="fortune_current">Current</string>
+    <string name="fortune_saeun_fmt">%d Yearly Luck</string>
+    <string name="fortune_wolun_fmt">%d Monthly Luck</string>
+    <string name="fortune_month_flow_fmt">%d Month Flow</string>
+    <string name="fortune_score_fmt">%d Score</string>
+    <string name="fortune_saeun_summary_fmt">%s Yearly Luck Summary</string>
     
-    <!-- 결과 화면 추가 -->
-    <string name="result_title">사주 결과</string>
-    <string name="result_input_summary">입력 정보</string>
-    <string name="result_birth_date">생년월일: %1$s</string>
-    <string name="result_birth_time">시간: %1$s</string>
-    <string name="result_gender">성별: %1$s</string>
-    <string name="result_calendar">달력: %1$s</string>
-    <string name="result_generated_at">조회시간: %1$s</string>
-    <string name="result_pillars_title">📊 사주 기둥 (四柱)</string>
-    <string name="result_summary_title">🔮 오늘의 총운</string>
-    <string name="result_retry_btn">다시 입력</string>
-    <string name="result_not_found">결과를 찾을 수 없습니다</string>
-    <string name="result_not_found_desc">입력 화면에서 정보를 입력해주세요</string>
-    <string name="result_go_to_input">입력 화면으로</string>
-    <string name="result_lucky_color">🍀 행운의 색상</string>
-    <string name="result_lucky_number">🔢 행운의 숫자</string>
+    <!-- Result -->
+    <string name="result_title">Saju Result</string>
+    <string name="result_input_summary">Input Info</string>
+    <string name="result_birth_date">Date: %1$s</string>
+    <string name="result_birth_time">Time: %1$s</string>
+    <string name="result_gender">Gender: %1$s</string>
+    <string name="result_calendar">Calendar: %1$s</string>
+    <string name="result_generated_at">Checked at: %1$s</string>
+    <string name="result_pillars_title">📊 Four Pillars</string>
+    <string name="result_summary_title">🔮 Today\'s Total Luck</string>
+    <string name="result_retry_btn">Retry</string>
+    <string name="result_not_found">Result Not Found</string>
+    <string name="result_not_found_desc">Please enter info in the input screen.</string>
+    <string name="result_go_to_input">Go to Input</string>
+    <string name="result_lucky_color">🍀 Lucky Color</string>
+    <string name="result_lucky_number">🔢 Lucky Number</string>
     
-    <string name="home_lucky_today_title">오늘의 행운 코디</string>
-    <string name="home_lucky_item_fmt">오늘은 \'%1$s\' 색상이 행운을 가져다 줍니다.</string>
+    <string name="color_gold">Gold</string>
+    <string name="color_red">Red</string>
+    <string name="color_blue">Blue</string>
+    <string name="color_green">Green</string>
+    <string name="color_silver">Silver</string>
+    <string name="home_lucky_today_title">Today\'s Lucky Look</string>
+    <string name="home_lucky_item_fmt">Today, \'%1$s\' color brings you luck.</string>
     
-    <!-- 설정 화면 추가 -->
-    <string name="settings_default_calendar_title">기본 달력 설정</string>
-    <string name="settings_default_calendar_desc">입력 화면에서 기본으로 선택될 달력 유형입니다.</string>
-    <string name="settings_calendar_solar">양력 (陽)</string>
-    <string name="settings_calendar_lunar">음력 (陰)</string>
-    <string name="settings_upcoming_title">추가 설정 (예정)</string>
-    <string name="settings_upcoming_gender">• 기본 성별 설정</string>
-    <string name="settings_upcoming_time">• 시간 입력 방식 (모름/직접입력)</string>
-    <string name="settings_upcoming_theme">• 테마 설정</string>
-    <string name="settings_info_title">앱 정보</string>
-    <string name="settings_info_version">버전: 1.0.0 (MVP)</string>
-    <string name="settings_info_package">패키지: com.rsr41.oracle</string>
+    <!-- Settings -->
+    <string name="settings_default_calendar_title">Default Calendar</string>
+    <string name="settings_default_calendar_desc">Default calendar type for input screens.</string>
+    <string name="settings_calendar_solar">Solar</string>
+    <string name="settings_calendar_lunar">Lunar</string>
     
-    <!-- 언어 설정 -->
-    <string name="settings_language_title">언어 설정</string>
-    <string name="settings_language_desc">앱에서 사용할 언어를 선택하세요.</string>
-    <string name="settings_language_korean">한국어</string>
+    <string name="settings_upcoming_title">Upcoming Settings</string>
+    <string name="settings_upcoming_gender">Default Gender</string>
+    <string name="settings_upcoming_time">Time Input Method</string>
+    <string name="settings_upcoming_theme">Theme</string>
+    
+    <string name="settings_info_title">App Info</string>
+    <string name="settings_info_version">Version: 1.0.0 (MVP)</string>
+    <string name="settings_info_package">Package: com.rsr41.oracle</string>
+    
+    <string name="settings_language_title">Language</string>
+    <string name="settings_language_desc">Select app language</string>
+    <string name="settings_language_korean">Korean</string>
     <string name="settings_language_english">English</string>
-    <string name="settings_language_system">시스템</string>
+    <string name="settings_language_system">System</string>
     
-    <!-- 테마 설정 -->
-    <string name="settings_theme_title">테마 설정</string>
-    <string name="settings_theme_desc">앱의 외관 테마를 선택하세요.</string>
-    <string name="settings_theme_light">라이트</string>
-    <string name="settings_theme_dark">다크</string>
-    <string name="settings_theme_system">시스템</string>
+    <string name="settings_theme_title">Theme</string>
+    <string name="settings_theme_desc">Select app theme</string>
+    <string name="settings_theme_light">Light</string>
+    <string name="settings_theme_dark">Dark</string>
+    <string name="settings_theme_system">System</string>
 </resources>

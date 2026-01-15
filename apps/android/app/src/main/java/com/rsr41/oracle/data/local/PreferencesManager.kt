@@ -254,8 +254,8 @@ class PreferencesManager(context: Context) {
                 summary = obj.optString("summary", ""),
                 payload = obj.optString("payload", "{}"),
                 inputSnapshot = obj.optString("inputSnapshot", "{}"),
-                profileId = obj.optString("profileId", null),
-                partnerProfileId = obj.optString("partnerProfileId", null),
+                profileId = if (obj.isNull("profileId")) null else obj.getString("profileId"),
+                partnerProfileId = if (obj.isNull("partnerProfileId")) null else obj.getString("partnerProfileId"),
                 createdAt = obj.optLong("createdAt", System.currentTimeMillis())
             )
         } catch (e: Exception) {

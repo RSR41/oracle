@@ -3,39 +3,32 @@ package com.rsr41.oracle.core.util
 import android.util.Log
 
 /**
- * 날짜/시간 유효성 검증 유틸리티
+ * Validates date and time strings.
+ * Returns Pair(Boolean, String?) errors.
  */
 object ValidationUtil {
     private const val TAG = "ValidationUtil"
 
-    /**
-     * yyyy-MM-dd 형식의 날짜 문자열 유효성 검증
-     * @return Pair<Boolean, String?> - (유효여부, 에러메시지)
-     */
     fun validateDate(dateStr: String): Pair<Boolean, String?> {
         if (dateStr.isBlank()) {
-            Log.w(TAG, "Date validation failed: empty string")
-            return Pair(false, "날짜를 입력해주세요")
+            return Pair(false, "Please enter a date")
         }
 
         val regex = Regex("""^\d{4}-\d{2}-\d{2}$""")
         if (!regex.matches(dateStr)) {
-            Log.w(TAG, "Date validation failed: invalid format - $dateStr")
-            return Pair(false, "날짜 형식이 올바르지 않습니다 (yyyy-MM-dd)")
+            return Pair(false, "Invalid date format (yyyy-MM-dd)")
         }
 
         val parts = dateStr.split("-")
-        val year = parts[0].toIntOrNull() ?: return Pair(false, "연도가 올바르지 않습니다")
-        val month = parts[1].toIntOrNull() ?: return Pair(false, "월이 올바르지 않습니다")
-        val day = parts[2].toIntOrNull() ?: return Pair(false, "일이 올바르지 않습니다")
+        val year = parts[0].toIntOrNull() ?: return Pair(false, "Invalid year")
+        val month = parts[1].toIntOrNull() ?: return Pair(false, "Invalid month")
+        val day = parts[2].toIntOrNull() ?: return Pair(false, "Invalid day")
 
         if (year < 1900 || year > 2100) {
-            Log.w(TAG, "Date validation failed: year out of range - $year")
-            return Pair(false, "연도는 1900~2100 사이여야 합니다")
+            return Pair(false, "Year must be 1900-2100")
         }
         if (month < 1 || month > 12) {
-            Log.w(TAG, "Date validation failed: month out of range - $month")
-            return Pair(false, "월은 1~12 사이여야 합니다")
+            return Pair(false, "Month must be 1-12")
         }
 
         val maxDay = when (month) {
@@ -46,46 +39,33 @@ object ValidationUtil {
         }
 
         if (day < 1 || day > maxDay) {
-            Log.w(TAG, "Date validation failed: day out of range - $day for month $month")
-            return Pair(false, "일이 올바르지 않습니다 (${month}월은 1~${maxDay}일)")
+            return Pair(false, "Day out of range")
         }
 
-        Log.d(TAG, "Date validation passed: $dateStr")
         return Pair(true, null)
     }
 
-    /**
-     * HH:mm 형식의 시간 문자열 유효성 검증
-     * 빈 문자열은 "시간 미입력"으로 허용
-     * @return Pair<Boolean, String?> - (유효여부, 에러메시지)
-     */
     fun validateTime(timeStr: String): Pair<Boolean, String?> {
         if (timeStr.isBlank()) {
-            // 시간 미입력은 허용
-            Log.d(TAG, "Time validation: empty (allowed)")
             return Pair(true, null)
         }
 
         val regex = Regex("""^\d{2}:\d{2}$""")
         if (!regex.matches(timeStr)) {
-            Log.w(TAG, "Time validation failed: invalid format - $timeStr")
-            return Pair(false, "시간 형식이 올바르지 않습니다 (HH:mm)")
+            return Pair(false, "Invalid time format (HH:mm)")
         }
 
         val parts = timeStr.split(":")
-        val hour = parts[0].toIntOrNull() ?: return Pair(false, "시간이 올바르지 않습니다")
-        val minute = parts[1].toIntOrNull() ?: return Pair(false, "분이 올바르지 않습니다")
+        val hour = parts[0].toIntOrNull() ?: return Pair(false, "Invalid hour")
+        val minute = parts[1].toIntOrNull() ?: return Pair(false, "Invalid minute")
 
         if (hour < 0 || hour > 23) {
-            Log.w(TAG, "Time validation failed: hour out of range - $hour")
-            return Pair(false, "시간은 00~23 사이여야 합니다")
+            return Pair(false, "Hour must be 00-23")
         }
         if (minute < 0 || minute > 59) {
-            Log.w(TAG, "Time validation failed: minute out of range - $minute")
-            return Pair(false, "분은 00~59 사이여야 합니다")
+            return Pair(false, "Minute must be 00-59")
         }
 
-        Log.d(TAG, "Time validation passed: $timeStr")
         return Pair(true, null)
     }
 
