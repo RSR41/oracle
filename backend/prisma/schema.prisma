@@ -1,0 +1,88 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  name      String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  profile   Profile?
+  tags      Tag[]
+  history   History[]
+  
+  transfersFrom TagTransfer[] @relation("TransferFrom")
+  transfersTo   TagTransfer[] @relation("TransferTo")
+}
+
+model Profile {
+  id          String  @id @default(uuid())
+  userId      String  @unique
+  user        User    @relation(fields: [userId], references: [id])
+  
+  birthDate   String  // YYYY-MM-DD
+  birthTime   String? // HH:mm or '00:00'
+  isSolar     Boolean @default(true)
+  isUnknown   Boolean @default(false)
+  isLeapMonth Boolean @default(false)
+  gender      String  // M/F
+  
+  updatedAt   DateTime @updatedAt
+}
+
+model Tag {
+  id        String    @id @default(uuid())
+  tagId     String    @unique // 16-char URL-safe Base64
+  ownerId   String?
+  owner     User?     @relation(fields: [ownerId], references: [id])
+  
+  status    String    @default("UNCLAIMED") // UNCLAIMED, CLAIMED, BLOCKED
+  
+  // Temporary data for PWA flow before claiming
+  tempData  Json?     // { name, birthDate, ... }
+  
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  
+  transfers TagTransfer[]
+}
+
+model TagTransfer {
+  id           String   @id @default(uuid())
+  tagId        String
+  tag          Tag      @relation(fields: [tagId], references: [id])
+  
+  code         String   @unique // 8-char alphanumeric
+  fromOwnerId  String
+  fromOwner    User     @relation("TransferFrom", fields: [fromOwnerId], references: [id])
+  
+  toOwnerId    String?
+  toOwner      User?    @relation("TransferTo", fields: [toOwnerId], references: [id])
+  
+  status       String   @default("PENDING") // PENDING, COMPLETED, EXPIRED
+  expiresAt    DateTime
+  completedAt  DateTime?
+  
+  createdAt    DateTime @default(now())
+}
+
+model History {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  
+  type      String   // SAJU, TAROT, FACE, COMPATIBILITY
+  title     String
+  summary   String
+  metadata  Json?    // Detailed result
+  
+  createdAt DateTime @default(now())
+}
