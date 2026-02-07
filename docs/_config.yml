@@ -1,0 +1,19 @@
+theme: jekyll-theme-minimal
+title: Oracle 사주 법적 고지
+description: Oracle 사주 앱의 이용약관 및 개인정보처리방침
+markdown: kramdown
+
+# 기본 URL 설정 (GitHub Pages 배포 시)
+# username.github.io/repo-name 형태로 배포됨
+baseurl: "/oracle"
+
+# 법적 문서 빌드 포함
+include:
+  - legal
+
+# 불필요한 파일 제외
+exclude:
+  - README.md
+  - Gemfile
+  - Gemfile.lock
+  - PLACEHOLDERS.md

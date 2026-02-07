@@ -7,6 +7,7 @@ import { TagsModule } from './tags/tags.module';
 import { HistoryModule } from './history/history.module';
 import { FaceModule } from './face/face.module';
 import { PrismaModule } from './prisma.module';
+import { LlmModule } from './llm/llm.module';
 
 @Module({
   imports: [
@@ -19,8 +20,10 @@ import { PrismaModule } from './prisma.module';
     TagsModule,
     HistoryModule,
     FaceModule,
+    LlmModule, // AI 기능 모듈
   ],
   controllers: [AppController],
   providers: [AppService],
 })
 export class AppModule { }
+

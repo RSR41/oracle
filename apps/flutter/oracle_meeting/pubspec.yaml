@@ -1,0 +1,22 @@
+name: oracle_meeting
+description: A new Flutter package for matching and meeting features.
+version: 0.0.1
+publish_to: 'none'
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+  flutter: ">=1.17.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  sqflite: ^2.4.2
+  intl: ^0.20.0
+  provider: ^6.1.2
+  uuid: ^4.3.3
+  go_router: ^17.0.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.0

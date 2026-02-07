@@ -1,0 +1,6 @@
+Analyzing oracle_flutter...                                     
+
+warning - Unused import: 'package:oracle_flutter/app/widgets/oracle_card.dart' - lib\app\screens\fortune\fortune_today_screen.dart:6:8 - unused_import
+  error - Target of URI doesn't exist: 'package:oracle_flutter/app/app.dart' - test\widget_test.dart:5:8 - uri_does_not_exist
+  error - The function 'OracleApp' isn't defined - test\widget_test.dart:14:29 - undefined_function
+
