@@ -1,8 +1,11 @@
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import 'package:oracle_flutter/app/state/app_state.dart';
 import 'package:oracle_flutter/app/theme/app_colors.dart';
+import 'package:oracle_flutter/app/services/saju/saju_service.dart';
+import 'package:oracle_flutter/app/services/saju/saju_models.dart';
 
 class CalendarScreen extends StatefulWidget {
   const CalendarScreen({super.key});
@@ -12,11 +15,13 @@ class CalendarScreen extends StatefulWidget {
 }
 
 class _CalendarScreenState extends State<CalendarScreen> {
+  final SajuService _sajuService = SajuService();
   DateTime _selectedDate = DateTime.now();
   DateTime _focusedMonth = DateTime.now();
 
-  // Mock fortune data for dates
+  // Mock fortune data + ganji cache
   final Map<int, int> _dailyFortune = {};
+  final Map<int, Pillar> _dailyGanji = {};
 
   @override
   void initState() {
@@ -25,10 +30,23 @@ class _CalendarScreenState extends State<CalendarScreen> {
   }
 
   void _generateMockFortune() {
-    final now = DateTime.now();
-    final daysInMonth = DateUtils.getDaysInMonth(now.year, now.month);
+    final daysInMonth = DateUtils.getDaysInMonth(
+      _focusedMonth.year,
+      _focusedMonth.month,
+    );
+    _dailyFortune.clear();
+    _dailyGanji.clear();
+
+    // Use a seed based on the month to ensure consistency for the same month
+    // but randomness across days.
+    final random = Random(_focusedMonth.year * 100 + _focusedMonth.month);
+
     for (int i = 1; i <= daysInMonth; i++) {
-      _dailyFortune[i] = 50 + (i * 7 + now.month * 3) % 50;
+      // Random score between 40 and 99
+      _dailyFortune[i] = 40 + random.nextInt(60);
+
+      final date = DateTime(_focusedMonth.year, _focusedMonth.month, i);
+      _dailyGanji[i] = _sajuService.getDayGanji(date);
     }
   }
 

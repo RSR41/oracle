@@ -8,6 +8,7 @@ import 'package:provider/provider.dart';
 import 'package:oracle_flutter/app/state/app_state.dart';
 import 'package:oracle_flutter/app/database/history_repository.dart';
 import 'package:oracle_flutter/app/models/fortune_result.dart';
+import 'package:oracle_flutter/app/config/feature_flags.dart';
 
 class HistoryScreen extends StatefulWidget {
   final String? initialFilter;
@@ -270,8 +271,11 @@ class _HistoryScreenState extends State<HistoryScreen> {
           _filterChip('전체', 'ALL'),
           const SizedBox(width: 8),
           _filterChip('사주', 'SAJU'),
-          const SizedBox(width: 8),
-          _filterChip('Meeting', 'MEETING'),
+          // Phase 2+: Meeting filter
+          if (FeatureFlags.showBetaFeatures) ...[
+            const SizedBox(width: 8),
+            _filterChip('Meeting', 'MEETING'),
+          ],
         ],
       ),
     );

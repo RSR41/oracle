@@ -10,13 +10,14 @@ enum AppThemePreference { light, dark, system }
 /// State container for the application, following React AppContext.
 class AppState extends ChangeNotifier {
   AppLanguage _language = AppLanguage.ko;
-  AppThemePreference _theme = AppThemePreference.system;
+  AppThemePreference _theme = AppThemePreference.dark; // 기본값을 다크(밤하늘)로
   SajuProfile? _profile;
+  bool _isFirstRun = true;
 
   AppLanguage get language => _language;
   AppThemePreference get theme => _theme;
   SajuProfile? get profile => _profile;
-
+  bool get isFirstRun => _isFirstRun;
   bool get hasSajuProfile => _profile != null;
 
   /// Loads state from SharedPreferences (startup only)
@@ -37,7 +38,7 @@ class AppState extends ChangeNotifier {
     if (themeStr != null) {
       _theme = AppThemePreference.values.firstWhere(
         (e) => e.name == themeStr,
-        orElse: () => AppThemePreference.system,
+        orElse: () => AppThemePreference.dark,
       );
     }
 
@@ -51,6 +52,25 @@ class AppState extends ChangeNotifier {
       }
     }
 
+    // Load First Run status
+    _isFirstRun = !(prefs.getBool('first_run_complete') ?? false);
+
+    notifyListeners();
+  }
+
+  /// Marks first run as complete
+  Future<void> completeFirstRun() async {
+    _isFirstRun = false;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('first_run_complete', true);
+    notifyListeners();
+  }
+
+  /// Resets first run (for testing)
+  Future<void> resetFirstRun() async {
+    _isFirstRun = true;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove('first_run_complete');
     notifyListeners();
   }
 

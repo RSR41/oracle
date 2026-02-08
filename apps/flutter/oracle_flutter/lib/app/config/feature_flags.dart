@@ -1,23 +1,22 @@
-import 'package:flutter/foundation.dart';
+/// FeatureFlags: 베타 기능 및 AI 기능 제어를 위한 중앙 관리 클래스
 
 /// FeatureFlags: 베타 기능 및 AI 기능 제어를 위한 중앙 관리 클래스
 ///
-/// ## MVP 기능 (항상 노출)
-/// - 사주 (/fortune-today, /saju-analysis)
+/// ## MVP (Phase 1) 기능 - 항상 노출
+/// - 사주 입력/결과 (/profile)
 /// - 만세력/캘린더 (/calendar)
 /// - 타로 (/tarot, /tarot-result)
+/// - 히스토리 (/history)
+/// - 설정 (/settings)
+///
+/// ## Phase 2+ 기능 (showBetaFeatures=true일 때만 노출)
 /// - 꿈해몽 (/dream, /dream-result)
 /// - 관상 얼굴분석 (/face, /face-result)
-///
-/// ## 베타 기능 (showBetaFeatures=true일 때만 노출)
 /// - 소개팅 전체 (/meeting, /meeting/*)
 /// - 궁합 (/compatibility, /compat-*)
 /// - 이상형 이미지 생성 (/ideal-type)
-///
-/// ## AI 온라인 기능 (aiOnline=true일 때만 활성화)
-/// - 사주/타로/꿈해몽/관상 AI 상세 분석
-/// - 백엔드 API 호출 (네트워크 연결 필요)
-/// - ⚠️ 개인정보 처리 동의 필요
+/// - 신년운세 (/yearly-fortune)
+/// - 전문상담 (/consultation)
 ///
 /// ## 빌드 모드
 /// | 모드 | BETA_FEATURES | AI_ONLINE | 용도 |
@@ -36,12 +35,9 @@ class FeatureFlags {
   );
 
   /// 베타 기능 표시 여부
-  /// - 릴리스 모드: false (기본값)
-  /// - 디버그 모드: true (kDebugMode)
-  /// - 명시적 설정: BETA_FEATURES=true/1
-  static const bool showBetaFeatures = _betaEnv == ''
-      ? kDebugMode
-      : (_betaEnv == 'true' || _betaEnv == '1');
+  /// - Phase 1 스토어 제출을 위해 기본값을 false로 설정
+  /// - 명시적으로 BETA_FEATURES=true로 설정해야만 베타 기능 노출
+  static const bool showBetaFeatures = _betaEnv == 'true' || _betaEnv == '1';
 
   // ========================================
   // AI 온라인 기능 플래그
@@ -54,7 +50,6 @@ class FeatureFlags {
   /// AI 온라인 기능 활성화 여부
   /// - 기본값: false (오프라인 전용)
   /// - 활성화: AI_ONLINE=true/1
-  /// - ⚠️ 활성화 시 개인정보 처리 동의 UX 필요
   static const bool aiOnline = _aiEnv == 'true' || _aiEnv == '1';
 
   // ========================================
@@ -72,7 +67,6 @@ class FeatureFlags {
   /// 스토어 심사용 안전 모드인지 확인
   static bool get isStoreRelease => !showBetaFeatures && !aiOnline;
 
-  /// AI 기능 사용 가능 여부 (온라인 + 동의 완료)
-  /// 실제 동의 상태는 별도 저장소에서 확인해야 함
+  /// AI 기능 사용 가능 여부
   static bool get canUseAi => aiOnline;
 }

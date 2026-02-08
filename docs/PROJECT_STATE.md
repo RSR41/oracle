@@ -1,6 +1,6 @@
-# Project State: Oracle Flutter (Release Candidate)
+# Project State: Oracle Flutter (Phase 2 Completed)
 
-이 문서는 Phase E-6 작업이 완료된 시점의 프로젝트 상태를 확정합니다.
+이 문서는 Phase E-6 및 추가 기능 강화(테마, 온보딩, 만세력 로직 개선) 작업이 완료된 시점의 프로젝트 상태를 확정합니다.
 
 ## 근거 데이터 (Evidence)
 - **FeatureFlags**: [feature_flags.dart](file:///C:/Users/qkrtj/destiny/oracle/apps/flutter/oracle_flutter/lib/app/config/feature_flags.dart#L1-L33)

@@ -11,6 +11,7 @@ import '../screens/tabs/history_screen.dart';
 import '../screens/tabs/profile_screen.dart';
 import '../screens/tabs/meeting_profile_gate.dart';
 import '../screens/onboarding/onboarding_screen.dart';
+import '../screens/onboarding/welcome_screen.dart';
 import '../state/app_state.dart';
 import 'package:provider/provider.dart';
 // Stack Screens
@@ -38,11 +39,36 @@ class AppRouter {
   static GoRouter? _router;
 
   static GoRouter router(AppState appState) {
+    // 첫 실행 여부에 따라 초기 위치 결정
+    final initialLocation = appState.isFirstRun ? '/welcome' : '/home';
+
     _router ??= GoRouter(
       navigatorKey: _rootNavigatorKey,
-      initialLocation: '/home',
+      initialLocation: initialLocation,
       refreshListenable: appState,
+      redirect: (context, state) {
+        // 첫 실행이면 welcome으로 리다이렉트 (단, welcome/onboarding은 제외)
+        final isOnWelcome = state.matchedLocation == '/welcome';
+        final isOnOnboarding = state.matchedLocation == '/onboarding';
+
+        if (appState.isFirstRun && !isOnWelcome && !isOnOnboarding) {
+          return '/welcome';
+        }
+        return null;
+      },
       routes: [
+        // Welcome Screen (첫 실행)
+        GoRoute(
+          path: '/welcome',
+          builder: (context, state) => const WelcomeScreen(),
+        ),
+
+        // Onboarding Screen (프로필 입력)
+        GoRoute(
+          path: '/onboarding',
+          builder: (context, state) => const OnboardingScreen(),
+        ),
+
         // Bottom Navigation Shell
         ShellRoute(
           navigatorKey: _shellNavigatorKey,
@@ -143,17 +169,11 @@ class AppRouter {
 
         // Stack Screens (No Bottom Nav)
         GoRoute(
-          path: '/onboarding',
-          builder: (context, state) => const OnboardingScreen(),
-        ),
-        GoRoute(
           path: '/face',
-          // MVP: 관상 얼굴분석은 항상 접근 가능
           builder: (context, state) => const FaceReadingScreen(),
         ),
         GoRoute(
           path: '/face-result',
-          // MVP: 관상 결과 화면
           builder: (context, state) {
             final extra = state.extra as Map<String, dynamic>;
             return FaceResultScreen(
@@ -178,12 +198,10 @@ class AppRouter {
         ),
         GoRoute(
           path: '/tarot',
-          // MVP: 타로는 항상 접근 가능
           builder: (context, state) => const TarotScreen(),
         ),
         GoRoute(
           path: '/tarot-result',
-          // MVP: 타로 결과 화면
           builder: (context, state) {
             final cards = state.extra as List<TarotCard>;
             return TarotResultScreen(cards: cards);
@@ -191,12 +209,10 @@ class AppRouter {
         ),
         GoRoute(
           path: '/dream',
-          // MVP: 꿈해몽은 항상 접근 가능
           builder: (context, state) => const DreamInputScreen(),
         ),
         GoRoute(
           path: '/dream-result',
-          // MVP: 꿈해몽 결과 화면
           builder: (context, state) {
             final extra = state.extra as Map<String, dynamic>;
             return DreamResultScreen(
@@ -303,5 +319,10 @@ class AppRouter {
       ],
     );
     return _router!;
+  }
+
+  /// 첫 실행 후 router 재설정 (for hot reload)
+  static void reset() {
+    _router = null;
   }
 }

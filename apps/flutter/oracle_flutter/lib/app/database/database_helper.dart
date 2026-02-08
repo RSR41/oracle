@@ -1,5 +1,6 @@
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
+import 'package:flutter/foundation.dart';
 
 /// Central database helper for SQLite operations.
 /// Manages schema creation and provides database access.
@@ -19,15 +20,21 @@ class DatabaseHelper {
   }
 
   Future<Database> _initDatabase() async {
-    final dbPath = await getDatabasesPath();
-    final path = join(dbPath, _databaseName);
+    try {
+      final dbPath = await getDatabasesPath();
+      final path = join(dbPath, _databaseName);
+      debugPrint('Opening database at: $path');
 
-    return await openDatabase(
-      path,
-      version: _databaseVersion,
-      onCreate: _onCreate,
-      onUpgrade: _onUpgrade,
-    );
+      return await openDatabase(
+        path,
+        version: _databaseVersion,
+        onCreate: _onCreate,
+        onUpgrade: _onUpgrade,
+      );
+    } catch (e) {
+      debugPrint('CRITICAL DATABASE ERROR: $e');
+      rethrow;
+    }
   }
 
   Future<void> _onCreate(Database db, int version) async {
