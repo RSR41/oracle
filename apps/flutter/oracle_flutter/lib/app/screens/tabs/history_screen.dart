@@ -75,15 +75,19 @@ class _HistoryScreenState extends State<HistoryScreen> {
         _items = data;
         _offset = data.length;
         _hasMore = data.length >= _pageSize;
-        _isLoading = false;
       });
     } catch (e) {
       if (!mounted) return;
       setState(() {
-        _isLoading = false;
         _hasError = true;
       });
       debugPrint('Error loading initial history: $e');
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
     }
   }
 
@@ -150,15 +154,6 @@ class _HistoryScreenState extends State<HistoryScreen> {
         ),
         centerTitle: true,
         actions: [
-          if (kDebugMode)
-            IconButton(
-              icon: const Icon(Icons.add_chart),
-              tooltip: '더미 데이터 생성 (Debug)',
-              onPressed: () async {
-                await _historyRepo.seedDummyHistory(50);
-                _loadInitialData();
-              },
-            ),
           IconButton(
             icon: const Icon(Icons.delete_outline),
             onPressed: () async {

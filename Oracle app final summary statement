@@ -1,0 +1,942 @@
+# ORACLE 사주어플 프로젝트 명세서 v10 FINAL
+
+> **프로젝트 목적**: Flutter 기반 ORACLE 사주 운세 앱 + NestJS 백엔드 + 소개팅 기능을  
+> 다른 환경/도구에서도 일관되게 개발 완수하기 위한 **최종 기준 문서**
+
+---
+
+## 🎯 핵심 요약 (v10 최종 업데이트)
+
+### ✅ 현재 완료 사항
+- **Flutter 앱 구조**: ✅ 완성 (calendar, dream, face, fortune, meeting, tarot 화면 구현)
+- **내비게이션**: ✅ go_router + 하단 탭바
+- **데이터베이스**: ✅ SQLite (database_helper.dart, history_repository.dart)
+- **서비스 레이어**: ✅ fortune_service.dart, ai_service.dart, face_analyzer.dart
+- **UI/테마**: ✅ app_theme.dart, starry_background.dart, 컬러 시스템
+- **백엔드**: ✅ NestJS (auth, face, history, llm, tags 모듈)
+- **개발자 계정**: ✅ Apple + Google 모두 완료
+
+### ⚠️ 즉시 필요 작업
+1. **기존 구현 완성도 점검** (Day 1, 최우선)
+2. **사주 패턴 데이터 생성** (Day 2-3)
+3. **데이터 연결 및 통합** (Day 4-7)
+4. **테스트 및 버그 수정** (Day 8-14)
+5. **스토어 제출 준비** (Day 15-21)
+
+### 📊 예상 일정
+- **Phase 1 (앱스토어 제출)**: 18-21일
+- **Phase 2 (AI + 소개팅)**: Phase 1 출시 후 4-8주
+
+---
+
+## 📋 목차
+
+1. [프로젝트 정의](#1-프로젝트-정의)
+2. [릴리스 전략](#2-릴리스-전략)
+3. [현재 상태 분석](#3-현재-상태-분석)
+4. [프로젝트 구조](#4-프로젝트-구조)
+5. [기술 스택](#5-기술-스택)
+6. [기능 명세](#6-기능-명세)
+7. [사주 데이터 전략](#7-사주-데이터-전략)
+8. [개발 로드맵](#8-개발-로드맵-21일)
+9. [앱스토어 제출](#9-앱스토어-제출-가이드)
+10. [체크리스트](#10-체크리스트)
+
+---
+
+## 1. 프로젝트 정의
+
+### 1.1 한 줄 설명
+**ORACLE**: 사주 팔자 분석, 만세력, 타로, 운세를 제공하며, Phase 2에서 AI 기반 관상/꿈해몽/궁합/소개팅까지 제공하는 종합 운세 앱
+
+### 1.2 핵심 가치
+- **정확성**: 전통 사주 명리학 기반 분석
+- **편의성**: 간단한 입력으로 즉시 결과 확인
+- **기록**: 모든 결과 저장 및 재확인 가능
+- **확장성**: Phase별 점진적 기능 추가
+
+---
+
+## 2. 릴리스 전략
+
+### 2.1 Phase 1: 빠른 출시 (2-3주)
+**목표**: 앱스토어 심사 통과 및 빠른 출시
+
+#### 포함 기능
+1. **사주 분석**
+   - 생년월일 입력 → 사주 팔자 계산
+   - 100개 패턴 DB 매칭
+   - 성격/직업/재물/건강 해석
+2. **만세력 (Calendar)**
+   - 날짜별 천간지지 조회
+3. **타로 (Tarot)**
+   - 카드 뽑기 (1장/3장)
+   - 78장 카드 해석
+4. **History**
+   - 결과 저장/조회/삭제
+5. **Settings**
+   - 테마/언어 설정
+
+#### 기술 제약
+- ✅ **AI 없음** → 심사 빠름
+- ✅ **오프라인 동작** → 안정성 높음
+- ✅ **무료 + 광고 없음** → 심사 우호적
+
+---
+
+### 2.2 Phase 2: 전체 기능 (4-8주)
+**목표**: Phase 1 출시 후 업데이트
+
+#### 추가 기능
+1. **AI 기반 서비스**
+   - 오늘의 운세 (GPT-4o/Claude/Gemini)
+   - 관상 분석 (Vision AI)
+   - 꿈해몽
+   - 궁합 상세 분석
+   - 이상형 생성
+2. **소개팅/매칭**
+   - 프로필 카드
+   - 좋아요/매칭/채팅
+3. **고급 기능**
+   - 푸시 알림
+   - 공유 기능
+
+#### 백엔드 활용
+- ✅ 기존 NestJS 백엔드 활용
+- ✅ LLM 모듈 이미 구현됨
+- ⚠️ 환경 변수 설정만 필요
+
+---
+
+## 3. 현재 상태 분석
+
+### 3.1 Flutter 앱 현황
+
+#### ✅ 완성된 구조
+```
+lib/
+├── main.dart                          ✅
+├── app/
+│   ├── config/
+│   │   ├── api_config.dart            ✅
+│   │   ├── feature_flags.dart         ✅ Phase 제어
+│   │
+│   ├── database/
+│   │   ├── database_helper.dart       ✅ SQLite
+│   │   └── history_repository.dart    ✅
+│   │
+│   ├── models/
+│   │   ├── fortune_result.dart        ✅
+│   │   ├── saju_profile.dart          ✅
+│   │   └── tarot_card.dart            ✅
+│   │
+│   ├── navigation/
+│   │   ├── app_router.dart            ✅ go_router
+│   │   └── scaffold_with_navbar.dart  ✅ 하단 탭
+│   │
+│   ├── screens/
+│   │   ├── calendar/                  ✅ 존재 (점검 필요)
+│   │   ├── dream/                     ✅ 존재 (점검 필요)
+│   │   ├── face/                      ✅ 존재 (점검 필요)
+│   │   ├── fortune/                   ✅ 존재 (점검 필요)
+│   │   ├── meeting/                   ✅ 존재 (Phase 2)
+│   │   ├── tarot/                     ✅ 존재 (점검 필요)
+│   │   └── tabs/                      ✅ 홈/운세/궁합/기록/설정
+│   │
+│   ├── services/
+│   │   ├── fortune_service.dart       ✅
+│   │   ├── ai/ai_service.dart         ✅
+│   │   ├── dream/dream_interpreter.dart ✅
+│   │   └── face/face_analyzer.dart    ✅
+│   │
+│   ├── theme/
+│   │   ├── app_theme.dart             ✅
+│   │   ├── app_colors.dart            ✅
+│   │   └── starry_background.dart     ✅
+│   │
+│   └── widgets/
+│       ├── bottom_nav.dart            ✅
+│       └── oracle_card.dart           ✅
+```
+
+#### ⚠️ 점검 필요 항목
+1. **각 화면의 완성도**
+   - UI는 있지만 실제 데이터 연결 상태 확인
+   - 더미 데이터 vs 실제 데이터 파악
+2. **서비스 레이어 구현도**
+   - fortune_service.dart의 실제 로직 확인
+   - 사주 계산 로직 존재 여부
+
+#### ❌ 누락 항목
+1. **assets/data/ 폴더** → 생성 필요
+   - `saju_patterns.json` (사주 패턴 100개)
+   - `tarot_cards.json` (타로 카드 78장)
+2. **사주 입력/결과 화면** → 확장/생성 필요
+
+---
+
+### 3.2 백엔드 현황
+
+#### ✅ 완성된 모듈
+```
+backend/src/
+├── auth/                  ✅ JWT 인증
+├── face/                  ✅ 관상 모듈
+├── history/               ✅ 기록 저장
+├── llm/                   ✅ LLM 서비스 (중요!)
+└── tags/                  ✅ 태그 관리
+```
+
+#### ⚠️ Phase 2 추가 필요
+```
+src/
+├── fortune/              → 운세 (LLM 활용)
+├── dream/                → 꿈해몽 (LLM 활용)
+├── compatibility/        → 궁합 (LLM 활용)
+├── meeting/              → 소개팅
+└── saju/                 → 사주 (선택, Phase 1은 로컬만)
+```
+
+---
+
+## 4. 프로젝트 구조
+
+### 4.1 전체 디렉토리
+```
+oracle/
+├── apps/
+│   ├── flutter/
+│   │   └── oracle_flutter/        # 메인 Flutter 앱
+│   └── android/
+│       └── src/main/assets/seed/
+│           └── saju_content.json  # 천간지지 정의 (참고용)
+│
+├── backend/                       # NestJS API
+│   ├── src/
+│   │   ├── auth/
+│   │   ├── face/
+│   │   ├── history/
+│   │   ├── llm/                   # ⭐ LLM 서비스
+│   │   └── tags/
+│   ├── prisma/
+│   └── .env
+│
+└── pwa/                           # PWA (Phase 3)
+```
+
+### 4.2 Flutter 앱 주요 파일
+```
+oracle_flutter/
+├── lib/
+│   ├── main.dart
+│   ├── app/
+│   │   ├── config/feature_flags.dart
+│   │   ├── database/database_helper.dart
+│   │   ├── navigation/app_router.dart
+│   │   ├── screens/
+│   │   ├── services/
+│   │   └── theme/
+│   └── ...
+│
+├── assets/
+│   ├── brand/
+│   │   ├── app_icon.png
+│   │   └── splash.png
+│   └── data/                      # ⚠️ 생성 필요
+│       ├── saju_patterns.json     # ⚠️ 생성 필요
+│       └── tarot_cards.json       # ⚠️ 생성 필요
+│
+├── pubspec.yaml
+└── ...
+```
+
+---
+
+## 5. 기술 스택
+
+### 5.1 Frontend
+| 기술 | 용도 | 상태 |
+|------|------|------|
+| **Flutter 3.x** | UI 프레임워크 | ✅ |
+| **Dart** | 프로그래밍 언어 | ✅ |
+| **go_router** | 라우팅 | ✅ |
+| **SQLite** | 로컬 DB | ✅ |
+| **Provider/Riverpod** | 상태 관리 | ✅ |
+
+### 5.2 Backend (Phase 2)
+| 기술 | 용도 | 상태 |
+|------|------|------|
+| **NestJS** | API 프레임워크 | ✅ |
+| **Prisma** | ORM | ✅ |
+| **PostgreSQL** | 클라우드 DB | ✅ |
+| **JWT** | 인증 | ✅ |
+
+### 5.3 AI (Phase 2)
+| 서비스 | 용도 | 비용 |
+|--------|------|------|
+| **GPT-4o** | LLM | $2.50/1M |
+| **Claude 3.5** | LLM | $3/1M |
+| **Gemini 2.0** | LLM | 무료 1500/day |
+| **Vision AI** | 관상 분석 | 유료 |
+
+---
+
+## 6. 기능 명세
+
+### 6.1 Phase 1 기능 (3주)
+
+#### 6.1.1 사주 분석 (Saju)
+**화면**: Profile → Saju Result
+
+**입력**:
+- 성함
+- 생년월일 (양력/음력)
+- 출생 시간
+- 성별
+
+**처리**:
+1. 입력 → 천간지지 8자 계산
+2. 100개 패턴 DB 매칭
+3. 가장 유사한 결과 반환
+
+**출력**:
+- 사주 팔자 (년/월/일/시)
+- 성격 분석
+- 직업운
+- 재물운
+- 건강
+- 행운의 색상/숫자
+- 종합 점수
+
+**저장**: SQLite History (type: saju)
+
+---
+
+#### 6.1.2 만세력 (Calendar)
+**화면**: Calendar Screen
+
+**기능**:
+- 달력 UI
+- 날짜 선택
+- 해당 날짜의 천간지지 표시
+
+**데이터**: 로컬 계산
+
+---
+
+#### 6.1.3 타로 (Tarot)
+**화면**: Tarot → Tarot Result
+
+**기능**:
+- 카드 뽑기 (1장 or 3장)
+- 카드 해석 표시
+
+**데이터**: `assets/data/tarot_cards.json` (78장)
+- 현재 제작한 이미지를 추가할 계획
+
+**저장**: SQLite History (type: tarot)
+
+---
+
+#### 6.1.4 History
+**화면**: History Screen
+
+**기능**:
+- 사주/타로 결과 목록
+- 필터 (전체/사주/타로)
+- 상세 보기
+- 삭제/전체 삭제
+
+**데이터**: SQLite 조회
+
+---
+
+#### 6.1.5 Settings
+**화면**: Settings Screen
+
+**기능**:
+- 다크/라이트 모드
+- 언어 (한국어/English)
+- 앱 정보
+
+---
+
+### 6.2 Phase 2 기능 (4-8주)
+
+#### 6.2.1 AI 운세
+- GPT-4o/Claude로 맞춤 해석
+- Backend llm 모듈 활용
+
+#### 6.2.2 관상 기능 (1)
+- 사진 업로드
+- Vision AI + LLM 분석
+
+#### 6.2.3 관상 기능 (2) (이상형) — AI
+- 관상에 대한 결과 값 받은 이후 결과 값에 잘맞는 이성의 LLM + 이미지 생성
+
+#### 6.2.4 꿈해몽
+- 꿈 내용 입력
+- LLM 해석
+
+#### 6.2.5 궁합
+- 두 사람 사주 입력
+- 궁합 점수 + 해석
+
+#### 6.2.6 소개팅 (오늘의 인연)
+- 프로필 카드
+- 매칭 알고리즘
+- 채팅
+
+---
+
+## 7. 사주 데이터 전략
+
+### 7.1 필요한 데이터 파일
+
+#### 1) 사주 패턴 100개
+**파일**: `assets/data/saju_patterns.json`
+
+**구조**:
+```json
+[
+  {
+    "id": 1,
+    "pattern": {
+      "year_gan": "갑", "year_ji": "자",
+      "month_gan": "병", "month_ji": "인",
+      "day_gan": "무", "day_ji": "신",
+      "hour_gan": "임", "hour_ji": "술"
+    },
+    "gender": "남",
+    "result": {
+      "personality": "리더십이 강하고 정직한 성격입니다...",
+      "career": "경영, 정치, 교육 분야에 적합합니다...",
+      "wealth": "중년 이후 재물운이 크게 상승합니다...",
+      "health": "심장과 혈압에 주의가 필요합니다...",
+      "luckyColor": ["빨강", "노랑"],
+      "luckyNumber": [1, 6, 8],
+      "overallScore": 75
+    }
+  }
+  // ... 100개
+]
+```
+
+**생성 방법**: ChatGPT/Claude 활용 (1-2시간)
+
+**프롬프트 예시**:
+```
+사주 팔자 결과 100개를 JSON 형식으로 생성해주세요.
+
+구조:
+- pattern: 천간지지 8자 (년/월/일/시)
+- gender: 남/여
+- result: 성격/직업/재물/건강/행운
+
+천간: 갑/을/병/정/무/기/경/신/임/계
+지지: 자/축/인/묘/진/사/오/미/신/유/술/해
+
+다양한 조합으로 100개 생성해주세요.
+```
+
+---
+
+#### 2) 타로 카드 78장
+**파일**: `assets/data/tarot_cards.json`
+
+**구조**:
+```json
+[
+  {
+    "id": 1,
+    "nameKo": "바보",
+    "nameEn": "The Fool",
+    "number": "0",
+    "suit": "major",
+    "uprightMeaning": "새로운 시작, 순수함, 자유로운 영혼",
+    "reversedMeaning": "무모함, 경솔함, 리스크",
+    "keywords": ["시작", "자유", "모험", "순수"]
+  }
+  // ... 78장 (메이저 22 + 마이너 56)
+]
+```
+
+**생성 방법**: ChatGPT/Claude 활용 (30분)
+
+---
+
+### 7.2 pubspec.yaml 업데이트
+```yaml
+flutter:
+  assets:
+    - assets/brand/
+    - assets/data/         # ⚠️ 추가
+```
+
+---
+
+## 8. 개발 로드맵 (21일)
+
+### Week 1: 점검 + 데이터 준비 (Day 1-7)
+
+#### ⚠️ Day 1: 기존 구현 점검 (최우선)
+**시간**: 2-3시간
+
+**작업**:
+```bash
+# 1. Flutter 앱 실행
+cd C:\Users\qkrtj\destiny\oracle\apps\flutter\oracle_flutter
+flutter pub get
+flutter run -d windows
+
+# 2. 각 화면 점검
+```
+
+**체크리스트**:
+- [ ] Home 화면 동작 확인
+- [ ] Profile 화면 확인 (사주 입력 가능?)
+- [ ] Calendar 화면 확인 (만세력 계산?)
+- [ ] Tarot 화면 확인 (카드 뽑기?)
+- [ ] Fortune 화면 확인
+- [ ] Dream 화면 확인
+- [ ] Face 화면 확인
+- [ ] History 화면 확인 (저장/조회?)
+- [ ] Settings 화면 확인 (테마 변경?)
+
+**결과 기록**:
+```
+[예시]
+✅ Home: 완성
+⚠️ Profile: 입력 폼 있으나 사주 계산 없음
+⚠️ Tarot: UI 있으나 카드 데이터 없음
+❌ Calendar: 천간지지 계산 로직 없음
+```
+
+---
+
+#### Day 2-3: 데이터 생성
+**시간**: 3-4시간
+
+**작업**:
+1. `assets/data/` 폴더 생성
+2. ChatGPT/Claude로 사주 패턴 100개 생성
+   - `saju_patterns.json`
+3. ChatGPT/Claude로 타로 카드 78장 생성
+   - `tarot_cards.json`
+4. `pubspec.yaml` 업데이트
+   ```yaml
+   flutter:
+     assets:
+       - assets/brand/
+       - assets/data/
+   ```
+5. `flutter pub get` 실행
+
+---
+
+#### Day 4-5: 사주 기능 완성
+**작업**:
+- [ ] `SajuService` 구현
+  - 패턴 JSON 로딩
+  - 패턴 매칭 로직
+- [ ] 사주 계산 로직
+  - 생년월일 → 천간지지 변환
+  - Android 로직 참고 또는 간단한 룩업 테이블
+- [ ] Profile 화면 확장
+  - 사주 입력 폼 완성
+  - 저장 버튼
+- [ ] 사주 결과 화면
+  - 팔자 카드 표시
+  - 해석 표시
+  - 저장 기능
+- [ ] History 연동 테스트
+
+---
+
+#### Day 6-7: 만세력 + 타로 완성
+**작업**:
+- [ ] Calendar 만세력 계산
+  - 날짜 → 천간지지 로직
+- [ ] Tarot 완성
+  - 타로 카드 JSON 로딩
+  - 카드 뽑기 로직 (랜덤 1/3장)
+  - 결과 화면
+  - 저장 기능
+- [ ] 통합 테스트
+
+---
+
+### Week 2: 통합 + 테스트 (Day 8-14)
+
+#### Day 8-10: 통합 테스트
+**작업**:
+- [ ] 전체 플로우 테스트
+  - 사주: 입력 → 결과 → 저장 → History ✅
+  - 타로: 뽑기 → 결과 → 저장 → History ✅
+  - 만세력: 날짜 선택 → 천간지지 표시 ✅
+- [ ] 데이터 흐름 검증
+  - SQLite 저장/조회 확인
+  - 에러 처리
+- [ ] 엣지 케이스 테스트
+  - 음력 날짜
+  - 특수 시간대
+  - 빈 History
+
+---
+
+#### Day 11-12: 버그 수정
+**작업**:
+- [ ] 크래시 수정
+- [ ] UI 버그 수정
+- [ ] 성능 최적화
+  - 로딩 시간 개선
+  - 메모리 최적화
+
+---
+
+#### Day 13-14: UI/UX 개선
+**작업**:
+- [ ] 디자인 통일성
+- [ ] 애니메이션 추가
+- [ ] 다국어 검증 (한/영)
+- [ ] 접근성 개선
+
+---
+
+### Week 3: 스토어 준비 + 제출 (Day 15-21)
+
+#### Day 15-17: 스토어 자료
+**작업**:
+- [ ] **앱 아이콘** (1024x1024)
+  - 기존 `assets/brand/app_icon.png` 확인
+  - 필요시 재디자인 (Canva/Figma)
+  - 컨셉: 주역 괘, 태극, 타로 카드
+
+- [ ] **스크린샷 8개**
+  1. 사주 결과 (핵심!)
+  2. 사주 입력
+  3. 만세력
+  4. 타로 뽑기
+  5. 타로 결과
+  6. History
+  7. Settings
+  8. Home
+  - 크기: iPhone 1290x2796, Android 1080x1920
+
+- [ ] **앱 설명** (한/영)
+- [ ] **키워드 리서치**
+- [ ] **개인정보처리방침**
+  - Firebase Hosting으로 호스팅
+  - URL: `https://oracle-saju.web.app/privacy`
+
+---
+
+#### Day 18-19: 빌드
+**작업**:
+- [ ] iOS 빌드
+  ```bash
+  flutter build ios --release
+  # Xcode에서 Archive
+  ```
+- [ ] Android 빌드
+  ```bash
+  flutter build appbundle --release
+  ```
+- [ ] TestFlight 배포
+- [ ] Google Play Internal Testing
+
+---
+
+#### Day 20-21: 제출
+**작업**:
+- [ ] App Store Connect 제출
+  - 앱 정보 입력
+  - 스크린샷 업로드
+  - 빌드 업로드
+  - 심사 요청
+- [ ] Google Play Console 제출
+  - 앱 정보 입력
+  - 스크린샷 업로드
+  - AAB 업로드
+  - 심사 요청
+- [ ] 심사 모니터링
+
+---
+
+## 9. 앱스토어 제출 가이드
+
+### 9.1 앱 정보
+
+#### 앱 이름
+- **메인**: ORACLE (또는 "오라클 사주")
+- **부제**: "전통 사주와 타로"
+
+#### 카테고리
+- Lifestyle / Entertainment
+
+#### 설명 (한국어)
+```
+오라클 사주 - 전통 사주와 타로의 만남
+
+[주요 기능]
+• 사주 팔자 분석: 생년월일로 나의 사주 확인
+• 만세력: 전통 만세력 달력
+• 타로: 오늘의 운세를 타로 카드로
+• 기록: 모든 결과 저장/공유
+
+100% 무료, 광고 없음, 오프라인 지원
+```
+
+#### 설명 (영어)
+```
+ORACLE Saju - Traditional Korean Fortune Telling
+
+[Features]
+• Saju Analysis: Four Pillars from birth date
+• Manse Calendar: Traditional Korean calendar
+• Tarot Reading: Daily fortune with Tarot
+• History: Save and review all results
+
+Free, No Ads, Works Offline
+```
+
+#### 키워드
+- 사주, 만세력, 타로, 운세, fortune, saju, tarot
+
+---
+
+### 9.2 개인정보처리방침
+**URL**: `https://oracle-saju.web.app/privacy`
+
+**간단 템플릿**:
+```html
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>개인정보처리방침 - ORACLE</title>
+</head>
+<body>
+  <h1>개인정보처리방침</h1>
+  
+  <h2>1. 개인정보 수집</h2>
+  <p>ORACLE은 사용자의 개인정보를 수집하지 않습니다.</p>
+  
+  <h2>2. 데이터 저장</h2>
+  <p>생년월일, 시간 등의 정보는 사용자 기기에만 저장되며, 서버로 전송되지 않습니다.</p>
+  
+  <h2>3. 광고 및 추적</h2>
+  <p>본 앱은 광고를 표시하지 않으며, 사용자 추적을 하지 않습니다.</p>
+  
+  <h2>4. 문의</h2>
+  <p>이메일: support@oracle-saju.com</p>
+</body>
+</html>
+```
+
+**호스팅**:
+```bash
+firebase init hosting
+firebase deploy
+```
+
+---
+
+### 9.3 심사 팁
+
+#### App Store
+✅ **통과 전략**:
+- AI 없음 → 빠른 심사
+- 오프라인 → 안정적
+- 무료 + 광고 없음
+
+⚠️ **주의사항**:
+- 타로/사주: "엔터테인먼트 목적"
+- 생년월일: "기기 저장만"
+
+**앱 리뷰 메모**:
+```
+This app provides traditional Korean fortune-telling (Saju) and Tarot reading 
+for entertainment purposes only. All data is stored locally on the device.
+No server communication, no AI, no personal data collection.
+```
+
+#### Google Play
+✅ **데이터 세이프티**:
+- 데이터 수집: 아니요
+- 데이터 공유: 아니요
+- 데이터 삭제: 가능
+
+---
+
+### 9.4 예상 심사 기간
+- **App Store**: 1-3일
+- **Google Play**: 수 시간~3일
+
+---
+
+## 10. 체크리스트
+
+### Phase 1 출시 (21일)
+
+#### Week 1: 점검 + 데이터
+- [ ] **Day 1**: 기존 구현 점검
+  - [ ] Flutter 앱 실행
+  - [ ] 모든 화면 확인
+  - [ ] 미완성 부분 식별
+- [ ] **Day 2-3**: 데이터 생성
+  - [ ] `assets/data/` 폴더
+  - [ ] 사주 패턴 100개
+  - [ ] 타로 카드 78장
+  - [ ] pubspec.yaml 업데이트
+- [ ] **Day 4-5**: 사주 완성
+  - [ ] SajuService
+  - [ ] 계산 로직
+  - [ ] Profile 확장
+  - [ ] 결과 화면
+- [ ] **Day 6-7**: 만세력 + 타로
+  - [ ] Calendar 로직
+  - [ ] Tarot 완성
+
+#### Week 2: 통합 + 테스트
+- [ ] **Day 8-10**: 통합 테스트
+  - [ ] 사주 플로우
+  - [ ] 타로 플로우
+  - [ ] History
+- [ ] **Day 11-12**: 버그 수정
+- [ ] **Day 13-14**: UI/UX 개선
+
+#### Week 3: 스토어
+- [ ] **Day 15-17**: 자료 준비
+  - [ ] 아이콘
+  - [ ] 스크린샷 8개
+  - [ ] 앱 설명
+  - [ ] 개인정보처리방침
+- [ ] **Day 18-19**: 빌드
+  - [ ] iOS
+  - [ ] Android
+- [ ] **Day 20-21**: 제출
+
+---
+
+### Phase 2 (추후)
+- [ ] Backend 환경 변수
+- [ ] AI 모듈 추가
+- [ ] 소개팅 기능
+- [ ] 업데이트 제출
+
+---
+
+## 부록 A. 즉시 시작 가이드
+
+### 🔥 Day 1 작업 (오늘, 2-3시간)
+
+#### 1. Flutter 앱 실행
+```bash
+cd C:\Users\qkrtj\destiny\oracle\apps\flutter\oracle_flutter
+flutter pub get
+flutter run -d windows
+```
+
+#### 2. 전체 화면 점검
+**체크리스트**:
+- [ ] Home
+- [ ] Profile
+- [ ] Calendar
+- [ ] Tarot
+- [ ] Fortune
+- [ ] Dream
+- [ ] Face
+- [ ] History
+- [ ] Settings
+
+**기록 양식**:
+```
+[Home]
+✅ 완성: 버튼 동작 정상
+⚠️ 개선: 더미 데이터
+
+[Profile]
+⚠️ 미완성: 사주 계산 없음
+작업: SajuService 추가
+
+[Calendar]
+❌ 미완성: 천간지지 계산 없음
+```
+
+#### 3. 작업 계획 수립
+- 미완성 부분 우선순위
+- Day 2-21 계획 조정
+
+---
+
+### Day 2부터
+1. 데이터 생성 (사주 패턴 + 타로 카드)
+2. 핵심 기능 구현
+3. 통합 테스트
+4. 스토어 제출
+
+---
+
+## 부록 B. Phase 2 백엔드
+
+### 현재 백엔드
+```
+backend/src/
+├── auth/      # ✅ JWT
+├── face/      # ✅ 관상
+├── history/   # ✅ 기록
+├── llm/       # ✅ LLM 서비스
+└── tags/      # ✅ 태그
+```
+
+### 추가 필요
+```
+src/
+├── fortune/
+├── dream/
+├── compatibility/
+├── meeting/
+└── saju/
+```
+
+### 환경 변수
+```bash
+# .env
+OPENAI_API_KEY=sk-...
+GOOGLE_AI_KEY=...
+DATABASE_URL=postgresql://...
+JWT_SECRET=...
+```
+
+---
+
+## 부록 C. 버전별 변경사항
+
+### v7 → v8
+- 백엔드 구조 확인
+- 개발자 계정 완료
+- 사주 패턴 100개 생성 필요 명시
+
+### v8 → v9
+- 실제 파일 구조 확인
+- 많은 화면 이미 구현됨 발견
+- 기존 구현 활용 전략
+- Day 1 최우선: 기존 구현 점검
+
+### v9 → v10
+- 명세서 간결화 및 중복 제거
+- 실행 가능한 액션 플랜 강화
+- 기술 스택 명확화
+- 체크리스트 구체화
+
+---
+
+# 끝.
+
+**🚀 즉시 시작**:
+1. Day 1: Flutter 앱 실행 + 전체 화면 점검 (2-3시간)
+2. Day 2-3: 데이터 생성 (사주 패턴 + 타로 카드)
+3. Day 4-21: 개발 + 테스트 + 제출
+
+**🎯 21일 후**: 앱스토어 제출 완료!

@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import '../../state/app_state.dart';
 import '../../navigation/nav_state.dart';
 import '../../i18n/translations.dart';
+import '../../database/history_repository.dart';
+import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 
 /// 설정 화면
 /// - 언어/테마 설정
@@ -16,6 +19,57 @@ class SettingsScreen extends StatelessWidget {
     required this.appState,
     required this.navState,
   });
+
+  // Delete Account
+  Future<void> _handleDeleteAccount(BuildContext context) async {
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('계정/데이터 삭제'),
+        content: const Text(
+          '모든 사주 데이터와 프로필 정보가 영구적으로 삭제됩니다.\n이 작업은 되돌릴 수 없습니다.\n정말 삭제하시겠습니까?',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('취소'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            child: const Text('삭제'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirm == true && context.mounted) {
+      try {
+        // Clear all history
+        final historyRepo = HistoryRepository();
+        await historyRepo.clearAll();
+
+        // Clear AppState (Profile & Settings default)
+        final appState = Provider.of<AppState>(context, listen: false);
+        await appState.clearProfile();
+
+        if (context.mounted) {
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(const SnackBar(content: Text('모든 데이터가 삭제되었습니다.')));
+          // Navigate to Welcome
+          context.go('/welcome');
+        }
+      } catch (e) {
+        debugPrint('Error deleting account: $e');
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('오류가 발생했습니다. 다시 시도해주세요.')),
+          );
+        }
+      }
+    }
+  }
 
   /// 법적 고지 내용을 다이얼로그로 표시
   void _showLegalDialog(BuildContext context, String title, String content) {
@@ -138,6 +192,20 @@ Oracle은 정보통신망법, 개인정보보호법 등 관련 법령을 준수�
               ],
               selected: {appState.theme},
               onSelectionChanged: (set) => appState.setTheme(set.first),
+            ),
+            const SizedBox(height: 32),
+
+            // ============ 계정 관리 ============
+            const Text('계정 관리', style: TextStyle(fontWeight: FontWeight.bold)),
+            const SizedBox(height: 8),
+            ListTile(
+              leading: const Icon(Icons.person_off, color: Colors.redAccent),
+              title: const Text(
+                '회원 탈퇴 / 데이터 초기화',
+                style: TextStyle(color: Colors.redAccent),
+              ),
+              subtitle: const Text('기기에 저장된 모든 정보를 삭제합니다'),
+              onTap: () => _handleDeleteAccount(context),
             ),
             const SizedBox(height: 32),
 

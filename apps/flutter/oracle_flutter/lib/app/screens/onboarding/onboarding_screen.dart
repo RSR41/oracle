@@ -52,6 +52,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   }
 
   void _submit() async {
+    if (!_formKey.currentState!.validate()) {
+      return;
+    }
+
     if (_selectedYear == null ||
         _selectedMonth == null ||
         _selectedDay == null) {
@@ -109,7 +113,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   Align(
                     alignment: Alignment.centerLeft,
                     child: IconButton(
-                      onPressed: () => context.pop(),
+                      onPressed: () =>
+                          context.go('/welcome'), // Go back to Welcome screen
                       icon: const Icon(
                         Icons.arrow_back,
                         color: AppColors.nightTextPrimary,
@@ -145,7 +150,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
                   // 제목
                   const Text(
-                    '생년월일 입력',
+                    '정보 입력',
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 24,
@@ -155,7 +160,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    '정확한 사주를 보기 위해 정보를 입력해주세요',
+                    '정확한 사주를 위해 성함과 생년월일을 입력해주세요',
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 14,
@@ -176,6 +181,47 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+                        // 성함 입력
+                        const Text(
+                          '성함',
+                          style: TextStyle(
+                            color: AppColors.nightTextSecondary,
+                            fontSize: 12,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        TextFormField(
+                          initialValue: _nickname,
+                          style: const TextStyle(
+                            color: AppColors.nightTextPrimary,
+                          ),
+                          decoration: InputDecoration(
+                            hintText: '성함을 입력해주세요',
+                            hintStyle: const TextStyle(
+                              color: AppColors.nightTextMuted,
+                            ),
+                            filled: true,
+                            fillColor: AppColors.nightSkySurface,
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8),
+                              borderSide: BorderSide.none,
+                            ),
+                            contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 14,
+                            ),
+                          ),
+                          onChanged: (value) =>
+                              setState(() => _nickname = value),
+                          validator: (value) {
+                            if (value == null || value.trim().isEmpty) {
+                              return '성함을 입력해주세요';
+                            }
+                            return null;
+                          },
+                        ),
+                        const SizedBox(height: 20),
+
                         // 년/월/일 행
                         Row(
                           children: [

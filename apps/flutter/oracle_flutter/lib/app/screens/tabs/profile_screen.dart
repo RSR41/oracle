@@ -24,6 +24,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   TimeOfDay? _birthTime;
   String _gender = 'M';
   bool _isEditing = false;
+  bool _isTimeUnknown = false;
   SajuResult? _sajuResult;
 
   @override
@@ -47,14 +48,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
       _nicknameController.text = profile.nickname;
       _gender = profile.gender;
       _birthDate = DateTime.tryParse(profile.birthDate);
-      if (profile.birthTime != null) {
+      _birthDate = DateTime.tryParse(profile.birthDate);
+      if (profile.birthTime != null && profile.birthTime!.isNotEmpty) {
         final parts = profile.birthTime!.split(':');
         if (parts.length >= 2) {
           _birthTime = TimeOfDay(
             hour: int.tryParse(parts[0]) ?? 0,
             minute: int.tryParse(parts[1]) ?? 0,
           );
+          _isTimeUnknown = false;
         }
+      } else {
+        _birthTime = null;
+        _isTimeUnknown = true;
       }
       _calculateSaju();
       setState(() {});
@@ -114,9 +120,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
       nickname: _nicknameController.text.trim(),
       gender: _gender,
       birthDate: DateFormat('yyyy-MM-dd').format(_birthDate!),
-      birthTime: _birthTime != null
-          ? '${_birthTime!.hour.toString().padLeft(2, '0')}:${_birthTime!.minute.toString().padLeft(2, '0')}'
-          : null,
+      birthTime: (_isTimeUnknown || _birthTime == null)
+          ? null
+          : '${_birthTime!.hour.toString().padLeft(2, '0')}:${_birthTime!.minute.toString().padLeft(2, '0')}',
     );
 
     await context.read<AppState>().saveProfile(profile);
@@ -508,17 +514,29 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ),
           const SizedBox(height: 24),
 
-          // Nickname
+          // Name (formerly Nickname)
           TextFormField(
             controller: _nicknameController,
-            decoration: const InputDecoration(
-              labelText: '닉네임 *',
-              hintText: '닉네임을 입력해주세요',
-              prefixIcon: Icon(Icons.person),
+            style: const TextStyle(color: AppColors.nightTextPrimary),
+            decoration: InputDecoration(
+              labelText: '성함',
+              labelStyle: const TextStyle(color: AppColors.nightTextSecondary),
+              hintText: '성함을 입력해주세요',
+              hintStyle: const TextStyle(color: AppColors.nightTextMuted),
+              prefixIcon: const Icon(
+                Icons.person,
+                color: AppColors.nightTextSecondary,
+              ),
+              filled: true,
+              fillColor: AppColors.nightSkyCard,
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide.none,
+              ),
             ),
             validator: (value) {
               if (value == null || value.trim().isEmpty) {
-                return '닉네임을 입력해주세요';
+                return '성함을 입력해주세요';
               }
               return null;
             },
@@ -527,9 +545,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
           // Gender
           Text(
-            '성별 *',
+            '성별',
             style: theme.textTheme.bodyMedium?.copyWith(
               fontWeight: FontWeight.w500,
+              color: AppColors.nightTextSecondary,
             ),
           ),
           const SizedBox(height: 8),
@@ -560,9 +579,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
           // Birth Date
           Text(
-            '생년월일 *',
+            '생년월일',
             style: theme.textTheme.bodyMedium?.copyWith(
               fontWeight: FontWeight.w500,
+              color: AppColors.nightTextSecondary,
             ),
           ),
           const SizedBox(height: 8),
@@ -572,12 +592,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
             child: Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: AppColors.inputBackground,
+                color: AppColors.nightSkyCard,
                 borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: AppColors.nightBorder),
               ),
               child: Row(
                 children: [
-                  const Icon(Icons.calendar_today),
+                  const Icon(
+                    Icons.calendar_today,
+                    color: AppColors.nightTextSecondary,
+                  ),
                   const SizedBox(width: 12),
                   Text(
                     _birthDate != null
@@ -585,8 +609,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         : '생년월일을 선택해주세요',
                     style: TextStyle(
                       color: _birthDate != null
-                          ? null
-                          : AppColors.mutedForeground,
+                          ? AppColors.nightTextPrimary
+                          : AppColors.nightTextMuted,
                     ),
                   ),
                 ],
@@ -597,38 +621,104 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
           // Birth Time (Optional)
           Text(
-            '출생 시간 (선택)',
+            '출생 시간',
             style: theme.textTheme.bodyMedium?.copyWith(
               fontWeight: FontWeight.w500,
+              color: AppColors.nightTextSecondary,
             ),
           ),
           const SizedBox(height: 8),
-          InkWell(
-            onTap: _selectBirthTime,
-            borderRadius: BorderRadius.circular(12),
-            child: Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: AppColors.inputBackground,
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Row(
-                children: [
-                  const Icon(Icons.access_time),
-                  const SizedBox(width: 12),
-                  Text(
-                    _birthTime != null
-                        ? '${_birthTime!.hour.toString().padLeft(2, '0')}:${_birthTime!.minute.toString().padLeft(2, '0')}'
-                        : '출생 시간을 선택해주세요 (선택)',
-                    style: TextStyle(
-                      color: _birthTime != null
-                          ? null
-                          : AppColors.mutedForeground,
+          const SizedBox(height: 8),
+          Row(
+            children: [
+              Expanded(
+                child: InkWell(
+                  onTap: _isTimeUnknown
+                      ? null
+                      : _selectBirthTime, // Disable tap if unknown
+                  borderRadius: BorderRadius.circular(12),
+                  child: Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: _isTimeUnknown
+                          ? AppColors.nightSkyCard.withValues(alpha: 0.5)
+                          : AppColors.nightSkyCard,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: AppColors.nightBorder),
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.access_time,
+                          color: _isTimeUnknown
+                              ? AppColors.nightTextMuted
+                              : AppColors.nightTextSecondary,
+                        ),
+                        const SizedBox(width: 12),
+                        Text(
+                          _isTimeUnknown
+                              ? '출생 시간 모름'
+                              : (_birthTime != null
+                                    ? '${_birthTime!.hour.toString().padLeft(2, '0')}:${_birthTime!.minute.toString().padLeft(2, '0')}'
+                                    : '출생 시간을 선택해주세요'),
+                          style: TextStyle(
+                            color: _isTimeUnknown
+                                ? AppColors.nightTextMuted
+                                : (_birthTime != null
+                                      ? AppColors.nightTextPrimary
+                                      : AppColors.nightTextMuted),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                ],
+                ),
               ),
-            ),
+              const SizedBox(width: 12),
+              // Time Unknown Toggle Button
+              InkWell(
+                onTap: () {
+                  setState(() {
+                    _isTimeUnknown = !_isTimeUnknown;
+                    if (_isTimeUnknown) {
+                      _birthTime = null; // Reset time if unknown
+                    }
+                    _calculateSaju();
+                  });
+                },
+                borderRadius: BorderRadius.circular(12),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 16,
+                  ),
+                  decoration: BoxDecoration(
+                    color: _isTimeUnknown
+                        ? AppColors.starGold.withValues(alpha: 0.2)
+                        : AppColors.nightSkyCard,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: _isTimeUnknown
+                          ? AppColors.starGold
+                          : AppColors.nightBorder,
+                    ),
+                  ),
+                  child: Center(
+                    child: Text(
+                      '시간 모름',
+                      style: TextStyle(
+                        color: _isTimeUnknown
+                            ? AppColors.starGold
+                            : AppColors.nightTextSecondary,
+                        fontWeight: _isTimeUnknown
+                            ? FontWeight.bold
+                            : FontWeight.normal,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
           const SizedBox(height: 32),
 
@@ -638,14 +728,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
               '사주 미리보기',
               style: theme.textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.bold,
+                color: AppColors.nightTextPrimary,
               ),
             ),
             const SizedBox(height: 12),
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: AppColors.primary.withValues(alpha: 0.1),
+                color: AppColors.nightSkySurface,
                 borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: AppColors.nightBorder),
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -666,14 +758,33 @@ class _ProfileScreenState extends State<ProfileScreen> {
             width: double.infinity,
             child: FilledButton(
               onPressed: _saveProfile,
-              style: FilledButton.styleFrom(
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                backgroundColor: AppColors.primary,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
+              style:
+                  FilledButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    backgroundColor: AppColors.starGold,
+                    foregroundColor:
+                        AppColors.nightSkyDark, // Dark text on gold button
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    elevation: 0,
+                  ).copyWith(
+                    overlayColor: WidgetStateProperty.resolveWith((states) {
+                      if (states.contains(WidgetState.pressed)) {
+                        return Colors.black.withValues(
+                          alpha: 0.2,
+                        ); // Darken on press
+                      }
+                      return null;
+                    }),
+                  ),
+              child: Text(
+                _isEditing ? '수정 완료' : '저장하기',
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
                 ),
               ),
-              child: Text(_isEditing ? '수정 완료' : '저장하기'),
             ),
           ),
           const SizedBox(height: 12),
@@ -689,6 +800,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 },
                 style: OutlinedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 16),
+                  side: const BorderSide(color: AppColors.nightBorder),
+                  foregroundColor: AppColors.nightTextSecondary,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
@@ -717,23 +830,26 @@ class _ProfileScreenState extends State<ProfileScreen> {
         decoration: BoxDecoration(
           color: isSelected
               ? color.withValues(alpha: 0.1)
-              : AppColors.inputBackground,
+              : AppColors.nightSkyCard,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: isSelected ? color : Colors.transparent,
-            width: 2,
+            color: isSelected ? color : AppColors.nightBorder,
+            width: isSelected ? 2 : 1,
           ),
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon, color: isSelected ? color : AppColors.mutedForeground),
+            Icon(
+              icon,
+              color: isSelected ? color : AppColors.nightTextSecondary,
+            ),
             const SizedBox(width: 8),
             Text(
               label,
               style: TextStyle(
                 fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                color: isSelected ? color : null,
+                color: isSelected ? color : AppColors.nightTextSecondary,
               ),
             ),
           ],

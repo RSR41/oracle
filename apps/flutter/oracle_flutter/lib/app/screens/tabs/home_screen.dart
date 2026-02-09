@@ -59,7 +59,7 @@ class HomeScreen extends StatelessWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                '${appState.t('home.title')} $userName님',
+                                '$userName님',
                                 style: theme.textTheme.headlineSmall?.copyWith(
                                   fontWeight: FontWeight.w700,
                                   color: AppColors.nightTextPrimary,
