@@ -21,6 +21,14 @@
 
 > 기본 정책: **Phase 1(STORE_RELEASE) 고정 제출을 기본값으로 유지**하고,
 > Phase 2 기능은 **후속 업데이트로 분리**합니다.
+### 1-3. 사전 검증
+`verify_store_ready.ps1`와 `release_preflight.sh`를 실행하여 준비 상태를 확인합니다.
+```powershell
+cd ../../.. # repo root
+.\tools\verify_store_ready.ps1
+bash ./tools/release_preflight.sh
+```
+> **PASS**가 나와야 진행 가능합니다. (Android keystore 경로, iOS Signing 정책, placeholder 등 확인)
 
 ---
 
@@ -29,6 +37,28 @@
 ### 2-1. STORE_RELEASE
 ```powershell
 cd apps/flutter/oracle_flutter
+keytool -genkey -v -keystore oracle-release.jks -keyalg RSA -keysize 2048 -validity 10000 -alias oracle
+```
+- 비밀번호 설정 및 정보 입력
+
+### 2-2. key.properties 설정
+`android/key.properties` 파일을 열어 실제 비밀번호를 입력합니다.
+```properties
+storePassword=설정한_비밀번호
+keyPassword=설정한_비밀번호
+keyAlias=oracle
+storeFile=../oracle-release.jks
+```
+> 주의: 이 파일은 절대 커밋하지 마세요 (.gitignore 확인됨).
+
+
+### 2-3. iOS Signing 정책 확인
+- `docs/IOS_SIGNING.md` 기준과 `ios/Runner.xcodeproj/project.pbxproj`의 설정이 일치해야 합니다.
+- Team은 `ORACLE_IOS_TEAM_ID`로 주입하며 Signing은 Automatic 정책을 사용합니다.
+
+---
+
+## 3. STORE_RELEASE 빌드
 
 flutter build appbundle --release `
   --dart-define=BETA_FEATURES=false `
@@ -44,9 +74,10 @@ cd apps/flutter/oracle_flutter
 flutter build appbundle --release `
   --dart-define=BETA_FEATURES=true `
   --dart-define=AI_ONLINE=false `
-  --dart-define=TERMS_URL=https://<YOUR_GITHUB_ID>.github.io/oracle/legal/terms_of_service `
-  --dart-define=PRIVACY_URL=https://<YOUR_GITHUB_ID>.github.io/oracle/legal/privacy_policy
+  --dart-define=TERMS_URL=https://oracle-saju.github.io/oracle/legal/terms_of_service `
+  --dart-define=PRIVACY_URL=https://oracle-saju.github.io/oracle/legal/privacy_policy
 ```
+> `oracle-saju`를 실제 GitHub 아이디로 교체하세요.
 
 ---
 

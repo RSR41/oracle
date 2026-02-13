@@ -1,13 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:provider/provider.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:provider/provider.dart';
 import 'package:oracle_flutter/app/state/app_state.dart';
 import 'package:oracle_flutter/app/theme/app_colors.dart';
 import 'package:oracle_flutter/app/services/face/face_analyzer.dart';
+import 'package:oracle_flutter/app/screens/face/selected_image_preview.dart';
 
 class FaceReadingScreen extends StatefulWidget {
-  const FaceReadingScreen({super.key});
+  const FaceReadingScreen({
+    super.key,
+    this.onPickImage,
+    this.analyzer,
+  });
+
+  final Future<XFile?> Function(ImageSource source)? onPickImage;
+  final FaceAnalyzer? analyzer;
 
   @override
   State<FaceReadingScreen> createState() => _FaceReadingScreenState();
@@ -15,18 +23,20 @@ class FaceReadingScreen extends StatefulWidget {
 
 class _FaceReadingScreenState extends State<FaceReadingScreen> {
   final _picker = ImagePicker();
-  final _analyzer = MockFaceAnalyzer();
+  final FaceAnalyzer _defaultAnalyzer = MockFaceAnalyzer();
   String? _imagePath;
   bool _isAnalyzing = false;
 
   Future<void> _pickImage(ImageSource source) async {
     try {
-      final image = await _picker.pickImage(
-        source: source,
-        maxWidth: 1024,
-        maxHeight: 1024,
-        imageQuality: 80,
-      );
+      final image = await (widget.onPickImage != null
+          ? widget.onPickImage!(source)
+          : _picker.pickImage(
+              source: source,
+              maxWidth: 1024,
+              maxHeight: 1024,
+              imageQuality: 80,
+            ));
 
       if (image != null) {
         setState(() => _imagePath = image.path);
@@ -46,7 +56,9 @@ class _FaceReadingScreenState extends State<FaceReadingScreen> {
     setState(() => _isAnalyzing = true);
 
     try {
-      final result = await _analyzer.analyze(_imagePath!);
+      final result = await (widget.analyzer ?? _defaultAnalyzer).analyze(
+        _imagePath!,
+      );
       if (mounted) {
         context.push(
           '/face-result',
@@ -124,34 +136,9 @@ class _FaceReadingScreenState extends State<FaceReadingScreen> {
                 ),
               ),
               child: _imagePath != null
-                  ? ClipRRect(
+                  ? buildSelectedImagePreview(
+                      imagePath: _imagePath!,
                       borderRadius: BorderRadius.circular(16),
-                      child: Image.asset(
-                        'assets/placeholder.png',
-                        fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) {
-                          return Center(
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(
-                                  Icons.check_circle,
-                                  size: 48,
-                                  color: AppColors.sage,
-                                ),
-                                const SizedBox(height: 8),
-                                Text(
-                                  appState.t('face.imageSelected'),
-                                  style: const TextStyle(
-                                    color: AppColors.sage,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          );
-                        },
-                      ),
                     )
                   : Center(
                       child: Column(
@@ -211,6 +198,7 @@ class _FaceReadingScreenState extends State<FaceReadingScreen> {
             SizedBox(
               width: double.infinity,
               child: FilledButton(
+                key: const Key('face_analyze_button'),
                 onPressed: _imagePath == null || _isAnalyzing ? null : _analyze,
                 style: FilledButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 16),
