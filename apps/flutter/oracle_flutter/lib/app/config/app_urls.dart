@@ -21,11 +21,11 @@ class AppUrls {
   ///
   /// ⚠️ 스토어 제출 전:
   /// - dart-define으로 실제 URL 주입, 또는
-  /// - 아래 fallback URL의 oracle-user를 실제 GitHub 사용자명으로 교체
+  /// - 아래 fallback URL의 destiny-saju를 실제 GitHub 사용자명으로 교체
   static const String termsOfService = String.fromEnvironment(
     'TERMS_URL',
-    // TODO(DEPLOY): GitHub Pages 배포 후 oracle-user를 실제 사용자명으로 교체
-    defaultValue: 'https://oracle-user.github.io/oracle/legal/terms_of_service',
+    // TODO(DEPLOY): GitHub Pages 배포 후 destiny-saju를 실제 사용자명으로 교체
+    defaultValue: 'https://destiny-saju.github.io/oracle/legal/terms_of_service',
   );
 
   /// 개인정보처리방침 URL
@@ -36,11 +36,11 @@ class AppUrls {
   ///
   /// ⚠️ 스토어 제출 전:
   /// - dart-define으로 실제 URL 주입, 또는
-  /// - 아래 fallback URL의 oracle-user를 실제 GitHub 사용자명으로 교체
+  /// - 아래 fallback URL의 destiny-saju를 실제 GitHub 사용자명으로 교체
   static const String privacyPolicy = String.fromEnvironment(
     'PRIVACY_URL',
-    // TODO(DEPLOY): GitHub Pages 배포 후 oracle-user를 실제 사용자명으로 교체
-    defaultValue: 'https://oracle-user.github.io/oracle/legal/privacy_policy',
+    // TODO(DEPLOY): GitHub Pages 배포 후 destiny-saju를 실제 사용자명으로 교체
+    defaultValue: 'https://destiny-saju.github.io/oracle/legal/privacy_policy',
   );
 
   /// URL 유효성 검증
@@ -52,7 +52,7 @@ class AppUrls {
   static bool isValidUrl(String url) {
     if (!url.startsWith('https://')) return false;
     if (url.contains('example.com')) return false;
-    if (url.contains('YOUR_USERNAME')) return false; // fallback 미교체 감지
+    if (url.contains('oracle-user')) return false; // placeholder fallback 감지
     return Uri.tryParse(url) != null;
   }
 }

@@ -89,6 +89,7 @@ flutter run --release `
   - [ ] "오늘의 운세" 등 MVP 기능 정상 동작
   - [ ] "AI 분석" / "소개팅" 메뉴가 보이지 않음 (또는 동작 안함)
   - [ ] 설정 > 이용약관 클릭 시 브라우저 열림
+  - [ ] 이용약관/개인정보 URL 실제 접근 확인 (HTTPS, 404 없음)
 
 ### 4-2. Google Play Console 업로드
 1. Google Play Console 로그인
