@@ -2,13 +2,13 @@
 ///
 /// ## 법적 페이지 URL
 /// - dart-define으로 빌드 시 주입 가능
-/// - 주입 없으면 fallback URL 사용 (GitHub Pages 기준)
+/// - 주입이 없으면 기본 배포 URL 사용
 ///
 /// ## 사용 예시
 /// ```bash
 /// flutter build appbundle --release \
-///   --dart-define=TERMS_URL=https://username.github.io/oracle/legal/terms_of_service \
-///   --dart-define=PRIVACY_URL=https://username.github.io/oracle/legal/privacy_policy
+///   --dart-define=TERMS_URL=https://oracle-saju.web.app/terms \
+///   --dart-define=PRIVACY_URL=https://oracle-saju.web.app/privacy
 /// ```
 class AppUrls {
   AppUrls._(); // private 생성자 (인스턴스 생성 방지)
@@ -17,6 +17,10 @@ class AppUrls {
   ///
   /// 우선순위:
   /// 1. dart-define으로 주입된 값 (TERMS_URL)
+  /// 2. fallback: 기본 배포 URL
+  static const String termsOfService = String.fromEnvironment(
+    'TERMS_URL',
+    defaultValue: 'https://oracle-saju.web.app/terms',
   /// 2. fallback: 확정된 GitHub Pages URL
   ///
   /// ⚠️ 스토어 제출 전 필수:
@@ -32,6 +36,10 @@ class AppUrls {
   ///
   /// 우선순위:
   /// 1. dart-define으로 주입된 값 (PRIVACY_URL)
+  /// 2. fallback: 기본 배포 URL
+  static const String privacyPolicy = String.fromEnvironment(
+    'PRIVACY_URL',
+    defaultValue: 'https://oracle-saju.web.app/privacy',
   /// 2. fallback: 확정된 GitHub Pages URL
   ///
   /// ⚠️ 스토어 제출 전 필수:
