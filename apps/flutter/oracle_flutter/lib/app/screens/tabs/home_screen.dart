@@ -297,7 +297,8 @@ class HomeScreen extends StatelessWidget {
                             route: '/tarot',
                           ),
                           // Phase 2+: 꿈해몽, 궁합
-                          if (FeatureFlags.showBetaFeatures) ...[
+                          if (FeatureFlags.enableDream)
+                          if (FeatureFlags.phase2Features) ...[
                             _buildQuickAccessBtn(
                               context,
                               icon: Icons.bedtime,
@@ -305,6 +306,7 @@ class HomeScreen extends StatelessWidget {
                               color: AppColors.caramel,
                               route: '/dream',
                             ),
+                          if (FeatureFlags.enableCompatibility)
                             _buildQuickAccessBtn(
                               context,
                               icon: Icons.favorite,
@@ -312,7 +314,6 @@ class HomeScreen extends StatelessWidget {
                               color: AppColors.peach,
                               route: '/compatibility',
                             ),
-                          ],
                         ],
                       ),
                     ],
