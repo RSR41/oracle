@@ -76,6 +76,9 @@ dependencies:
 # The following section is specific to Flutter packages.
 flutter:
   uses-material-design: true
+  assets:
+    - assets/data/saju_patterns.json
+    - assets/data/tarot_cards.json
 
 flutter_launcher_icons:
   android: true
