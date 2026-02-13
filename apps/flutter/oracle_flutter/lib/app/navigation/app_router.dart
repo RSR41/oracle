@@ -15,7 +15,7 @@ import '../screens/onboarding/welcome_screen.dart';
 import '../state/app_state.dart';
 import 'package:provider/provider.dart';
 // Stack Screens
-import '../screens/stack/settings_screen.dart';
+import '../screens/tabs/settings_screen.dart';
 import '../screens/fortune/fortune_today_screen.dart';
 import '../screens/fortune/fortune_detail_screen.dart';
 import '../screens/meeting/meeting_history_detail_screen.dart';

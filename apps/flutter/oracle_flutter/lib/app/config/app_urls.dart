@@ -39,6 +39,8 @@ class AppUrls {
   /// - 아래 fallback URL의 oracle-user를 실제 도메인으로 교체
   static const String termsOfService = String.fromEnvironment(
     'TERMS_URL',
+    defaultValue:
+        'https://destiny-saju.github.io/oracle/legal/terms_of_service',
     // 확정된 GitHub Pages URL
     defaultValue: 'https://oracle-saju.github.io/oracle/legal/terms_of_service',
   );
@@ -67,6 +69,8 @@ class AppUrls {
   /// - 아래 fallback URL의 oracle-user를 실제 도메인으로 교체
   static const String privacyPolicy = String.fromEnvironment(
     'PRIVACY_URL',
+    defaultValue:
+        'https://destiny-saju.github.io/oracle/legal/privacy_policy',
     // 확정된 GitHub Pages URL
     defaultValue: 'https://oracle-saju.github.io/oracle/legal/privacy_policy',
   );
@@ -89,6 +93,7 @@ class AppUrls {
     if (url.contains('example.com')) return false;
     if (url.contains('oracle-user')) return false; // placeholder 감지
     if (url.contains('YOUR_USERNAME')) return false; // fallback 미교체 감지
+    if (url.contains('oracle-user.github.io')) return false;
     if (url.contains('oracle-user.github.io')) return false; // fallback 미교체 감지
     return Uri.tryParse(url) != null;
   }

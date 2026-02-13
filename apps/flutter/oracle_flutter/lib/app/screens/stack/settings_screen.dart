@@ -82,6 +82,11 @@ class SettingsScreen extends StatelessWidget {
             theme,
             icon: Icons.privacy_tip_outlined,
             title: appState.t('settings.privacy'),
+            subtitle: AppUrls.privacyPolicy,
+            onTap: () => _openLegalUrl(
+              context,
+              '개인정보처리방침',
+              AppUrls.privacyPolicy,
             onTap: () => _openLegalUrl(context, AppUrls.privacyPolicy),
             onTap: () => _openUrl(
               context,
@@ -98,6 +103,11 @@ class SettingsScreen extends StatelessWidget {
             theme,
             icon: Icons.article_outlined,
             title: appState.t('settings.terms'),
+            subtitle: AppUrls.termsOfService,
+            onTap: () => _openLegalUrl(
+              context,
+              '이용약관',
+              AppUrls.termsOfService,
             onTap: () => _openLegalUrl(context, AppUrls.termsOfService),
             onTap: () => _openUrl(
               context,
@@ -132,6 +142,25 @@ class SettingsScreen extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  Future<void> _openLegalUrl(
+    BuildContext context,
+    String label,
+    String url,
+  ) async {
+    if (!AppUrls.isValidUrl(url)) {
+      _showInfoDialog(context, '$label URL 오류', '유효하지 않은 URL입니다.\n$url');
+      return;
+    }
+
+    final uri = Uri.parse(url);
+    final opened = await launchUrl(uri, mode: LaunchMode.externalApplication);
+    if (!opened && context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('$label 페이지를 열 수 없습니다.\n$url')),
+      );
+    }
   }
 
   Widget _buildSectionHeader(String title, ThemeData theme) {
