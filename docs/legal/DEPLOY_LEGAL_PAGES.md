@@ -24,10 +24,10 @@
 
 ```
 이용약관:
-https://<USERNAME>.github.io/oracle/legal/terms_of_service
+https://oracle-saju.github.io/oracle/legal/terms_of_service
 
 개인정보처리방침:
-https://<USERNAME>.github.io/oracle/legal/privacy_policy
+https://oracle-saju.github.io/oracle/legal/privacy_policy
 ```
 
 예시 (username이 `destiny-saju`인 경우):
@@ -41,15 +41,15 @@ https://destiny-saju.github.io/oracle/legal/privacy_policy
 #### 방법 A: app_urls.dart 직접 수정 (개발용)
 ```dart
 // lib/app/config/app_urls.dart
-static const String termsOfService = 'https://USERNAME.github.io/oracle/legal/terms_of_service';
-static const String privacyPolicy = 'https://USERNAME.github.io/oracle/legal/privacy_policy';
+static const String termsOfService = 'https://oracle-saju.github.io/oracle/legal/terms_of_service';
+static const String privacyPolicy = 'https://oracle-saju.github.io/oracle/legal/privacy_policy';
 ```
 
 #### 방법 B: dart-define으로 빌드 시 주입 (릴리즈용)
 ```powershell
 flutter build appbundle --release `
-  --dart-define=TERMS_URL=https://USERNAME.github.io/oracle/legal/terms_of_service `
-  --dart-define=PRIVACY_URL=https://USERNAME.github.io/oracle/legal/privacy_policy
+  --dart-define=TERMS_URL=https://oracle-saju.github.io/oracle/legal/terms_of_service `
+  --dart-define=PRIVACY_URL=https://oracle-saju.github.io/oracle/legal/privacy_policy
 ```
 
 ---
@@ -90,7 +90,7 @@ legal.yourdomain.com
 ### 2단계: DNS 설정
 도메인 DNS에 CNAME 레코드 추가:
 ```
-legal.yourdomain.com → USERNAME.github.io
+legal.yourdomain.com → oracle-saju.github.io
 ```
 
 ### 3단계: HTTPS 활성화
@@ -120,8 +120,8 @@ GitHub Pages 설정에서 "Enforce HTTPS" 활성화
 
 | 페이지 | 경로 |
 |--------|------|
-| 인덱스 | `https://USERNAME.github.io/oracle/` |
-| 이용약관 | `https://USERNAME.github.io/oracle/legal/terms_of_service` |
-| 개인정보처리방침 | `https://USERNAME.github.io/oracle/legal/privacy_policy` |
+| 인덱스 | `https://oracle-saju.github.io/oracle/` |
+| 이용약관 | `https://oracle-saju.github.io/oracle/legal/terms_of_service` |
+| 개인정보처리방침 | `https://oracle-saju.github.io/oracle/legal/privacy_policy` |
 
-> ⚠️ `USERNAME`을 실제 GitHub 사용자명으로 교체하세요.
+> ✅ 본 프로젝트 확정 GitHub 사용자명은 `oracle-saju`입니다.
