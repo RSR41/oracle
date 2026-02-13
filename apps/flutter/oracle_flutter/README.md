@@ -22,4 +22,11 @@ flutter run
 bash tools/release_preflight.sh
 ```
 
+For help getting started with Flutter development, view the
+[online documentation](https://docs.flutter.dev/), which offers tutorials,
+samples, guidance on mobile development, and a full API reference.
+
+## 릴리즈
+
+- **최우선:** [스토어 제출 체크리스트](docs/STORE_SUBMISSION_CHECKLIST.md)
 자세한 내용은 `docs/MOBILE_RELEASE_GUIDE.md`를 참고하세요.
