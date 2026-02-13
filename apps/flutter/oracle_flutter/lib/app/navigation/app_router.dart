@@ -59,6 +59,12 @@ class AppRouter {
         if (appState.isFirstRun && !isOnWelcome && !isOnOnboarding) {
           return '/welcome';
         }
+
+        // 스토어 릴리즈(베타 기능 비활성화)에서는 Phase 2 경로 접근 차단
+        if (!FeatureFlags.showBetaFeatures &&
+            _isPhase2RestrictedRoute(state.matchedLocation)) {
+          return '/home';
+        }
         return null;
       },
       routes: [
@@ -487,5 +493,24 @@ class AppRouter {
   /// 첫 실행 후 router 재설정 (for hot reload)
   static void reset() {
     _router = null;
+  }
+
+  static bool _isPhase2RestrictedRoute(String matchedLocation) {
+    const restrictedPrefixes = [
+      '/face',
+      '/dream',
+      '/meeting',
+      '/compat',
+      '/ideal-type',
+      '/consultation',
+      '/yearly-fortune',
+    ];
+
+    return restrictedPrefixes.any(
+      (prefix) =>
+          matchedLocation == prefix ||
+          matchedLocation.startsWith('$prefix/') ||
+          matchedLocation.startsWith('$prefix-'),
+    );
   }
 }
