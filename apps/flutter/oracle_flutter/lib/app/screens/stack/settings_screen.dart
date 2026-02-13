@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:provider/provider.dart';
+import 'package:oracle_flutter/app/config/app_urls.dart';
 import 'package:oracle_flutter/app/state/app_state.dart';
 import 'package:oracle_flutter/app/theme/app_colors.dart';
 import 'package:oracle_flutter/app/i18n/translations.dart';
@@ -107,22 +109,14 @@ class SettingsScreen extends StatelessWidget {
             theme,
             icon: Icons.privacy_tip_outlined,
             title: appState.t('settings.privacy'),
-            onTap: () => _showInfoDialog(
-              context,
-              'Privacy Policy',
-              'Privacy policy will be available at oracle-saju.web.app/privacy',
-            ),
+            onTap: () => _openLegalUrl(context, AppUrls.privacyPolicy),
           ),
 
           _buildSettingCard(
             theme,
             icon: Icons.article_outlined,
             title: appState.t('settings.terms'),
-            onTap: () => _showInfoDialog(
-              context,
-              'Terms of Service',
-              'Terms of service will be available at oracle-saju.web.app/terms',
-            ),
+            onTap: () => _openLegalUrl(context, AppUrls.termsOfService),
           ),
 
           _buildSettingCard(
@@ -218,19 +212,20 @@ class SettingsScreen extends StatelessWidget {
     }
   }
 
-  void _showInfoDialog(BuildContext context, String title, String content) {
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: Text(title),
-        content: Text(content),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: const Text('OK'),
-          ),
-        ],
-      ),
-    );
+  Future<void> _openLegalUrl(BuildContext context, String url) async {
+    if (!AppUrls.isValidUrl(url)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('법적 문서 URL이 올바르지 않습니다.')),
+      );
+      return;
+    }
+
+    final uri = Uri.parse(url);
+    final opened = await launchUrl(uri, mode: LaunchMode.externalApplication);
+    if (!opened && context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('문서를 열 수 없습니다. 잠시 후 다시 시도해주세요.')),
+      );
+    }
   }
 }
