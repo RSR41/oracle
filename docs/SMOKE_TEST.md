@@ -9,6 +9,8 @@
   - Fortune 탭 노출 기능: 오늘의 운세, 만세력, 사주(프로필 유도), 타로
   - Dream/Face/Meeting/Compat: 베타 전용(스토어 릴리즈 기본 비노출)
 
+> 스토어 메타데이터/정책 입력 상태는 [STORE_SUBMISSION_CHECKLIST.md](./STORE_SUBMISSION_CHECKLIST.md)에서 함께 관리하세요.
+
 ## 1. 앱 설치 및 브랜딩
 - [ ] **아이콘 확인**: 홈 화면 앱 아이콘이 설정한 아이콘으로 노출되는가?
 - [ ] **앱 이름 확인**: 아이콘 아래 표시 이름이 "Oracle 사주"인가?
