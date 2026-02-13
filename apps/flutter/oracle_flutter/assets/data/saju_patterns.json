@@ -1,0 +1,102 @@
+[
+  {
+    "id": 1,
+    "pattern": {"year_gan": "갑", "year_ji": "자", "month_gan": "병", "month_ji": "인", "day_gan": "무", "day_ji": "진", "hour_gan": "임", "hour_ji": "오"},
+    "gender": "공통",
+    "result": {
+      "personality": "주도성이 강하고 결단이 빠른 편입니다.",
+      "career": "기획, 리더십, 대외 협업 업무에서 강점을 보입니다.",
+      "wealth": "중장기 자산관리에서 안정적 상승 흐름이 보입니다.",
+      "health": "과로로 인한 소화기 피로를 주의하세요.",
+      "message": "작은 실행을 시작하면 큰 성과로 이어지는 날입니다.",
+      "luckyColor": ["골드", "아이보리"],
+      "luckyNumber": [3, 7, 9],
+      "luckyTime": "오후 2-4시",
+      "overallScore": 84,
+      "loveScore": 82,
+      "moneyScore": 78,
+      "healthScore": 80,
+      "workScore": 88
+    }
+  },
+  {
+    "id": 2,
+    "pattern": {"year_gan": "을", "year_ji": "축", "month_gan": "정", "month_ji": "묘", "day_gan": "기", "day_ji": "사", "hour_gan": "계", "hour_ji": "미"},
+    "gender": "공통",
+    "result": {
+      "personality": "배려가 깊고 균형감각이 뛰어납니다.",
+      "career": "상담, 교육, 운영 관리 업무와 궁합이 좋습니다.",
+      "wealth": "지출 통제가 잘되면 수익성이 개선됩니다.",
+      "health": "수면 리듬을 일정하게 유지하는 것이 중요합니다.",
+      "message": "관계를 정돈하면 기회가 더 또렷하게 보입니다.",
+      "luckyColor": ["민트", "화이트"],
+      "luckyNumber": [2, 5, 8],
+      "luckyTime": "오전 9-11시",
+      "overallScore": 79,
+      "loveScore": 86,
+      "moneyScore": 74,
+      "healthScore": 81,
+      "workScore": 77
+    }
+  },
+  {
+    "id": 3,
+    "pattern": {"year_gan": "병", "year_ji": "인", "month_gan": "무", "month_ji": "진", "day_gan": "경", "day_ji": "오", "hour_gan": "갑", "hour_ji": "신"},
+    "gender": "공통",
+    "result": {
+      "personality": "추진력이 좋고 목표 지향적입니다.",
+      "career": "영업, 프로젝트 리딩, 스타트업 환경에서 성과를 냅니다.",
+      "wealth": "성과급/인센티브성 수익 운이 있습니다.",
+      "health": "목과 어깨 긴장을 자주 풀어주세요.",
+      "message": "주저하던 일을 정면 돌파하면 실마리가 생깁니다.",
+      "luckyColor": ["레드", "네이비"],
+      "luckyNumber": [1, 4, 6],
+      "luckyTime": "오후 6-8시",
+      "overallScore": 88,
+      "loveScore": 76,
+      "moneyScore": 85,
+      "healthScore": 74,
+      "workScore": 91
+    }
+  },
+  {
+    "id": 4,
+    "pattern": {"year_gan": "정", "year_ji": "묘", "month_gan": "기", "month_ji": "사", "day_gan": "신", "day_ji": "미", "hour_gan": "을", "hour_ji": "유"},
+    "gender": "공통",
+    "result": {
+      "personality": "섬세한 관찰력과 분석 능력이 뛰어납니다.",
+      "career": "디자인, 품질관리, 연구 직무에서 유리합니다.",
+      "wealth": "소액 분산 투자에 강점이 있습니다.",
+      "health": "눈 피로와 건조함 관리가 필요합니다.",
+      "message": "디테일을 점검하면 리스크를 크게 줄일 수 있습니다.",
+      "luckyColor": ["실버", "스카이"],
+      "luckyNumber": [4, 6, 7],
+      "luckyTime": "오후 1-3시",
+      "overallScore": 82,
+      "loveScore": 80,
+      "moneyScore": 81,
+      "healthScore": 77,
+      "workScore": 85
+    }
+  },
+  {
+    "id": 5,
+    "pattern": {"year_gan": "무", "year_ji": "진", "month_gan": "경", "month_ji": "오", "day_gan": "임", "day_ji": "신", "hour_gan": "병", "hour_ji": "자"},
+    "gender": "공통",
+    "result": {
+      "personality": "유연한 사고와 학습력이 빠릅니다.",
+      "career": "데이터, 기술, 전략 업무와 잘 맞습니다.",
+      "wealth": "정보 기반 의사결정이 수익으로 이어집니다.",
+      "health": "수분 섭취와 순환 관리가 핵심입니다.",
+      "message": "새로운 정보를 빠르게 흡수할수록 유리합니다.",
+      "luckyColor": ["블루", "블랙"],
+      "luckyNumber": [1, 6, 8],
+      "luckyTime": "오전 7-9시",
+      "overallScore": 86,
+      "loveScore": 75,
+      "moneyScore": 88,
+      "healthScore": 79,
+      "workScore": 90
+    }
+  }
+]
