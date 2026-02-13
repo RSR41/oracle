@@ -78,6 +78,8 @@ dev_dependencies:
 flutter:
   uses-material-design: true
   assets:
+    - assets/data/saju_patterns.json
+    - assets/data/tarot_cards.json
     - assets/data/
 
 flutter_launcher_icons:
