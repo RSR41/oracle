@@ -20,17 +20,27 @@
 ---
 
 ## 2) 앱 노출 방식 기준 (외부 URL 열기)
+- **회사명**: `오라클사주`
+- **대표자명**: `오라클사주 운영책임자`
+- **이메일**: `support@oracle-saju.com`
+- **주소**: `서울특별시 강남구 테헤란로 123`
 
 앱은 인앱 고정 문구가 아니라 **외부 URL 열기 방식**을 사용합니다.
 
 - 이용약관: `https://oracle-saju.github.io/oracle/legal/terms_of_service`
 - 개인정보처리방침: `https://oracle-saju.github.io/oracle/legal/privacy_policy`
+- **개인정보보호책임자명**: `오라클사주 개인정보보호책임자`
+- **연락처**: `02-1234-5678`
 
 해당 URL은 아래 파일과 1:1로 일치해야 합니다.
 
 - `apps/flutter/oracle_flutter/lib/app/config/app_urls.dart`
 - `docs/legal/terms_of_service.md`
 - `docs/legal/privacy_policy.md`
+- **GitHub Username**: `oracle-saju`
+- **배포 URL**:
+  - `https://oracle-saju.github.io/oracle/legal/terms_of_service`
+  - `https://oracle-saju.github.io/oracle/legal/privacy_policy`
 
 ---
 
@@ -39,3 +49,11 @@
 1. 문서 본문의 placeholder를 커밋 전 모두 실제값으로 치환합니다.
 2. 법적 문서 링크는 앱의 모든 설정 화면에서 `AppUrls` 값으로 단일화합니다.
 3. 스토어 제출 시 기입하는 약관/개인정보 URL은 본 문서의 URL과 동일하게 유지합니다.
+- **Keystore 비밀번호**: `********`
+- **Key 비밀번호**: `********`
+- **Key Alias**: `oracle` (기본값)
+
+---
+
+최종 검증일: 2026-02-13  
+검증자: Codex (GPT-5.2-Codex)

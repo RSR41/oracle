@@ -38,10 +38,17 @@ class _TarotScreenState extends State<TarotScreen>
     super.dispose();
   }
 
-  void _initDeck() {
+  Future<void> _initDeck() async {
     _deck = List.from(TarotDeck.majorArcana);
     _selectedCards = [];
     _hasDrawn = false;
+
+    final loadedDeck = await TarotDeckLoader.loadDeck();
+    if (!mounted) return;
+
+    setState(() {
+      _deck = loadedDeck;
+    });
   }
 
   Future<void> _shuffle() async {

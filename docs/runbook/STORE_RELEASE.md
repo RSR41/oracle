@@ -22,12 +22,13 @@ flutter pub get
 ```
 
 ### 1-3. 사전 검증
-`verify_store_ready.ps1` 스크립트를 실행하여 준비 상태를 확인합니다.
+`verify_store_ready.ps1`와 `release_preflight.sh`를 실행하여 준비 상태를 확인합니다.
 ```powershell
 cd ../../.. # repo root
 .\tools\verify_store_ready.ps1
+bash ./tools/release_preflight.sh
 ```
-> **PASS**가 나와야 진행 가능합니다. (key.properties, placeholder 등 확인)
+> **PASS**가 나와야 진행 가능합니다. (Android keystore 경로, iOS Signing 정책, placeholder 등 확인)
 
 ---
 
@@ -52,6 +53,11 @@ storeFile=../oracle-release.jks
 ```
 > 주의: 이 파일은 절대 커밋하지 마세요 (.gitignore 확인됨).
 
+
+### 2-3. iOS Signing 정책 확인
+- `docs/IOS_SIGNING.md` 기준과 `ios/Runner.xcodeproj/project.pbxproj`의 설정이 일치해야 합니다.
+- Team은 `ORACLE_IOS_TEAM_ID`로 주입하며 Signing은 Automatic 정책을 사용합니다.
+
 ---
 
 ## 3. STORE_RELEASE 빌드
@@ -65,10 +71,10 @@ cd apps/flutter/oracle_flutter
 flutter build appbundle --release `
   --dart-define=BETA_FEATURES=false `
   --dart-define=AI_ONLINE=false `
-  --dart-define=TERMS_URL=https://<YOUR_GITHUB_ID>.github.io/oracle/legal/terms_of_service `
-  --dart-define=PRIVACY_URL=https://<YOUR_GITHUB_ID>.github.io/oracle/legal/privacy_policy
+  --dart-define=TERMS_URL=https://oracle-saju.github.io/oracle/legal/terms_of_service `
+  --dart-define=PRIVACY_URL=https://oracle-saju.github.io/oracle/legal/privacy_policy
 ```
-> `<YOUR_GITHUB_ID>`를 실제 GitHub 아이디로 교체하세요.
+> `oracle-saju`를 실제 GitHub 아이디로 교체하세요.
 
 ### 3-2. 산출물 확인
 빌드가 완료되면 아래 경로에 AAB 파일이 생성됩니다.
