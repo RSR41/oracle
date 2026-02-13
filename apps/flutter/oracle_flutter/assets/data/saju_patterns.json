@@ -1,5 +1,59 @@
 [
   {
+    "id": "saju_day_wood_growth",
+    "overall": 85,
+    "love": 92,
+    "money": 78,
+    "health": 85,
+    "work": 88,
+    "message": "새로운 시작을 위한 준비가 필요한 날입니다. 작은 변화가 큰 결과를 가져올 수 있습니다.",
+    "luckyColor": "골드",
+    "luckyNumber": 7,
+    "luckyTime": "오후 2-4시",
+    "details": {
+      "love": "오늘은 사랑하는 사람과의 관계가 더욱 깊어질 수 있는 날입니다.",
+      "money": "예상치 못한 작은 수입이 있을 수 있습니다.",
+      "health": "몸 상태가 좋은 날입니다.",
+      "work": "집중력이 높아지는 시기입니다."
+    }
+  },
+  {
+    "id": "saju_day_fire_focus",
+    "overall": 79,
+    "love": 74,
+    "money": 82,
+    "health": 77,
+    "work": 84,
+    "message": "주변 정리를 통해 흐름을 되찾는 날입니다. 우선순위를 분명히 하면 성과가 납니다.",
+    "luckyColor": "코랄",
+    "luckyNumber": 3,
+    "luckyTime": "오전 9-11시",
+    "details": {
+      "love": "감정보다 경청이 관계를 안정시키는 포인트입니다.",
+      "money": "지출 점검을 하면 손실을 줄이고 기회를 확보할 수 있습니다.",
+      "health": "수분 섭취와 가벼운 스트레칭이 컨디션에 도움이 됩니다.",
+      "work": "작은 작업부터 마무리하면 큰 업무도 수월해집니다."
+    }
+  },
+  {
+    "id": "saju_day_water_balance",
+    "overall": 88,
+    "love": 83,
+    "money": 86,
+    "health": 90,
+    "work": 84,
+    "message": "균형감이 빛나는 날입니다. 직관을 따르되 기록을 남기면 운이 더 커집니다.",
+    "luckyColor": "네이비",
+    "luckyNumber": 1,
+    "luckyTime": "저녁 7-9시",
+    "details": {
+      "love": "편안한 대화가 관계의 신뢰를 더 깊게 만듭니다.",
+      "money": "장기적인 관점의 선택이 재정 안정에 유리합니다.",
+      "health": "충분한 휴식이 다음 날의 에너지를 높여줍니다.",
+      "work": "협업에서 조율 역할을 맡으면 좋은 평가를 받습니다."
+    }
+  }
+]
     "id": "flow_wood",
     "messageKo": "성장 에너지가 강해 새로운 시도가 좋은 결과로 이어질 수 있습니다.",
     "loveKo": "솔직한 대화가 관계를 한층 안정적으로 만들어줍니다.",
