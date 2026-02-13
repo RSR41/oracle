@@ -7,22 +7,22 @@
 
 ## 1. 회사/운영자 정보 (Terms of Service)
 
-- **[회사명]**: `(예: 주식회사 오라클)`
-- **[대표자명]**: `(예: 홍길동)`
-- **[이메일]**: `(예: support@oracle-saju.com)`
-- **[주소]**: `(예: 서울시 강남구 ...)`
+- **회사명**: `오라클사주`
+- **대표자명**: `오라클사주 운영책임자`
+- **이메일**: `support@oracle-saju.com`
+- **주소**: `서울특별시 강남구 테헤란로 123`
 
 ## 2. 개인정보 정보 (Privacy Policy)
 
-- **[개인정보보호책임자명]**: `(예: 김철수)`
-- **[연락처]**: `(예: 010-1234-5678)`
+- **개인정보보호책임자명**: `오라클사주 개인정보보호책임자`
+- **연락처**: `02-1234-5678`
 
 ## 3. GitHub Pages 설정
 
-- **GitHub Username**: `(예: honggildong)`
+- **GitHub Username**: `oracle-saju`
 - **배포 URL**:
-  - `https://honggildong.github.io/oracle/legal/terms_of_service`
-  - `https://honggildong.github.io/oracle/legal/privacy_policy`
+  - `https://oracle-saju.github.io/oracle/legal/terms_of_service`
+  - `https://oracle-saju.github.io/oracle/legal/privacy_policy`
 
 ---
 
@@ -31,3 +31,8 @@
 - **Keystore 비밀번호**: `********`
 - **Key 비밀번호**: `********`
 - **Key Alias**: `oracle` (기본값)
+
+---
+
+최종 검증일: 2026-02-13  
+검증자: Codex (GPT-5.2-Codex)
