@@ -95,41 +95,11 @@ class SettingsScreen extends StatelessWidget {
           // About Section
           _buildSectionHeader(appState.t('settings.about'), theme),
           const SizedBox(height: 12),
-
-          _buildSettingCard(
-            theme,
-            icon: Icons.info_outline,
-            title: appState.t('settings.version'),
-            subtitle: 'v1.1.0 (Phase 1)',
-          ),
-
-          _buildSettingCard(
-            theme,
-            icon: Icons.privacy_tip_outlined,
-            title: appState.t('settings.privacy'),
-            onTap: () => _showInfoDialog(
-              context,
-              'Privacy Policy',
-              'Privacy policy will be available at oracle-saju.web.app/privacy',
-            ),
-          ),
-
-          _buildSettingCard(
-            theme,
-            icon: Icons.article_outlined,
-            title: appState.t('settings.terms'),
-            onTap: () => _showInfoDialog(
-              context,
-              'Terms of Service',
-              'Terms of service will be available at oracle-saju.web.app/terms',
-            ),
-          ),
-
-          _buildSettingCard(
-            theme,
-            icon: Icons.mail_outline,
-            title: appState.t('settings.contact'),
-            subtitle: 'support@oracle-saju.com',
+          _SettingsInfoSection(
+            theme: theme,
+            appState: appState,
+            buildSettingCard: _buildSettingCard,
+            onShowInfoDialog: _showInfoDialog,
           ),
 
           const SizedBox(height: 32),
@@ -231,6 +201,68 @@ class SettingsScreen extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+class _SettingsInfoSection extends StatelessWidget {
+  const _SettingsInfoSection({
+    required this.theme,
+    required this.appState,
+    required this.buildSettingCard,
+    required this.onShowInfoDialog,
+  });
+
+  final ThemeData theme;
+  final AppState appState;
+  final Widget Function(
+    ThemeData theme, {
+    required IconData icon,
+    required String title,
+    String? subtitle,
+    Widget? trailing,
+    VoidCallback? onTap,
+  }) buildSettingCard;
+  final void Function(BuildContext context, String title, String content)
+  onShowInfoDialog;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        buildSettingCard(
+          theme,
+          icon: Icons.info_outline,
+          title: appState.t('settings.version'),
+          subtitle: 'v1.1.0 (Phase 1)',
+        ),
+        buildSettingCard(
+          theme,
+          icon: Icons.privacy_tip_outlined,
+          title: appState.t('settings.privacy'),
+          onTap: () => onShowInfoDialog(
+            context,
+            'Privacy Policy',
+            'Privacy policy will be available at oracle-saju.web.app/privacy',
+          ),
+        ),
+        buildSettingCard(
+          theme,
+          icon: Icons.article_outlined,
+          title: appState.t('settings.terms'),
+          onTap: () => onShowInfoDialog(
+            context,
+            'Terms of Service',
+            'Terms of service will be available at oracle-saju.web.app/terms',
+          ),
+        ),
+        buildSettingCard(
+          theme,
+          icon: Icons.mail_outline,
+          title: appState.t('settings.contact'),
+          subtitle: 'support@oracle-saju.com',
+        ),
+      ],
     );
   }
 }
