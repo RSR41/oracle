@@ -42,6 +42,9 @@ class AppRouter {
     // 첫 실행 여부에 따라 초기 위치 결정
     final initialLocation = appState.isFirstRun ? '/welcome' : '/home';
 
+    // 제출 프로파일별 활성 기능 목록을 시작 시 1회 출력 (심사/QA 확인용)
+    FeatureFlags.printSubmissionDiagnostics();
+
     _router ??= GoRouter(
       navigatorKey: _rootNavigatorKey,
       initialLocation: initialLocation,
@@ -88,8 +91,11 @@ class AppRouter {
             ),
             GoRoute(
               path: '/meeting',
+              // Phase 2 공개 정책:
+              // - STORE_RELEASE: 비공개
+              // - STORE_PLUS/FULL_DEV: 저위험(local-only) 기능만 공개
               redirect: (context, state) =>
-                  FeatureFlags.showBetaFeatures ? null : '/home',
+                  FeatureFlags.allowPhase2LowRisk ? null : '/home',
               pageBuilder: (context, state) {
                 final appState = Provider.of<AppState>(context);
                 if (!appState.hasSajuProfile) {
@@ -149,8 +155,11 @@ class AppRouter {
             ),
             GoRoute(
               path: '/compatibility',
+              // Phase 2 공개 정책:
+              // - STORE_RELEASE: 비공개
+              // - STORE_PLUS/FULL_DEV: 저위험(local-only) 기능만 공개
               redirect: (context, state) =>
-                  FeatureFlags.showBetaFeatures ? null : '/home',
+                  FeatureFlags.allowPhase2LowRisk ? null : '/home',
               pageBuilder: (context, state) =>
                   const NoTransitionPage(child: CompatibilityScreen()),
             ),
@@ -170,10 +179,14 @@ class AppRouter {
         // Stack Screens (No Bottom Nav)
         GoRoute(
           path: '/face',
+          redirect: (context, state) =>
+              FeatureFlags.allowPhase2Sensitive ? null : '/home',
           builder: (context, state) => const FaceReadingScreen(),
         ),
         GoRoute(
           path: '/face-result',
+          redirect: (context, state) =>
+              FeatureFlags.allowPhase2Sensitive ? null : '/home',
           builder: (context, state) {
             final extra = state.extra as Map<String, dynamic>;
             return FaceResultScreen(
@@ -184,6 +197,8 @@ class AppRouter {
         ),
         GoRoute(
           path: '/ideal-type',
+          redirect: (context, state) =>
+              FeatureFlags.allowPhase2Sensitive ? null : '/home',
           builder: (context, state) =>
               const ComingSoonScreen(title: 'Ideal Type'),
         ),
@@ -209,10 +224,14 @@ class AppRouter {
         ),
         GoRoute(
           path: '/dream',
+          redirect: (context, state) =>
+              FeatureFlags.allowPhase2Sensitive ? null : '/home',
           builder: (context, state) => const DreamInputScreen(),
         ),
         GoRoute(
           path: '/dream-result',
+          redirect: (context, state) =>
+              FeatureFlags.allowPhase2Sensitive ? null : '/home',
           builder: (context, state) {
             final extra = state.extra as Map<String, dynamic>;
             return DreamResultScreen(
@@ -223,6 +242,8 @@ class AppRouter {
         ),
         GoRoute(
           path: '/meeting/chat',
+          redirect: (context, state) =>
+              FeatureFlags.allowPhase2LowRisk ? null : '/home',
           builder: (context, state) {
             final extra = state.extra as Map<String, dynamic>;
             return MeetingChatScreen(
@@ -250,21 +271,29 @@ class AppRouter {
         ),
         GoRoute(
           path: '/consultation',
+          redirect: (context, state) =>
+              FeatureFlags.allowPhase2Sensitive ? null : '/home',
           builder: (context, state) =>
               const ComingSoonScreen(title: 'Consultation'),
         ),
         GoRoute(
           path: '/yearly-fortune',
+          redirect: (context, state) =>
+              FeatureFlags.allowPhase2Sensitive ? null : '/home',
           builder: (context, state) =>
               const ComingSoonScreen(title: '2026 Yearly Fortune'),
         ),
         GoRoute(
           path: '/compat-check',
+          redirect: (context, state) =>
+              FeatureFlags.allowPhase2LowRisk ? null : '/home',
           builder: (context, state) =>
               const ComingSoonScreen(title: 'Compatibility Check'),
         ),
         GoRoute(
           path: '/compat-result',
+          redirect: (context, state) =>
+              FeatureFlags.allowPhase2LowRisk ? null : '/home',
           builder: (context, state) =>
               const ComingSoonScreen(title: 'Compatibility Result'),
         ),
