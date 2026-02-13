@@ -9,9 +9,14 @@
 /// ## 사용 예시
 /// ```bash
 /// flutter build appbundle --release \
+///   --dart-define=TERMS_URL=https://destiny-saju.github.io/oracle/legal/terms_of_service \
+///   --dart-define=PRIVACY_URL=https://destiny-saju.github.io/oracle/legal/privacy_policy
 ///   --dart-define=TERMS_URL=https://oracle-saju.web.app/terms \
 ///   --dart-define=PRIVACY_URL=https://oracle-saju.web.app/privacy
 /// ```
+///
+/// 릴리즈 빌드에서는 위 `--dart-define` 값을 CI/CD 또는 빌드 스크립트에서
+/// 주입해 운영 URL을 고정하세요.
 class AppUrls {
   AppUrls._();
 
@@ -21,6 +26,10 @@ class AppUrls {
   ///
   /// 우선순위:
   /// 1. dart-define으로 주입된 값 (TERMS_URL)
+  /// 2. fallback: 운영 GitHub Pages URL
+  static const String termsOfService = String.fromEnvironment(
+    'TERMS_URL',
+    defaultValue: 'https://destiny-saju.github.io/oracle/legal/terms_of_service',
   /// 2. fallback: 운영 URL
   ///
   /// ⚠️ 스토어 제출 전:
@@ -56,6 +65,10 @@ class AppUrls {
   ///
   /// 우선순위:
   /// 1. dart-define으로 주입된 값 (PRIVACY_URL)
+  /// 2. fallback: 운영 GitHub Pages URL
+  static const String privacyPolicy = String.fromEnvironment(
+    'PRIVACY_URL',
+    defaultValue: 'https://destiny-saju.github.io/oracle/legal/privacy_policy',
   /// 2. fallback: 운영 URL
   ///
   /// ⚠️ 스토어 제출 전:

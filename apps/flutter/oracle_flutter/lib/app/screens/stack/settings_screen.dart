@@ -82,6 +82,7 @@ class SettingsScreen extends StatelessWidget {
             theme,
             icon: Icons.privacy_tip_outlined,
             title: appState.t('settings.privacy'),
+            onTap: () => _openLegalUrl(context, AppUrls.privacyPolicy),
             subtitle: AppUrls.privacyPolicy,
             onTap: () => _openLegalUrl(
               context,
@@ -103,6 +104,7 @@ class SettingsScreen extends StatelessWidget {
             theme,
             icon: Icons.article_outlined,
             title: appState.t('settings.terms'),
+            onTap: () => _openLegalUrl(context, AppUrls.termsOfService),
             subtitle: AppUrls.termsOfService,
             onTap: () => _openLegalUrl(
               context,
@@ -233,6 +235,14 @@ class SettingsScreen extends StatelessWidget {
   }
 
   Future<void> _openLegalUrl(BuildContext context, String url) async {
+    final uri = Uri.parse(url);
+    final isLaunched = await launchUrl(uri, mode: LaunchMode.externalApplication);
+
+    if (!isLaunched && context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Unable to open legal page. Please try again.')),
+      );
+    }
     if (!AppUrls.isValidUrl(url)) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('법적 문서 URL이 올바르지 않습니다.')),
