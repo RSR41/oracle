@@ -43,8 +43,8 @@ Select-String -Path "docs\legal\*.md" -Pattern "TODO\(FILL_ME\)"
 → [DEPLOY_LEGAL_PAGES.md](./legal/DEPLOY_LEGAL_PAGES.md) 참조
 
 - [ ] GitHub Pages 설정 완료 (Settings → Pages → /docs)
-- [ ] 이용약관 URL 접근 확인: `https://USERNAME.github.io/oracle/legal/terms_of_service`
-- [ ] 개인정보처리방침 URL 접근 확인: `https://USERNAME.github.io/oracle/legal/privacy_policy`
+- [ ] 이용약관 URL 접근 확인: `https://oracle-saju.github.io/oracle/legal/terms_of_service`
+- [ ] 개인정보처리방침 URL 접근 확인: `https://oracle-saju.github.io/oracle/legal/privacy_policy`
 
 ---
 
@@ -64,8 +64,8 @@ Select-String -Path "docs\legal\*.md" -Pattern "TODO\(FILL_ME\)"
 ```powershell
 flutter build appbundle --release `
   --dart-define=BETA_FEATURES=false `
-  --dart-define=TERMS_URL=https://USERNAME.github.io/oracle/legal/terms_of_service `
-  --dart-define=PRIVACY_URL=https://USERNAME.github.io/oracle/legal/privacy_policy
+  --dart-define=TERMS_URL=https://oracle-saju.github.io/oracle/legal/terms_of_service `
+  --dart-define=PRIVACY_URL=https://oracle-saju.github.io/oracle/legal/privacy_policy
 ```
 - [ ] `app-release.aab` 생성 확인
 
