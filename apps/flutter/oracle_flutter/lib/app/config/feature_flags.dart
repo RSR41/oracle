@@ -22,9 +22,15 @@
 /// | 모드 | BETA_FEATURES | AI_ONLINE | 용도 |
 /// |------|---------------|-----------|------|
 /// | STORE_RELEASE | false | false | 스토어 심사 제출용 |
+/// | PHASE2_PREVIEW(가칭) | true | false | 심사 대응용 제한적 Phase 2 노출 |
 /// | BETA_TEST | true | false | 베타 기능 테스트 |
 /// | AI_ENABLED | false | true | AI 기능 프로덕션 |
 /// | FULL_DEV | true | true | 전체 개발/테스트 |
+///
+/// ## 제출 프로파일 고정 규칙
+/// - STORE_RELEASE: 반드시 BETA_FEATURES=false, AI_ONLINE=false
+/// - PHASE2_PREVIEW(가칭): AI는 비활성 유지(AI_ONLINE=false),
+///   기능 노출은 라우팅/화면 단에서 제출 대상만 선별 오픈
 class FeatureFlags {
   // ========================================
   // 베타 기능 플래그
