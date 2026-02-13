@@ -22,12 +22,13 @@ flutter pub get
 ```
 
 ### 1-3. 사전 검증
-`verify_store_ready.ps1` 스크립트를 실행하여 준비 상태를 확인합니다.
+`verify_store_ready.ps1`와 `release_preflight.sh`를 실행하여 준비 상태를 확인합니다.
 ```powershell
 cd ../../.. # repo root
 .\tools\verify_store_ready.ps1
+bash ./tools/release_preflight.sh
 ```
-> **PASS**가 나와야 진행 가능합니다. (key.properties, placeholder 등 확인)
+> **PASS**가 나와야 진행 가능합니다. (Android keystore 경로, iOS Signing 정책, placeholder 등 확인)
 
 ---
 
@@ -51,6 +52,11 @@ keyAlias=oracle
 storeFile=../oracle-release.jks
 ```
 > 주의: 이 파일은 절대 커밋하지 마세요 (.gitignore 확인됨).
+
+
+### 2-3. iOS Signing 정책 확인
+- `docs/IOS_SIGNING.md` 기준과 `ios/Runner.xcodeproj/project.pbxproj`의 설정이 일치해야 합니다.
+- Team은 `ORACLE_IOS_TEAM_ID`로 주입하며 Signing은 Automatic 정책을 사용합니다.
 
 ---
 
