@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../navigation/nav_state.dart';
+import '../../config/feature_flags.dart';
 
 /// Simple placeholder for Tabs and functional screens.
 class SimpleScreen extends StatelessWidget {
@@ -35,8 +36,15 @@ class SimpleScreen extends StatelessWidget {
                 OutlinedButton(
                   onPressed: () {
                     // Simulate React onNavigate('face')
-                    navState.navigate('face');
-                    context.push('/face');
+                    if (FeatureFlags.showBetaFeatures) {
+                      navState.navigate('face');
+                      context.push('/face');
+                    } else {
+                      context.push(
+                        '/fortune-settings',
+                        extra: const {'source': 'simple_screen_face_button'},
+                      );
+                    }
                   },
                   child: const Text('Go to Face'),
                 ),
