@@ -127,6 +127,7 @@ class AppRouter {
               // - STORE_RELEASE: 비공개
               // - STORE_PLUS/FULL_DEV: 저위험(local-only) 기능만 공개
               redirect: (context, state) =>
+                  FeatureFlags.canUseMeeting ? null : '/home',
                   FeatureFlags.allowPhase2LowRisk ? null : '/home',
               pageBuilder: (context, state) {
                 final appState = Provider.of<AppState>(context);
@@ -201,6 +202,7 @@ class AppRouter {
               // - STORE_RELEASE: 비공개
               // - STORE_PLUS/FULL_DEV: 저위험(local-only) 기능만 공개
               redirect: (context, state) =>
+                  FeatureFlags.phase2Features ? null : '/home',
                   FeatureFlags.allowPhase2LowRisk ? null : '/home',
               pageBuilder: (context, state) =>
                   const NoTransitionPage(child: CompatibilityScreen()),
@@ -344,6 +346,7 @@ class AppRouter {
         GoRoute(
           path: '/meeting/chat',
           redirect: (context, state) =>
+              FeatureFlags.canUseMeeting ? null : '/home',
               FeatureFlags.allowPhase2LowRisk ? null : '/home',
           builder: (context, state) {
             final extra = state.extra as Map<String, dynamic>;
