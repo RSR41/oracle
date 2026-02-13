@@ -101,6 +101,9 @@
 
 | 항목 | 내용 |
 |------|------|
+| 책임자 | 오라클사주 운영팀 |
+| 이메일 | support@oracle-saju.com |
+| 전화 | 070-0000-0000 |
 | 책임자 | Oracle 사주 운영팀 |
 | 이메일 | support@oracle-saju.com |
 | 전화 | support@oracle-saju.com |

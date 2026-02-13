@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -81,6 +82,7 @@ class SettingsScreen extends StatelessWidget {
             theme,
             icon: Icons.privacy_tip_outlined,
             title: appState.t('settings.privacy'),
+            onTap: () => _openLegalUrl(context, AppUrls.privacyPolicy),
             onTap: () => _openUrl(
               context,
               'Privacy Policy',
@@ -96,6 +98,7 @@ class SettingsScreen extends StatelessWidget {
             theme,
             icon: Icons.article_outlined,
             title: appState.t('settings.terms'),
+            onTap: () => _openLegalUrl(context, AppUrls.termsOfService),
             onTap: () => _openUrl(
               context,
               'Terms of Service',
@@ -200,6 +203,11 @@ class SettingsScreen extends StatelessWidget {
     }
   }
 
+  Future<void> _openLegalUrl(BuildContext context, String url) async {
+    if (!AppUrls.isValidUrl(url)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('법적 문서 URL이 올바르지 않습니다.')),
+      );
   Future<void> _showInfoDialog(
     BuildContext context,
     String title,
@@ -233,6 +241,12 @@ class SettingsScreen extends StatelessWidget {
     }
 
     final uri = Uri.parse(url);
+    final opened = await launchUrl(uri, mode: LaunchMode.externalApplication);
+    if (!opened && context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('문서를 열 수 없습니다. 잠시 후 다시 시도해주세요.')),
+      );
+    }
     final launched = await launchUrl(uri, mode: LaunchMode.externalApplication);
 
     if (!launched && context.mounted) {
