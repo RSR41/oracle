@@ -39,6 +39,8 @@ class AppRouter {
   static GoRouter? _router;
 
   static GoRouter router(AppState appState) {
+    final showBetaFeatures = FeatureFlags.showBetaFeatures;
+
     // 첫 실행 여부에 따라 초기 위치 결정
     final initialLocation = appState.isFirstRun ? '/welcome' : '/home';
 
@@ -86,74 +88,72 @@ class AppRouter {
               pageBuilder: (context, state) =>
                   NoTransitionPage(child: FortuneScreen()),
             ),
-            GoRoute(
-              path: '/meeting',
-              redirect: (context, state) =>
-                  FeatureFlags.showBetaFeatures ? null : '/home',
-              pageBuilder: (context, state) {
-                final appState = Provider.of<AppState>(context);
-                if (!appState.hasSajuProfile) {
-                  return const NoTransitionPage(child: MeetingProfileGate());
-                }
-                return NoTransitionPage(
-                  child: MeetingHomeScreen(
-                    myUserId: appState.profile?.nickname ?? 'me',
-                    myNickname: appState.profile?.nickname ?? '나',
-                    onHistoryRecord: (payload) async {
-                      final historyRepo = HistoryRepository();
-                      final result = FortuneResult(
-                        id: payload['id'],
-                        type: payload['type'],
-                        title: payload['title'],
-                        date: DateTime.now().toIso8601String().split('T')[0],
-                        summary: payload['body'],
-                        content: payload['body'],
-                        overallScore: 0,
-                        createdAt: payload['createdAt'],
-                      );
+            if (showBetaFeatures)
+              GoRoute(
+                path: '/meeting',
+                pageBuilder: (context, state) {
+                  final appState = Provider.of<AppState>(context);
+                  if (!appState.hasSajuProfile) {
+                    return const NoTransitionPage(child: MeetingProfileGate());
+                  }
+                  return NoTransitionPage(
+                    child: MeetingHomeScreen(
+                      myUserId: appState.profile?.nickname ?? 'me',
+                      myNickname: appState.profile?.nickname ?? '나',
+                      onHistoryRecord: (payload) async {
+                        final historyRepo = HistoryRepository();
+                        final result = FortuneResult(
+                          id: payload['id'],
+                          type: payload['type'],
+                          title: payload['title'],
+                          date: DateTime.now().toIso8601String().split('T')[0],
+                          summary: payload['body'],
+                          content: payload['body'],
+                          overallScore: 0,
+                          createdAt: payload['createdAt'],
+                        );
 
-                      await historyRepo.saveWithPayload(
-                        result: result,
-                        payload: payload['meta'],
-                      );
-                      debugPrint(
-                        'History recorded from App side: ${payload['type']}',
-                      );
-                    },
-                    onOpenMeetingHistory: () =>
-                        context.push('/meeting/history'),
-                  ),
-                );
-              },
-              routes: [
-                GoRoute(
-                  path: 'history',
-                  builder: (context, state) => const HistoryScreen(
-                    initialFilter: 'MEETING',
-                    lockFilter: true,
-                  ),
-                  routes: [
-                    GoRoute(
-                      path: 'detail/:id',
-                      builder: (context, state) {
-                        final id = state.pathParameters['id']!;
-                        return MeetingHistoryDetailScreen(
-                          id: id,
-                          extra: state.extra,
+                        await historyRepo.saveWithPayload(
+                          result: result,
+                          payload: payload['meta'],
+                        );
+                        debugPrint(
+                          'History recorded from App side: ${payload['type']}',
                         );
                       },
+                      onOpenMeetingHistory: () =>
+                          context.push('/meeting/history'),
                     ),
-                  ],
-                ),
-              ],
-            ),
-            GoRoute(
-              path: '/compatibility',
-              redirect: (context, state) =>
-                  FeatureFlags.showBetaFeatures ? null : '/home',
-              pageBuilder: (context, state) =>
-                  const NoTransitionPage(child: CompatibilityScreen()),
-            ),
+                  );
+                },
+                routes: [
+                  GoRoute(
+                    path: 'history',
+                    builder: (context, state) => const HistoryScreen(
+                      initialFilter: 'MEETING',
+                      lockFilter: true,
+                    ),
+                    routes: [
+                      GoRoute(
+                        path: 'detail/:id',
+                        builder: (context, state) {
+                          final id = state.pathParameters['id']!;
+                          return MeetingHistoryDetailScreen(
+                            id: id,
+                            extra: state.extra,
+                          );
+                        },
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            if (showBetaFeatures)
+              GoRoute(
+                path: '/compatibility',
+                pageBuilder: (context, state) =>
+                    const NoTransitionPage(child: CompatibilityScreen()),
+              ),
             GoRoute(
               path: '/history',
               pageBuilder: (context, state) =>
@@ -168,30 +168,34 @@ class AppRouter {
         ),
 
         // Stack Screens (No Bottom Nav)
-        GoRoute(
-          path: '/face',
-          builder: (context, state) => const FaceReadingScreen(),
-        ),
-        GoRoute(
-          path: '/face-result',
-          builder: (context, state) {
-            final extra = state.extra as Map<String, dynamic>;
-            return FaceResultScreen(
-              imagePath: extra['imagePath'] as String,
-              result: extra['result'] as FaceReadingResult,
-            );
-          },
-        ),
-        GoRoute(
-          path: '/ideal-type',
-          builder: (context, state) =>
-              const ComingSoonScreen(title: 'Ideal Type'),
-        ),
-        GoRoute(
-          path: '/connection',
-          builder: (context, state) =>
-              const ComingSoonScreen(title: 'Connection'),
-        ),
+        if (showBetaFeatures)
+          GoRoute(
+            path: '/face',
+            builder: (context, state) => const FaceReadingScreen(),
+          ),
+        if (showBetaFeatures)
+          GoRoute(
+            path: '/face-result',
+            builder: (context, state) {
+              final extra = state.extra as Map<String, dynamic>;
+              return FaceResultScreen(
+                imagePath: extra['imagePath'] as String,
+                result: extra['result'] as FaceReadingResult,
+              );
+            },
+          ),
+        if (showBetaFeatures)
+          GoRoute(
+            path: '/ideal-type',
+            builder: (context, state) =>
+                const ComingSoonScreen(title: 'Ideal Type'),
+          ),
+        if (showBetaFeatures)
+          GoRoute(
+            path: '/connection',
+            builder: (context, state) =>
+                const ComingSoonScreen(title: 'Connection'),
+          ),
         GoRoute(
           path: '/settings',
           builder: (context, state) => const SettingsScreen(),
@@ -207,32 +211,35 @@ class AppRouter {
             return TarotResultScreen(cards: cards);
           },
         ),
-        GoRoute(
-          path: '/dream',
-          builder: (context, state) => const DreamInputScreen(),
-        ),
-        GoRoute(
-          path: '/dream-result',
-          builder: (context, state) {
-            final extra = state.extra as Map<String, dynamic>;
-            return DreamResultScreen(
-              dreamContent: extra['dreamContent'] as String,
-              result: extra['result'] as DreamResult,
-            );
-          },
-        ),
-        GoRoute(
-          path: '/meeting/chat',
-          builder: (context, state) {
-            final extra = state.extra as Map<String, dynamic>;
-            return MeetingChatScreen(
-              matchId: extra['matchId'] as String,
-              myUserId: extra['myUserId'] as String,
-              otherUserId: extra['otherUserId'] as String,
-              otherUserName: extra['otherUserName'] as String,
-            );
-          },
-        ),
+        if (showBetaFeatures)
+          GoRoute(
+            path: '/dream',
+            builder: (context, state) => const DreamInputScreen(),
+          ),
+        if (showBetaFeatures)
+          GoRoute(
+            path: '/dream-result',
+            builder: (context, state) {
+              final extra = state.extra as Map<String, dynamic>;
+              return DreamResultScreen(
+                dreamContent: extra['dreamContent'] as String,
+                result: extra['result'] as DreamResult,
+              );
+            },
+          ),
+        if (showBetaFeatures)
+          GoRoute(
+            path: '/meeting/chat',
+            builder: (context, state) {
+              final extra = state.extra as Map<String, dynamic>;
+              return MeetingChatScreen(
+                matchId: extra['matchId'] as String,
+                myUserId: extra['myUserId'] as String,
+                otherUserId: extra['otherUserId'] as String,
+                otherUserName: extra['otherUserName'] as String,
+              );
+            },
+          ),
 
         // Feature & Placeholders
         GoRoute(
@@ -248,26 +255,30 @@ class AppRouter {
           builder: (context, state) =>
               const ComingSoonScreen(title: 'Saju Analysis'),
         ),
-        GoRoute(
-          path: '/consultation',
-          builder: (context, state) =>
-              const ComingSoonScreen(title: 'Consultation'),
-        ),
-        GoRoute(
-          path: '/yearly-fortune',
-          builder: (context, state) =>
-              const ComingSoonScreen(title: '2026 Yearly Fortune'),
-        ),
-        GoRoute(
-          path: '/compat-check',
-          builder: (context, state) =>
-              const ComingSoonScreen(title: 'Compatibility Check'),
-        ),
-        GoRoute(
-          path: '/compat-result',
-          builder: (context, state) =>
-              const ComingSoonScreen(title: 'Compatibility Result'),
-        ),
+        if (showBetaFeatures)
+          GoRoute(
+            path: '/consultation',
+            builder: (context, state) =>
+                const ComingSoonScreen(title: 'Consultation'),
+          ),
+        if (showBetaFeatures)
+          GoRoute(
+            path: '/yearly-fortune',
+            builder: (context, state) =>
+                const ComingSoonScreen(title: '2026 Yearly Fortune'),
+          ),
+        if (showBetaFeatures)
+          GoRoute(
+            path: '/compat-check',
+            builder: (context, state) =>
+                const ComingSoonScreen(title: 'Compatibility Check'),
+          ),
+        if (showBetaFeatures)
+          GoRoute(
+            path: '/compat-result',
+            builder: (context, state) =>
+                const ComingSoonScreen(title: 'Compatibility Result'),
+          ),
         GoRoute(
           path: '/profile-edit',
           builder: (context, state) =>
@@ -296,26 +307,29 @@ class AppRouter {
             return FortuneDetailScreen(result: result);
           },
         ),
-        GoRoute(
-          path: '/compat-detail',
-          builder: (context, state) =>
-              ComingSoonScreen(title: 'Compat Detail', data: state.extra),
-        ),
+        if (showBetaFeatures)
+          GoRoute(
+            path: '/compat-detail',
+            builder: (context, state) =>
+                ComingSoonScreen(title: 'Compat Detail', data: state.extra),
+          ),
         GoRoute(
           path: '/tarot-detail',
           builder: (context, state) =>
               ComingSoonScreen(title: 'Tarot Detail', data: state.extra),
         ),
-        GoRoute(
-          path: '/dream-detail',
-          builder: (context, state) =>
-              ComingSoonScreen(title: 'Dream Detail', data: state.extra),
-        ),
-        GoRoute(
-          path: '/face-detail',
-          builder: (context, state) =>
-              ComingSoonScreen(title: 'Face Detail', data: state.extra),
-        ),
+        if (showBetaFeatures)
+          GoRoute(
+            path: '/dream-detail',
+            builder: (context, state) =>
+                ComingSoonScreen(title: 'Dream Detail', data: state.extra),
+          ),
+        if (showBetaFeatures)
+          GoRoute(
+            path: '/face-detail',
+            builder: (context, state) =>
+                ComingSoonScreen(title: 'Face Detail', data: state.extra),
+          ),
       ],
     );
     return _router!;
