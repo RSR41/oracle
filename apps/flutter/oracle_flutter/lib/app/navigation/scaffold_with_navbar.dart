@@ -28,6 +28,7 @@ class ScaffoldWithNavBar extends StatelessWidget {
         selectedIcon: Icons.auto_awesome,
         label: 'Fortune',
       ),
+      if (hasSaju && FeatureFlags.enableMeeting)
       if (hasSaju && FeatureFlags.canUseMeeting)
         _NavBarItem(
           route: '/meeting',
@@ -35,6 +36,7 @@ class ScaffoldWithNavBar extends StatelessWidget {
           selectedIcon: Icons.people,
           label: 'Meeting',
         ),
+      if (FeatureFlags.enableCompatibility)
       if (FeatureFlags.phase2Features)
         _NavBarItem(
           route: '/compatibility',

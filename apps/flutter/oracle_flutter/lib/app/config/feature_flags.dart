@@ -13,6 +13,7 @@ enum SubmissionProfile { storeRelease, storePlus, fullDev }
 /// - 히스토리 (/history)
 /// - 설정 (/settings)
 ///
+/// ## Phase 2+ 기능 (기능별 플래그로 노출 제어)
 /// ## Phase 2+ 기능 (phase2Features=true일 때만 노출)
 /// - 꿈해몽 (/dream, /dream-result)
 /// - 관상 얼굴분석 (/face, /face-result)
@@ -67,6 +68,46 @@ class FeatureFlags {
     defaultValue: '',
   );
 
+  /// 전체 베타 기본값
+  /// - 기존 BETA_FEATURES 동작과의 하위 호환용
+  static const bool _betaDefault = _betaEnv == 'true' || _betaEnv == '1';
+
+  static const String _faceEnv = String.fromEnvironment(
+    'ENABLE_FACE',
+    defaultValue: _betaEnv,
+  );
+
+  static const String _dreamEnv = String.fromEnvironment(
+    'ENABLE_DREAM',
+    defaultValue: _betaEnv,
+  );
+
+  static const String _compatibilityEnv = String.fromEnvironment(
+    'ENABLE_COMPATIBILITY',
+    defaultValue: _betaEnv,
+  );
+
+  static const String _meetingEnv = String.fromEnvironment(
+    'ENABLE_MEETING',
+    defaultValue: '',
+  );
+
+  /// 관상 기능 노출 여부
+  static const bool enableFace = _faceEnv == 'true' || _faceEnv == '1';
+
+  /// 꿈해몽 기능 노출 여부
+  static const bool enableDream = _dreamEnv == 'true' || _dreamEnv == '1';
+
+  /// 궁합 기능 노출 여부
+  static const bool enableCompatibility =
+      _compatibilityEnv == 'true' || _compatibilityEnv == '1';
+
+  /// 소개팅 기능 노출 여부 (기본 false)
+  static const bool enableMeeting = _meetingEnv == 'true' || _meetingEnv == '1';
+
+  /// Phase2+ 기능 표시 여부 (하위 호환)
+  static const bool showBetaFeatures =
+      enableFace || enableDream || enableCompatibility || enableMeeting;
   /// 베타 기능 표시 여부
   /// - Phase 1 스토어 제출을 위해 기본값을 false로 설정
   /// - 명시적으로 BETA_FEATURES=true로 설정해야만 베타 기능 노출
@@ -129,6 +170,7 @@ class FeatureFlags {
   static String get buildModeName {
     if (aiOnline && phase2Features) return 'FULL_DEV';
     if (aiOnline) return 'AI_ENABLED';
+    if (_betaDefault || showBetaFeatures) return 'BETA_TEST';
     if (phase2Features) return 'BETA_TEST';
     return 'STORE_RELEASE';
   }
