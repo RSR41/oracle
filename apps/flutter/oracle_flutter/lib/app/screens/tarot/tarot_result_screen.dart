@@ -31,10 +31,12 @@ class _TarotResultScreenState extends State<TarotResultScreen> {
       final dateStr = DateFormat('yyyy-MM-dd').format(now);
 
       final cardNames = widget.cards.map((c) => c.nameKo).join(', ');
-      final score =
-          widget.cards.fold<int>(0, (sum, card) {
-            return sum + (card.isReversed ? 50 : 80);
-          }) ~/
+      final score = widget.cards
+              .map((card) {
+                final base = 68 + (card.id % 10) * 2;
+                return card.isReversed ? base - 12 : base + 6;
+              })
+              .reduce((a, b) => a + b) ~/
           widget.cards.length;
 
       final fortuneResult = FortuneResult(

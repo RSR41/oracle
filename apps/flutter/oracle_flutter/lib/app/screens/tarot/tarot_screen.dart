@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:oracle_flutter/app/state/app_state.dart';
 import 'package:oracle_flutter/app/theme/app_colors.dart';
 import 'package:oracle_flutter/app/models/tarot_card.dart';
+import 'package:oracle_flutter/app/services/tarot/tarot_data_service.dart';
 import 'package:oracle_flutter/app/services/tarot_content_service.dart';
 import 'package:oracle_flutter/app/services/fortune_service.dart';
 
@@ -18,6 +19,7 @@ class TarotScreen extends StatefulWidget {
 class _TarotScreenState extends State<TarotScreen>
     with SingleTickerProviderStateMixin {
   final _random = Random();
+  final TarotDataService _tarotDataService = TarotDataService();
   final TarotContentService _tarotContentService = TarotContentService();
   final FortuneService _fortuneService = FortuneService();
 
@@ -45,6 +47,17 @@ class _TarotScreenState extends State<TarotScreen>
   }
 
   Future<void> _loadDeck() async {
+    final cards = await _tarotDataService.loadCards();
+    if (!mounted) return;
+    setState(() {
+      _deck = List.from(cards);
+      _selectedCards = [];
+      _hasDrawn = false;
+      _isLoadingDeck = false;
+    });
+  }
+
+  void _initDeck() {
     try {
       final cards = await _tarotContentService.loadDeck();
       if (!mounted) return;

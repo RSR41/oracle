@@ -19,6 +19,22 @@
     "uprightKo": "새로운 시작, 순수함, 모험, 무한한 가능성, 자유로운 영혼",
     "reversed": "Recklessness, carelessness, ignoring danger, foolish choices",
     "reversedKo": "무모함, 부주의, 위험 무시, 어리석은 선택",
+    "description": "Key themes: beginning,adventure,innocence,freedom",
+    "descriptionKo": "핵심 키워드: 시작,모험,순수,자유",
+    "keywords": [
+      "beginning",
+      "adventure",
+      "innocence",
+      "freedom"
+    ],
+    "keywordsKo": [
+      "시작",
+      "모험",
+      "순수",
+      "자유"
+    ],
+    "suit": "major",
+    "number": 0
     "description": "beginning,adventure,innocence,freedom",
     "descriptionKo": "시작,모험,순수,자유"
   },
@@ -30,6 +46,22 @@
     "uprightKo": "의지력, 창조력, 능력, 집중력, 목표 달성의 힘",
     "reversed": "Trickery, untapped potential, wasted talent, self-deception",
     "reversedKo": "속임수, 미숙함, 능력 낭비, 자기기만",
+    "description": "Key themes: will,creation,focus,ability",
+    "descriptionKo": "핵심 키워드: 의지,창조,집중,능력",
+    "keywords": [
+      "will",
+      "creation",
+      "focus",
+      "ability"
+    ],
+    "keywordsKo": [
+      "의지",
+      "창조",
+      "집중",
+      "능력"
+    ],
+    "suit": "major",
+    "number": 1
     "description": "will,creation,focus,ability",
     "descriptionKo": "의지,창조,집중,능력"
   },
@@ -41,6 +73,22 @@
     "uprightKo": "직관, 신비, 내면의 지혜, 잠재의식, 숨겨진 진실",
     "reversed": "Secrets, ignoring intuition, superficial judgment, inner confusion",
     "reversedKo": "비밀, 직관 무시, 표면적 판단, 내면의 혼란",
+    "description": "Key themes: intuition,mystery,wisdom,secret",
+    "descriptionKo": "핵심 키워드: 직관,신비,지혜,비밀",
+    "keywords": [
+      "intuition",
+      "mystery",
+      "wisdom",
+      "secret"
+    ],
+    "keywordsKo": [
+      "직관",
+      "신비",
+      "지혜",
+      "비밀"
+    ],
+    "suit": "major",
+    "number": 2
     "description": "intuition,mystery,wisdom,secret",
     "descriptionKo": "직관,신비,지혜,비밀"
   },
@@ -52,6 +100,22 @@
     "uprightKo": "풍요, 모성, 자연, 창조성, 아름다움, 양육",
     "reversed": "Dependence, lack of creativity, overprotection, indifference",
     "reversedKo": "의존, 창조력 부족, 과보호, 무관심",
+    "description": "Key themes: abundance,motherhood,nature,nurturing",
+    "descriptionKo": "핵심 키워드: 풍요,모성,자연,양육",
+    "keywords": [
+      "abundance",
+      "motherhood",
+      "nature",
+      "nurturing"
+    ],
+    "keywordsKo": [
+      "풍요",
+      "모성",
+      "자연",
+      "양육"
+    ],
+    "suit": "major",
+    "number": 3
     "description": "abundance,motherhood,nature,nurturing",
     "descriptionKo": "풍요,모성,자연,양육"
   },
@@ -63,6 +127,22 @@
     "uprightKo": "권위, 구조, 안정, 리더십, 아버지 상, 통제력",
     "reversed": "Tyranny, excessive control, inflexibility, abuse of power",
     "reversedKo": "독재, 과도한 통제, 유연성 부족, 권력 남용",
+    "description": "Key themes: authority,stability,leadership,control",
+    "descriptionKo": "핵심 키워드: 권위,안정,리더십,통제",
+    "keywords": [
+      "authority",
+      "stability",
+      "leadership",
+      "control"
+    ],
+    "keywordsKo": [
+      "권위",
+      "안정",
+      "리더십",
+      "통제"
+    ],
+    "suit": "major",
+    "number": 4
     "description": "authority,stability,leadership,control",
     "descriptionKo": "권위,안정,리더십,통제"
   },
@@ -74,6 +154,22 @@
     "uprightKo": "전통, 종교, 지식 전수, 관습, 영적 지도자",
     "reversed": "Rebellion, unconventional thinking, new approaches, rejecting dogma",
     "reversedKo": "반항, 비전통적 사고, 새로운 접근, 교조주의 거부",
+    "description": "Key themes: tradition,religion,wisdom,education",
+    "descriptionKo": "핵심 키워드: 전통,종교,지혜,교육",
+    "keywords": [
+      "tradition",
+      "religion",
+      "wisdom",
+      "education"
+    ],
+    "keywordsKo": [
+      "전통",
+      "종교",
+      "지혜",
+      "교육"
+    ],
+    "suit": "major",
+    "number": 5
     "description": "tradition,religion,wisdom,education",
     "descriptionKo": "전통,종교,지혜,교육"
   },
@@ -85,6 +181,22 @@
     "uprightKo": "사랑, 조화, 관계, 선택, 가치관, 진정한 연결",
     "reversed": "Discord, imbalance, wrong choices, relationship problems",
     "reversedKo": "불화, 불균형, 잘못된 선택, 관계 문제",
+    "description": "Key themes: love,choice,relationship,harmony",
+    "descriptionKo": "핵심 키워드: 사랑,선택,관계,조화",
+    "keywords": [
+      "love",
+      "choice",
+      "relationship",
+      "harmony"
+    ],
+    "keywordsKo": [
+      "사랑",
+      "선택",
+      "관계",
+      "조화"
+    ],
+    "suit": "major",
+    "number": 6
     "description": "love,choice,relationship,harmony",
     "descriptionKo": "사랑,선택,관계,조화"
   },
@@ -96,6 +208,22 @@
     "uprightKo": "의지, 승리, 결단력, 통제, 추진력",
     "reversed": "Lack of direction, aggression, loss of control, obstacles",
     "reversedKo": "방향 상실, 공격성, 통제력 부족, 장애물",
+    "description": "Key themes: victory,will,determination,momentum",
+    "descriptionKo": "핵심 키워드: 승리,의지,결단,추진",
+    "keywords": [
+      "victory",
+      "will",
+      "determination",
+      "momentum"
+    ],
+    "keywordsKo": [
+      "승리",
+      "의지",
+      "결단",
+      "추진"
+    ],
+    "suit": "major",
+    "number": 7
     "description": "victory,will,determination,momentum",
     "descriptionKo": "승리,의지,결단,추진"
   },
@@ -107,6 +235,22 @@
     "uprightKo": "용기, 인내, 내면의 힘, 자제력, 결단",
     "reversed": "Weakness, self-doubt, loss of control, insecurity",
     "reversedKo": "나약함, 자기의심, 통제력 상실, 불안",
+    "description": "Key themes: courage,patience,strength,restraint",
+    "descriptionKo": "핵심 키워드: 용기,인내,힘,자제",
+    "keywords": [
+      "courage",
+      "patience",
+      "strength",
+      "restraint"
+    ],
+    "keywordsKo": [
+      "용기",
+      "인내",
+      "힘",
+      "자제"
+    ],
+    "suit": "major",
+    "number": 8
     "description": "courage,patience,strength,restraint",
     "descriptionKo": "용기,인내,힘,자제"
   },
@@ -118,6 +262,22 @@
     "uprightKo": "내면 탐구, 고독, 지혜 추구, 성찰, 안내자",
     "reversed": "Isolation, loneliness, wandering, excessive withdrawal",
     "reversedKo": "고립, 외로움, 방황, 과도한 은둔",
+    "description": "Key themes: reflection,solitude,wisdom,search",
+    "descriptionKo": "핵심 키워드: 성찰,고독,지혜,탐구",
+    "keywords": [
+      "reflection",
+      "solitude",
+      "wisdom",
+      "search"
+    ],
+    "keywordsKo": [
+      "성찰",
+      "고독",
+      "지혜",
+      "탐구"
+    ],
+    "suit": "major",
+    "number": 9
     "description": "reflection,solitude,wisdom,search",
     "descriptionKo": "성찰,고독,지혜,탐구"
   },
@@ -129,6 +289,22 @@
     "uprightKo": "운명의 변화, 행운, 순환, 전환점, 기회",
     "reversed": "Bad luck, resistance, fear of change, out of control",
     "reversedKo": "불운, 저항, 변화에 대한 두려움, 통제 불능",
+    "description": "Key themes: destiny,change,cycle,opportunity",
+    "descriptionKo": "핵심 키워드: 운명,변화,순환,기회",
+    "keywords": [
+      "destiny",
+      "change",
+      "cycle",
+      "opportunity"
+    ],
+    "keywordsKo": [
+      "운명",
+      "변화",
+      "순환",
+      "기회"
+    ],
+    "suit": "major",
+    "number": 10
     "description": "destiny,change,cycle,opportunity",
     "descriptionKo": "운명,변화,순환,기회"
   },
@@ -140,6 +316,22 @@
     "uprightKo": "공정함, 진실, 법, 원인과 결과, 균형",
     "reversed": "Unfairness, dishonesty, avoiding responsibility, bias",
     "reversedKo": "불공정, 부정직, 책임 회피, 편견",
+    "description": "Key themes: justice,fairness,truth,balance",
+    "descriptionKo": "핵심 키워드: 정의,공정,진실,균형",
+    "keywords": [
+      "justice",
+      "fairness",
+      "truth",
+      "balance"
+    ],
+    "keywordsKo": [
+      "정의",
+      "공정",
+      "진실",
+      "균형"
+    ],
+    "suit": "major",
+    "number": 11
     "description": "justice,fairness,truth,balance",
     "descriptionKo": "정의,공정,진실,균형"
   },
@@ -151,6 +343,22 @@
     "uprightKo": "희생, 관점 전환, 기다림, 포기, 새로운 시각",
     "reversed": "Delays, resistance, pointless sacrifice, stagnation",
     "reversedKo": "지연, 저항, 무의미한 희생, 정체",
+    "description": "Key themes: sacrifice,perspective,waiting,shift",
+    "descriptionKo": "핵심 키워드: 희생,관점,기다림,전환",
+    "keywords": [
+      "sacrifice",
+      "perspective",
+      "waiting",
+      "shift"
+    ],
+    "keywordsKo": [
+      "희생",
+      "관점",
+      "기다림",
+      "전환"
+    ],
+    "suit": "major",
+    "number": 12
     "description": "sacrifice,perspective,waiting,shift",
     "descriptionKo": "희생,관점,기다림,전환"
   },
@@ -162,6 +370,22 @@
     "uprightKo": "끝과 시작, 변화, 변형, 이별, 재탄생",
     "reversed": "Resistance to change, stagnation, denial, fear",
     "reversedKo": "변화에 대한 저항, 정체, 부정, 두려움",
+    "description": "Key themes: change,ending,beginning,rebirth",
+    "descriptionKo": "핵심 키워드: 변화,끝,시작,재탄생",
+    "keywords": [
+      "change",
+      "ending",
+      "beginning",
+      "rebirth"
+    ],
+    "keywordsKo": [
+      "변화",
+      "끝",
+      "시작",
+      "재탄생"
+    ],
+    "suit": "major",
+    "number": 13
     "description": "change,ending,beginning,rebirth",
     "descriptionKo": "변화,끝,시작,재탄생"
   },
@@ -173,6 +397,22 @@
     "uprightKo": "균형, 조화, 인내, 중용, 치유",
     "reversed": "Imbalance, excess, impatience, lack of harmony",
     "reversedKo": "불균형, 과잉, 조급함, 조화 부족",
+    "description": "Key themes: balance,harmony,patience,moderation",
+    "descriptionKo": "핵심 키워드: 균형,조화,인내,중용",
+    "keywords": [
+      "balance",
+      "harmony",
+      "patience",
+      "moderation"
+    ],
+    "keywordsKo": [
+      "균형",
+      "조화",
+      "인내",
+      "중용"
+    ],
+    "suit": "major",
+    "number": 14
     "description": "balance,harmony,patience,moderation",
     "descriptionKo": "균형,조화,인내,중용"
   },
@@ -184,6 +424,22 @@
     "uprightKo": "속박, 중독, 물질주의, 유혹, 그림자 자아",
     "reversed": "Liberation, breaking free, regaining freedom, awakening",
     "reversedKo": "해방, 속박에서의 탈출, 자유 회복, 각성",
+    "description": "Key themes: bondage,temptation,addiction,shadow",
+    "descriptionKo": "핵심 키워드: 속박,유혹,중독,그림자",
+    "keywords": [
+      "bondage",
+      "temptation",
+      "addiction",
+      "shadow"
+    ],
+    "keywordsKo": [
+      "속박",
+      "유혹",
+      "중독",
+      "그림자"
+    ],
+    "suit": "major",
+    "number": 15
     "description": "bondage,temptation,addiction,shadow",
     "descriptionKo": "속박,유혹,중독,그림자"
   },
@@ -195,6 +451,22 @@
     "uprightKo": "급격한 변화, 파괴, 계시, 혼란, 해방",
     "reversed": "Avoiding change, delayed disaster, fear, personal transformation",
     "reversedKo": "변화 회피, 재난 지연, 두려움, 개인적 변화",
+    "description": "Key themes: destruction,change,shock,liberation",
+    "descriptionKo": "핵심 키워드: 파괴,변화,충격,해방",
+    "keywords": [
+      "destruction",
+      "change",
+      "shock",
+      "liberation"
+    ],
+    "keywordsKo": [
+      "파괴",
+      "변화",
+      "충격",
+      "해방"
+    ],
+    "suit": "major",
+    "number": 16
     "description": "destruction,change,shock,liberation",
     "descriptionKo": "파괴,변화,충격,해방"
   },
@@ -206,6 +478,22 @@
     "uprightKo": "희망, 영감, 치유, 평온, 재생",
     "reversed": "Despair, loss of faith, lack of inspiration, disappointment",
     "reversedKo": "절망, 신뢰 상실, 영감 부족, 실망",
+    "description": "Key themes: hope,inspiration,healing,serenity",
+    "descriptionKo": "핵심 키워드: 희망,영감,치유,평온",
+    "keywords": [
+      "hope",
+      "inspiration",
+      "healing",
+      "serenity"
+    ],
+    "keywordsKo": [
+      "희망",
+      "영감",
+      "치유",
+      "평온"
+    ],
+    "suit": "major",
+    "number": 17
     "description": "hope,inspiration,healing,serenity",
     "descriptionKo": "희망,영감,치유,평온"
   },
@@ -217,6 +505,22 @@
     "uprightKo": "환상, 두려움, 잠재의식, 직관, 불확실성",
     "reversed": "Overcoming fear, facing truth, resolving confusion, clarity",
     "reversedKo": "두려움 극복, 진실 직면, 혼란 해소, 명확성",
+    "description": "Key themes: illusion,fear,intuition,mystery",
+    "descriptionKo": "핵심 키워드: 환상,두려움,직관,신비",
+    "keywords": [
+      "illusion",
+      "fear",
+      "intuition",
+      "mystery"
+    ],
+    "keywordsKo": [
+      "환상",
+      "두려움",
+      "직관",
+      "신비"
+    ],
+    "suit": "major",
+    "number": 18
     "description": "illusion,fear,intuition,mystery",
     "descriptionKo": "환상,두려움,직관,신비"
   },
@@ -228,6 +532,22 @@
     "uprightKo": "기쁨, 성공, 활력, 자신감, 축복",
     "reversed": "Temporary sadness, excessive optimism, arrogance, lack of clarity",
     "reversedKo": "일시적 우울, 과도한 낙관, 자만, 명확성 부족",
+    "description": "Key themes: joy,success,vitality,blessing",
+    "descriptionKo": "핵심 키워드: 기쁨,성공,활력,축복",
+    "keywords": [
+      "joy",
+      "success",
+      "vitality",
+      "blessing"
+    ],
+    "keywordsKo": [
+      "기쁨",
+      "성공",
+      "활력",
+      "축복"
+    ],
+    "suit": "major",
+    "number": 19
     "description": "joy,success,vitality,blessing",
     "descriptionKo": "기쁨,성공,활력,축복"
   },
@@ -239,6 +559,22 @@
     "uprightKo": "재생, 내면의 부름, 평가, 갱신, 결단",
     "reversed": "Self-doubt, ignoring inner voice, refusing judgment",
     "reversedKo": "자기 의심, 내면의 목소리 무시, 판단 거부",
+    "description": "Key themes: rebirth,calling,evaluation,decision",
+    "descriptionKo": "핵심 키워드: 재생,부름,평가,결단",
+    "keywords": [
+      "rebirth",
+      "calling",
+      "evaluation",
+      "decision"
+    ],
+    "keywordsKo": [
+      "재생",
+      "부름",
+      "평가",
+      "결단"
+    ],
+    "suit": "major",
+    "number": 20
     "description": "rebirth,calling,evaluation,decision",
     "descriptionKo": "재생,부름,평가,결단"
   },
@@ -250,6 +586,24 @@
     "uprightKo": "완성, 성취, 통합, 여행, 완전한 성공",
     "reversed": "Incompletion, goals not achieved, delayed closure, incompleteness",
     "reversedKo": "미완성, 목표 미달성, 마무리 지연, 불완전함",
+    "description": "Key themes: completion,achievement,integration,world",
+    "descriptionKo": "핵심 키워드: 완성,성취,통합,세계",
+    "keywords": [
+      "completion",
+      "achievement",
+      "integration",
+      "world"
+    ],
+    "keywordsKo": [
+      "완성",
+      "성취",
+      "통합",
+      "세계"
+    ],
+    "suit": "major",
+    "number": 21
+  }
+]
     "description": "completion,achievement,integration,world",
     "descriptionKo": "완성,성취,통합,세계"
   }
