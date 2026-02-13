@@ -3,6 +3,8 @@ import 'package:provider/provider.dart';
 import 'package:oracle_flutter/app/state/app_state.dart';
 import 'package:oracle_flutter/app/theme/app_colors.dart';
 import 'package:oracle_flutter/app/i18n/translations.dart';
+import 'package:oracle_flutter/app/config/app_urls.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
@@ -110,7 +112,7 @@ class SettingsScreen extends StatelessWidget {
             onTap: () => _showInfoDialog(
               context,
               'Privacy Policy',
-              'Privacy policy will be available at oracle-saju.web.app/privacy',
+              AppUrls.privacyPolicy,
             ),
           ),
 
@@ -121,7 +123,7 @@ class SettingsScreen extends StatelessWidget {
             onTap: () => _showInfoDialog(
               context,
               'Terms of Service',
-              'Terms of service will be available at oracle-saju.web.app/terms',
+              AppUrls.termsOfService,
             ),
           ),
 
@@ -218,19 +220,27 @@ class SettingsScreen extends StatelessWidget {
     }
   }
 
-  void _showInfoDialog(BuildContext context, String title, String content) {
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: Text(title),
-        content: Text(content),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: const Text('OK'),
-          ),
-        ],
-      ),
-    );
+  Future<void> _showInfoDialog(
+    BuildContext context,
+    String title,
+    String url,
+  ) async {
+    if (!AppUrls.isValidUrl(url)) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('$title URL is invalid.')),
+        );
+      }
+      return;
+    }
+
+    final uri = Uri.parse(url);
+    final launched = await launchUrl(uri, mode: LaunchMode.externalApplication);
+
+    if (!launched && context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Could not open $title.')),
+      );
+    }
   }
 }
