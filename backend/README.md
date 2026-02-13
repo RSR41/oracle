@@ -1,44 +1,51 @@
 # Backend Implementation Guide
 
-## Status: Code Ready / Waiting for Docker
+## Recommended Fast Path: Serverless PostgreSQL (Neon/Supabase)
 
-The backend code for Phase 4 is fully implemented using NestJS + Prisma.
-However, the database (PostgreSQL) container could not be started due to a local Docker Desktop issue.
+This backend uses Prisma with PostgreSQL (`backend/prisma/schema.prisma`).
+For the fastest free deployment path, connect to a managed serverless Postgres instance (Neon or Supabase) by replacing `DATABASE_URL`.
 
-### 1. Prerequisites (Action Required)
-- **Fix Docker**: Ensure `docker info` returns valid server status.
-- **Run Database**:
-  ```bash
-  cd ../
-  docker compose up -d
-  ```
+## 1. Prerequisites
+- Node.js (v18+)
+- A Neon or Supabase Postgres project/instance
 
-### 2. Database Setup (Once Docker is running)
-Inside `oracle/backend`:
+## 2. Environment Setup
+Inside `oracle/backend`, create `.env` (or update existing):
+
 ```bash
-# Install dependencies (if not done)
-npm install
-
-# Generate Prisma Client & Migrate DB
-npx prisma generate
-npx prisma migrate dev --name init
+DATABASE_URL="postgresql://<user>:<password>@<host>/<db>?sslmode=require"
+JWT_SECRET="dev_secret_key_do_not_use_in_prod"
+JWT_EXPIRATION="7d"
+PORT=8080
 ```
 
-### 3. Running the Server
+> For Neon/Supabase, use the provider's SSL-enabled connection string.
+
+## 3. Prisma Setup / Migration / Seed Runbook
+Inside `oracle/backend`:
+
 ```bash
-# Development Mode
+npm install
+npx prisma generate
+npx prisma migrate deploy
+npx prisma db seed   # optional, only if prisma seed is configured
+```
+
+For local schema changes during development:
+
+```bash
+npx prisma migrate dev --name <change_name>
+```
+
+## 4. Running the Server
+```bash
 npm run start:dev
 ```
-Server will start on `http://localhost:8080`.
+Server starts on `http://localhost:8080`.
 
-### 4. API Endpoints Available
+## 5. API Endpoints Available
 - **Auth**: `/auth/register`, `/auth/login`, `/auth/me`
 - **Tags (Public)**: `/public/tags/:tagId`
 - **Tags (App)**: `/tags/:tagId/claim`, `/tags/:tagId/transfer`
 - **History**: `/history` (GET, POST, DELETE)
 - **Face**: `/face/analyze` (Mock)
-
-### 5. Environment Variables
-Check `.env`. Default configuration:
-- DB: `postgresql://postgres:postgres@localhost:5432/ef_db?schema=public`
-- JWT Secret: `dev_secret_key_doe_not_use_in_prod`
