@@ -39,8 +39,13 @@ class AppRouter {
   static GoRouter? _router;
 
   static GoRouter router(AppState appState) {
+    final showBetaFeatures = FeatureFlags.showBetaFeatures;
+
     // 첫 실행 여부에 따라 초기 위치 결정
     final initialLocation = appState.isFirstRun ? '/welcome' : '/home';
+
+    // 제출 프로파일별 활성 기능 목록을 시작 시 1회 출력 (심사/QA 확인용)
+    FeatureFlags.printSubmissionDiagnostics();
 
     _router ??= GoRouter(
       navigatorKey: _rootNavigatorKey,
@@ -53,6 +58,12 @@ class AppRouter {
 
         if (appState.isFirstRun && !isOnWelcome && !isOnOnboarding) {
           return '/welcome';
+        }
+
+        // 스토어 릴리즈(베타 기능 비활성화)에서는 Phase 2 경로 접근 차단
+        if (!FeatureFlags.showBetaFeatures &&
+            _isPhase2RestrictedRoute(state.matchedLocation)) {
+          return '/home';
         }
         return null;
       },
@@ -86,10 +97,38 @@ class AppRouter {
               pageBuilder: (context, state) =>
                   NoTransitionPage(child: FortuneScreen()),
             ),
+            if (showBetaFeatures)
+              GoRoute(
+                path: '/meeting',
+                pageBuilder: (context, state) {
+                  final appState = Provider.of<AppState>(context);
+                  if (!appState.hasSajuProfile) {
+                    return const NoTransitionPage(child: MeetingProfileGate());
+                  }
+                  return NoTransitionPage(
+                    child: MeetingHomeScreen(
+                      myUserId: appState.profile?.nickname ?? 'me',
+                      myNickname: appState.profile?.nickname ?? '나',
+                      onHistoryRecord: (payload) async {
+                        final historyRepo = HistoryRepository();
+                        final result = FortuneResult(
+                          id: payload['id'],
+                          type: payload['type'],
+                          title: payload['title'],
+                          date: DateTime.now().toIso8601String().split('T')[0],
+                          summary: payload['body'],
+                          content: payload['body'],
+                          overallScore: 0,
+                          createdAt: payload['createdAt'],
+                        );
             GoRoute(
               path: '/meeting',
+              // Phase 2 공개 정책:
+              // - STORE_RELEASE: 비공개
+              // - STORE_PLUS/FULL_DEV: 저위험(local-only) 기능만 공개
               redirect: (context, state) =>
-                  FeatureFlags.showBetaFeatures ? null : '/home',
+                  FeatureFlags.canUseMeeting ? null : '/home',
+                  FeatureFlags.allowPhase2LowRisk ? null : '/home',
               pageBuilder: (context, state) {
                 final appState = Provider.of<AppState>(context);
                 if (!appState.hasSajuProfile) {
@@ -112,45 +151,59 @@ class AppRouter {
                         createdAt: payload['createdAt'],
                       );
 
-                      await historyRepo.saveWithPayload(
-                        result: result,
-                        payload: payload['meta'],
-                      );
-                      debugPrint(
-                        'History recorded from App side: ${payload['type']}',
-                      );
-                    },
-                    onOpenMeetingHistory: () =>
-                        context.push('/meeting/history'),
-                  ),
-                );
-              },
-              routes: [
-                GoRoute(
-                  path: 'history',
-                  builder: (context, state) => const HistoryScreen(
-                    initialFilter: 'MEETING',
-                    lockFilter: true,
-                  ),
-                  routes: [
-                    GoRoute(
-                      path: 'detail/:id',
-                      builder: (context, state) {
-                        final id = state.pathParameters['id']!;
-                        return MeetingHistoryDetailScreen(
-                          id: id,
-                          extra: state.extra,
+                        await historyRepo.saveWithPayload(
+                          result: result,
+                          payload: payload['meta'],
+                        );
+                        debugPrint(
+                          'History recorded from App side: ${payload['type']}',
                         );
                       },
+                      onOpenMeetingHistory: () =>
+                          context.push('/meeting/history'),
                     ),
+                  );
+                },
+                routes: [
+                  GoRoute(
+                    path: 'history',
+                    builder: (context, state) => const HistoryScreen(
+                      initialFilter: 'MEETING',
+                      lockFilter: true,
+                    ),
+                    routes: [
+                      GoRoute(
+                        path: 'detail/:id',
+                        builder: (context, state) {
+                          final id = state.pathParameters['id']!;
+                          return MeetingHistoryDetailScreen(
+                            id: id,
+                            extra: state.extra,
+                          );
+                        },
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            if (showBetaFeatures)
+              GoRoute(
+                path: '/compatibility',
+                pageBuilder: (context, state) =>
+                    const NoTransitionPage(child: CompatibilityScreen()),
+              ),
                   ],
                 ),
               ],
             ),
             GoRoute(
               path: '/compatibility',
+              // Phase 2 공개 정책:
+              // - STORE_RELEASE: 비공개
+              // - STORE_PLUS/FULL_DEV: 저위험(local-only) 기능만 공개
               redirect: (context, state) =>
-                  FeatureFlags.showBetaFeatures ? null : '/home',
+                  FeatureFlags.phase2Features ? null : '/home',
+                  FeatureFlags.allowPhase2LowRisk ? null : '/home',
               pageBuilder: (context, state) =>
                   const NoTransitionPage(child: CompatibilityScreen()),
             ),
@@ -168,12 +221,46 @@ class AppRouter {
         ),
 
         // Stack Screens (No Bottom Nav)
+        if (showBetaFeatures)
+          GoRoute(
+            path: '/face',
+            builder: (context, state) => const FaceReadingScreen(),
+          ),
+        if (showBetaFeatures)
+          GoRoute(
+            path: '/face-result',
+            builder: (context, state) {
+              final extra = state.extra as Map<String, dynamic>;
+              return FaceResultScreen(
+                imagePath: extra['imagePath'] as String,
+                result: extra['result'] as FaceReadingResult,
+              );
+            },
+          ),
+        if (showBetaFeatures)
+          GoRoute(
+            path: '/ideal-type',
+            builder: (context, state) =>
+                const ComingSoonScreen(title: 'Ideal Type'),
+          ),
+        if (showBetaFeatures)
+          GoRoute(
+            path: '/connection',
+            builder: (context, state) =>
+                const ComingSoonScreen(title: 'Connection'),
+          ),
         GoRoute(
           path: '/face',
+          redirect: (context, state) =>
+              FeatureFlags.showBetaFeatures ? null : '/home',
+              FeatureFlags.allowPhase2Sensitive ? null : '/home',
           builder: (context, state) => const FaceReadingScreen(),
         ),
         GoRoute(
           path: '/face-result',
+          redirect: (context, state) =>
+              FeatureFlags.showBetaFeatures ? null : '/home',
+              FeatureFlags.allowPhase2Sensitive ? null : '/home',
           builder: (context, state) {
             final extra = state.extra as Map<String, dynamic>;
             return FaceResultScreen(
@@ -184,6 +271,8 @@ class AppRouter {
         ),
         GoRoute(
           path: '/ideal-type',
+          redirect: (context, state) =>
+              FeatureFlags.allowPhase2Sensitive ? null : '/home',
           builder: (context, state) =>
               const ComingSoonScreen(title: 'Ideal Type'),
         ),
@@ -207,12 +296,45 @@ class AppRouter {
             return TarotResultScreen(cards: cards);
           },
         ),
+        if (showBetaFeatures)
+          GoRoute(
+            path: '/dream',
+            builder: (context, state) => const DreamInputScreen(),
+          ),
+        if (showBetaFeatures)
+          GoRoute(
+            path: '/dream-result',
+            builder: (context, state) {
+              final extra = state.extra as Map<String, dynamic>;
+              return DreamResultScreen(
+                dreamContent: extra['dreamContent'] as String,
+                result: extra['result'] as DreamResult,
+              );
+            },
+          ),
+        if (showBetaFeatures)
+          GoRoute(
+            path: '/meeting/chat',
+            builder: (context, state) {
+              final extra = state.extra as Map<String, dynamic>;
+              return MeetingChatScreen(
+                matchId: extra['matchId'] as String,
+                myUserId: extra['myUserId'] as String,
+                otherUserId: extra['otherUserId'] as String,
+                otherUserName: extra['otherUserName'] as String,
+              );
+            },
+          ),
         GoRoute(
           path: '/dream',
+          redirect: (context, state) =>
+              FeatureFlags.allowPhase2Sensitive ? null : '/home',
           builder: (context, state) => const DreamInputScreen(),
         ),
         GoRoute(
           path: '/dream-result',
+          redirect: (context, state) =>
+              FeatureFlags.allowPhase2Sensitive ? null : '/home',
           builder: (context, state) {
             final extra = state.extra as Map<String, dynamic>;
             return DreamResultScreen(
@@ -223,6 +345,9 @@ class AppRouter {
         ),
         GoRoute(
           path: '/meeting/chat',
+          redirect: (context, state) =>
+              FeatureFlags.canUseMeeting ? null : '/home',
+              FeatureFlags.allowPhase2LowRisk ? null : '/home',
           builder: (context, state) {
             final extra = state.extra as Map<String, dynamic>;
             return MeetingChatScreen(
@@ -248,23 +373,55 @@ class AppRouter {
           builder: (context, state) =>
               const ComingSoonScreen(title: 'Saju Analysis'),
         ),
+        if (showBetaFeatures)
+          GoRoute(
+            path: '/consultation',
+            builder: (context, state) =>
+                const ComingSoonScreen(title: 'Consultation'),
+          ),
+        if (showBetaFeatures)
+          GoRoute(
+            path: '/yearly-fortune',
+            builder: (context, state) =>
+                const ComingSoonScreen(title: '2026 Yearly Fortune'),
+          ),
+        if (showBetaFeatures)
+          GoRoute(
+            path: '/compat-check',
+            builder: (context, state) =>
+                const ComingSoonScreen(title: 'Compatibility Check'),
+          ),
+        if (showBetaFeatures)
+          GoRoute(
+            path: '/compat-result',
+            builder: (context, state) =>
+                const ComingSoonScreen(title: 'Compatibility Result'),
+          ),
         GoRoute(
           path: '/consultation',
+          redirect: (context, state) =>
+              FeatureFlags.allowPhase2Sensitive ? null : '/home',
           builder: (context, state) =>
               const ComingSoonScreen(title: 'Consultation'),
         ),
         GoRoute(
           path: '/yearly-fortune',
+          redirect: (context, state) =>
+              FeatureFlags.allowPhase2Sensitive ? null : '/home',
           builder: (context, state) =>
               const ComingSoonScreen(title: '2026 Yearly Fortune'),
         ),
         GoRoute(
           path: '/compat-check',
+          redirect: (context, state) =>
+              FeatureFlags.allowPhase2LowRisk ? null : '/home',
           builder: (context, state) =>
               const ComingSoonScreen(title: 'Compatibility Check'),
         ),
         GoRoute(
           path: '/compat-result',
+          redirect: (context, state) =>
+              FeatureFlags.allowPhase2LowRisk ? null : '/home',
           builder: (context, state) =>
               const ComingSoonScreen(title: 'Compatibility Result'),
         ),
@@ -296,16 +453,29 @@ class AppRouter {
             return FortuneDetailScreen(result: result);
           },
         ),
-        GoRoute(
-          path: '/compat-detail',
-          builder: (context, state) =>
-              ComingSoonScreen(title: 'Compat Detail', data: state.extra),
-        ),
+        if (showBetaFeatures)
+          GoRoute(
+            path: '/compat-detail',
+            builder: (context, state) =>
+                ComingSoonScreen(title: 'Compat Detail', data: state.extra),
+          ),
         GoRoute(
           path: '/tarot-detail',
           builder: (context, state) =>
               ComingSoonScreen(title: 'Tarot Detail', data: state.extra),
         ),
+        if (showBetaFeatures)
+          GoRoute(
+            path: '/dream-detail',
+            builder: (context, state) =>
+                ComingSoonScreen(title: 'Dream Detail', data: state.extra),
+          ),
+        if (showBetaFeatures)
+          GoRoute(
+            path: '/face-detail',
+            builder: (context, state) =>
+                ComingSoonScreen(title: 'Face Detail', data: state.extra),
+          ),
         GoRoute(
           path: '/dream-detail',
           builder: (context, state) =>
@@ -313,6 +483,8 @@ class AppRouter {
         ),
         GoRoute(
           path: '/face-detail',
+          redirect: (context, state) =>
+              FeatureFlags.showBetaFeatures ? null : '/home',
           builder: (context, state) =>
               ComingSoonScreen(title: 'Face Detail', data: state.extra),
         ),
@@ -324,5 +496,24 @@ class AppRouter {
   /// 첫 실행 후 router 재설정 (for hot reload)
   static void reset() {
     _router = null;
+  }
+
+  static bool _isPhase2RestrictedRoute(String matchedLocation) {
+    const restrictedPrefixes = [
+      '/face',
+      '/dream',
+      '/meeting',
+      '/compat',
+      '/ideal-type',
+      '/consultation',
+      '/yearly-fortune',
+    ];
+
+    return restrictedPrefixes.any(
+      (prefix) =>
+          matchedLocation == prefix ||
+          matchedLocation.startsWith('$prefix/') ||
+          matchedLocation.startsWith('$prefix-'),
+    );
   }
 }

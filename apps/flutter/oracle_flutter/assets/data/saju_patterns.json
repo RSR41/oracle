@@ -100,3 +100,268 @@
     }
   }
 ]
+    "id": "saju_day_wood_growth",
+    "overall": 85,
+    "love": 92,
+    "money": 78,
+    "health": 85,
+    "work": 88,
+    "message": "새로운 시작을 위한 준비가 필요한 날입니다. 작은 변화가 큰 결과를 가져올 수 있습니다.",
+    "luckyColor": "골드",
+    "luckyNumber": 7,
+    "luckyTime": "오후 2-4시",
+    "details": {
+      "love": "오늘은 사랑하는 사람과의 관계가 더욱 깊어질 수 있는 날입니다.",
+      "money": "예상치 못한 작은 수입이 있을 수 있습니다.",
+      "health": "몸 상태가 좋은 날입니다.",
+      "work": "집중력이 높아지는 시기입니다."
+    }
+  },
+  {
+    "id": "saju_day_fire_focus",
+    "overall": 79,
+    "love": 74,
+    "money": 82,
+    "health": 77,
+    "work": 84,
+    "message": "주변 정리를 통해 흐름을 되찾는 날입니다. 우선순위를 분명히 하면 성과가 납니다.",
+    "luckyColor": "코랄",
+    "luckyNumber": 3,
+    "luckyTime": "오전 9-11시",
+    "details": {
+      "love": "감정보다 경청이 관계를 안정시키는 포인트입니다.",
+      "money": "지출 점검을 하면 손실을 줄이고 기회를 확보할 수 있습니다.",
+      "health": "수분 섭취와 가벼운 스트레칭이 컨디션에 도움이 됩니다.",
+      "work": "작은 작업부터 마무리하면 큰 업무도 수월해집니다."
+    }
+  },
+  {
+    "id": "saju_day_water_balance",
+    "overall": 88,
+    "love": 83,
+    "money": 86,
+    "health": 90,
+    "work": 84,
+    "message": "균형감이 빛나는 날입니다. 직관을 따르되 기록을 남기면 운이 더 커집니다.",
+    "luckyColor": "네이비",
+    "luckyNumber": 1,
+    "luckyTime": "저녁 7-9시",
+    "details": {
+      "love": "편안한 대화가 관계의 신뢰를 더 깊게 만듭니다.",
+      "money": "장기적인 관점의 선택이 재정 안정에 유리합니다.",
+      "health": "충분한 휴식이 다음 날의 에너지를 높여줍니다.",
+      "work": "협업에서 조율 역할을 맡으면 좋은 평가를 받습니다."
+    }
+  }
+]
+    "id": "flow_wood",
+    "messageKo": "성장 에너지가 강해 새로운 시도가 좋은 결과로 이어질 수 있습니다.",
+    "loveKo": "솔직한 대화가 관계를 한층 안정적으로 만들어줍니다.",
+    "moneyKo": "작은 절약 습관이 이번 주 재정 균형을 지켜줍니다.",
+    "healthKo": "가벼운 유산소 운동으로 몸의 순환을 높여보세요.",
+    "workKo": "아이디어를 빠르게 메모하면 기회를 잡을 수 있습니다.",
+    "luckyColor": "에메랄드"
+  },
+  {
+    "id": "flow_fire",
+    "messageKo": "열정이 올라오는 날로, 미뤘던 일을 처리하기 좋습니다.",
+    "loveKo": "칭찬 한마디가 관계의 온도를 높여줍니다.",
+    "moneyKo": "충동구매만 피하면 만족스러운 소비가 가능합니다.",
+    "healthKo": "수분 섭취를 늘리면 피로가 줄어듭니다.",
+    "workKo": "주도적으로 움직이면 좋은 평가를 받을 가능성이 큽니다.",
+    "luckyColor": "레드"
+  },
+  {
+    "id": "flow_earth",
+    "messageKo": "안정감 있는 선택이 장기적으로 가장 유리한 날입니다.",
+    "loveKo": "무리한 기대보다 현실적인 배려가 관계에 도움이 됩니다.",
+    "moneyKo": "고정 지출을 정리하면 여유 자금이 생깁니다.",
+    "healthKo": "규칙적인 식사 리듬이 컨디션을 회복시켜줍니다.",
+    "workKo": "체크리스트 중심으로 진행하면 실수가 줄어듭니다.",
+    "luckyColor": "베이지"
+  },
+  {
+    "id": "flow_metal",
+    "messageKo": "판단력이 선명해져 중요한 결정을 내리기 좋습니다.",
+    "loveKo": "경청하는 태도가 신뢰를 쌓아줍니다.",
+    "moneyKo": "계획한 예산 안에서 효율적인 선택이 가능합니다.",
+    "healthKo": "목·어깨 스트레칭을 자주 해주면 집중력이 좋아집니다.",
+    "workKo": "우선순위를 분명히 하면 업무 속도가 빨라집니다.",
+    "luckyColor": "실버"
+  },
+  {
+    "id": "flow_water",
+    "messageKo": "유연하게 흐름을 타면 예상 밖의 기회를 만날 수 있습니다.",
+    "loveKo": "서두르지 않는 접근이 오히려 좋은 인상을 남깁니다.",
+    "moneyKo": "정보를 비교한 뒤 지출하면 손해를 줄일 수 있습니다.",
+    "healthKo": "충분한 수면이 감정 균형에 큰 도움이 됩니다.",
+    "workKo": "협업에서 조율 역할을 맡으면 성과가 좋아집니다.",
+    "luckyColor": "네이비"
+  }
+]
+    {
+        "id": "ohaeng_mok",
+        "type": "오행",
+        "code": "목",
+        "nameKo": "목(木)",
+        "nameEn": "Wood",
+        "descriptionKo": "성장과 발전을 상징합니다. 봄의 기운으로 새로운 시작과 창의성을 나타냅니다.",
+        "descriptionEn": "Symbolizes growth and development. Represents spring energy, new beginnings and creativity.",
+        "attributeKo": "성장,인자,창의성,유연성",
+        "attributeEn": "growth,benevolence,creativity,flexibility"
+    },
+    {
+        "id": "ohaeng_hwa",
+        "type": "오행",
+        "code": "화",
+        "nameKo": "화(火)",
+        "nameEn": "Fire",
+        "descriptionKo": "열정과 에너지를 상징합니다. 여름의 기운으로 활력과 표현력을 나타냅니다.",
+        "descriptionEn": "Symbolizes passion and energy. Represents summer energy, vitality and expression.",
+        "attributeKo": "열정,예의,표현력,따뜻함",
+        "attributeEn": "passion,courtesy,expression,warmth"
+    },
+    {
+        "id": "ohaeng_to",
+        "type": "오행",
+        "code": "토",
+        "nameKo": "토(土)",
+        "nameEn": "Earth",
+        "descriptionKo": "안정과 중심을 상징합니다. 사계절의 전환점으로 균형과 조화를 나타냅니다.",
+        "descriptionEn": "Symbolizes stability and center. Represents seasonal transitions, balance and harmony.",
+        "attributeKo": "안정,신뢰,중재,포용",
+        "attributeEn": "stability,trust,mediation,inclusiveness"
+    },
+    {
+        "id": "ohaeng_geum",
+        "type": "오행",
+        "code": "금",
+        "nameKo": "금(金)",
+        "nameEn": "Metal",
+        "descriptionKo": "결단력과 의지를 상징합니다. 가을의 기운으로 수확과 정리를 나타냅니다.",
+        "descriptionEn": "Symbolizes determination and will. Represents autumn energy, harvest and organization.",
+        "attributeKo": "결단,정의,강인함,명확성",
+        "attributeEn": "determination,justice,strength,clarity"
+    },
+    {
+        "id": "ohaeng_su",
+        "type": "오행",
+        "code": "수",
+        "nameKo": "수(水)",
+        "nameEn": "Water",
+        "descriptionKo": "지혜와 유연성을 상징합니다. 겨울의 기운으로 잠재력과 깊이를 나타냅니다.",
+        "descriptionEn": "Symbolizes wisdom and flexibility. Represents winter energy, potential and depth.",
+        "attributeKo": "지혜,적응력,깊이,소통",
+        "attributeEn": "wisdom,adaptability,depth,communication"
+    },
+    {
+        "id": "chungan_gap",
+        "type": "천간",
+        "code": "갑",
+        "nameKo": "갑(甲)",
+        "nameEn": "Gap (Yang Wood)",
+        "descriptionKo": "양목(陽木)으로 큰 나무를 상징합니다. 리더십과 정직함, 진취적 기상을 가집니다.",
+        "descriptionEn": "Yang Wood, symbolizes big trees. Represents leadership, honesty, and progressive spirit.",
+        "attributeKo": "리더십,정직,진취,강직",
+        "attributeEn": "leadership,honesty,progress,integrity"
+    },
+    {
+        "id": "chungan_eul",
+        "type": "천간",
+        "code": "을",
+        "nameKo": "을(乙)",
+        "nameEn": "Eul (Yin Wood)",
+        "descriptionKo": "음목(陰木)으로 풀과 꽃을 상징합니다. 부드러움과 적응력, 예술성을 가집니다.",
+        "descriptionEn": "Yin Wood, symbolizes grass and flowers. Represents gentleness, adaptability, and artistry.",
+        "attributeKo": "부드러움,적응력,예술성,협조",
+        "attributeEn": "gentleness,adaptability,artistry,cooperation"
+    },
+    {
+        "id": "chungan_byeong",
+        "type": "천간",
+        "code": "병",
+        "nameKo": "병(丙)",
+        "nameEn": "Byeong (Yang Fire)",
+        "descriptionKo": "양화(陽火)로 태양을 상징합니다. 밝음과 적극성, 열정적 성격을 가집니다.",
+        "descriptionEn": "Yang Fire, symbolizes the sun. Represents brightness, activeness, and passionate character.",
+        "attributeKo": "밝음,적극성,열정,관대함",
+        "attributeEn": "brightness,activeness,passion,generosity"
+    },
+    {
+        "id": "chungan_jeong",
+        "type": "천간",
+        "code": "정",
+        "nameKo": "정(丁)",
+        "nameEn": "Jeong (Yin Fire)",
+        "descriptionKo": "음화(陰火)로 촛불을 상징합니다. 따뜻함과 세심함, 내면의 열정을 가집니다.",
+        "descriptionEn": "Yin Fire, symbolizes candlelight. Represents warmth, attentiveness, and inner passion.",
+        "attributeKo": "따뜻함,세심함,헌신,지성",
+        "attributeEn": "warmth,attentiveness,dedication,intelligence"
+    },
+    {
+        "id": "chungan_mu",
+        "type": "천간",
+        "code": "무",
+        "nameKo": "무(戊)",
+        "nameEn": "Mu (Yang Earth)",
+        "descriptionKo": "양토(陽土)로 산을 상징합니다. 안정감과 신뢰성, 묵직한 존재감을 가집니다.",
+        "descriptionEn": "Yang Earth, symbolizes mountains. Represents stability, reliability, and solid presence.",
+        "attributeKo": "안정,신뢰,묵직함,포용력",
+        "attributeEn": "stability,reliability,solidity,inclusiveness"
+    },
+    {
+        "id": "jiji_ja",
+        "type": "지지",
+        "code": "자",
+        "nameKo": "자(子) - 쥐",
+        "nameEn": "Ja (Rat)",
+        "descriptionKo": "자시(23:00-01:00), 11월, 수(水) 기운. 영리함과 민첩함을 상징합니다.",
+        "descriptionEn": "23:00-01:00, November, Water energy. Symbolizes cleverness and agility.",
+        "attributeKo": "영리,민첩,사교성,적응력",
+        "attributeEn": "cleverness,agility,sociability,adaptability"
+    },
+    {
+        "id": "jiji_chuk",
+        "type": "지지",
+        "code": "축",
+        "nameKo": "축(丑) - 소",
+        "nameEn": "Chuk (Ox)",
+        "descriptionKo": "축시(01:00-03:00), 12월, 토(土) 기운. 성실함과 인내심을 상징합니다.",
+        "descriptionEn": "01:00-03:00, December, Earth energy. Symbolizes diligence and patience.",
+        "attributeKo": "성실,인내,끈기,신뢰",
+        "attributeEn": "diligence,patience,perseverance,trust"
+    },
+    {
+        "id": "jiji_in",
+        "type": "지지",
+        "code": "인",
+        "nameKo": "인(寅) - 호랑이",
+        "nameEn": "In (Tiger)",
+        "descriptionKo": "인시(03:00-05:00), 1월, 목(木) 기운. 용맹함과 리더십을 상징합니다.",
+        "descriptionEn": "03:00-05:00, January, Wood energy. Symbolizes bravery and leadership.",
+        "attributeKo": "용맹,리더십,정의감,독립성",
+        "attributeEn": "bravery,leadership,justice,independence"
+    },
+    {
+        "id": "jiji_myo",
+        "type": "지지",
+        "code": "묘",
+        "nameKo": "묘(卯) - 토끼",
+        "nameEn": "Myo (Rabbit)",
+        "descriptionKo": "묘시(05:00-07:00), 2월, 목(木) 기운. 온화함과 예술성을 상징합니다.",
+        "descriptionEn": "05:00-07:00, February, Wood energy. Symbolizes gentleness and artistry.",
+        "attributeKo": "온화,예술성,신중함,평화",
+        "attributeEn": "gentleness,artistry,prudence,peace"
+    },
+    {
+        "id": "jiji_jin",
+        "type": "지지",
+        "code": "진",
+        "nameKo": "진(辰) - 용",
+        "nameEn": "Jin (Dragon)",
+        "descriptionKo": "진시(07:00-09:00), 3월, 토(土) 기운. 권위와 성공을 상징합니다.",
+        "descriptionEn": "07:00-09:00, March, Earth energy. Symbolizes authority and success.",
+        "attributeKo": "권위,성공,카리스마,야망",
+        "attributeEn": "authority,success,charisma,ambition"
+    }
+]

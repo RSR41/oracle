@@ -1,100 +1,75 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
+
+import '../../../core/constants/app_colors.dart';
+import '../../state/app_state.dart';
+import '../../config/app_urls.dart';
+import 'package:oracle_flutter/app/config/app_urls.dart';
 import 'package:oracle_flutter/app/state/app_state.dart';
 import 'package:oracle_flutter/app/theme/app_colors.dart';
 import 'package:oracle_flutter/app/i18n/translations.dart';
+import 'package:oracle_flutter/app/config/app_urls.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     final appState = context.watch<AppState>();
+    final theme = Theme.of(context);
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(appState.t('settings.title')),
-        centerTitle: true,
-      ),
-      body: ListView(
-        padding: const EdgeInsets.all(20),
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // App Settings Section
-          _buildSectionHeader(appState.t('settings.appSettings'), theme),
-          const SizedBox(height: 12),
+          // Profile Section
+          _buildSectionHeader(appState.t('settings.profile'), theme),
+          const SizedBox(height: 16),
 
-          // Theme Setting
           _buildSettingCard(
             theme,
-            icon: Icons.color_lens,
-            title: appState.t('settings.theme'),
-            trailing: DropdownButton<AppThemePreference>(
-              value: appState.theme,
-              underline: const SizedBox(),
-              onChanged: (value) {
-                if (value != null) {
-                  appState.setTheme(value);
-                }
-              },
-              items: [
-                DropdownMenuItem(
-                  value: AppThemePreference.system,
-                  child: Text(appState.t('settings.system')),
-                ),
-                DropdownMenuItem(
-                  value: AppThemePreference.light,
-                  child: Text(appState.t('settings.light')),
-                ),
-                DropdownMenuItem(
-                  value: AppThemePreference.dark,
-                  child: Text(appState.t('settings.dark')),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 12),
-
-          // Language Setting
-          _buildSettingCard(
-            theme,
-            icon: Icons.language,
-            title: appState.t('settings.language'),
-            trailing: DropdownButton<AppLanguage>(
-              value: appState.language,
-              underline: const SizedBox(),
-              onChanged: (value) {
-                if (value != null) {
-                  appState.setLanguage(value);
-                }
-              },
-              items: const [
-                DropdownMenuItem(value: AppLanguage.ko, child: Text('한국어')),
-                DropdownMenuItem(value: AppLanguage.en, child: Text('English')),
-              ],
-            ),
+            icon: Icons.person_outline,
+            title: appState.t('profile.name'),
+            subtitle: appState.profile.name?.isNotEmpty == true
+                ? appState.profile.name
+                : appState.t('profile.notSet'),
           ),
 
-          const SizedBox(height: 32),
-
-          // Account Section
-          _buildSectionHeader(appState.t('settings.account'), theme),
-          const SizedBox(height: 12),
-
-          // Clear Profile
           _buildSettingCard(
             theme,
-            icon: Icons.person_off,
+            icon: Icons.cake_outlined,
+            title: appState.t('profile.birthDate'),
+            subtitle: appState.profile.birthDate?.isNotEmpty == true
+                ? appState.profile.birthDate
+                : appState.t('profile.notSet'),
+          ),
+
+          _buildSettingCard(
+            theme,
+            icon: Icons.access_time,
+            title: appState.t('profile.birthTime'),
+            subtitle: appState.profile.birthTime?.isNotEmpty == true
+                ? appState.profile.birthTime
+                : appState.t('profile.notSet'),
+          ),
+
+          _buildSettingCard(
+            theme,
+            icon: Icons.delete_outline,
             title: appState.t('settings.clearProfile'),
-            subtitle: appState.t('settings.clearProfileDesc'),
+            trailing: const Icon(Icons.chevron_right, color: Colors.red),
             onTap: () => _showClearProfileDialog(context, appState),
           ),
 
           const SizedBox(height: 32),
 
-          // About Section
-          _buildSectionHeader(appState.t('settings.about'), theme),
-          const SizedBox(height: 12),
+          // App Settings
+          _buildSectionHeader(appState.t('settings.appInfo'), theme),
+          const SizedBox(height: 16),
 
           _buildSettingCard(
             theme,
@@ -107,22 +82,32 @@ class SettingsScreen extends StatelessWidget {
             theme,
             icon: Icons.privacy_tip_outlined,
             title: appState.t('settings.privacy'),
-            onTap: () => _showInfoDialog(
+            onTap: () => _openLegalUrl(context, AppUrls.privacyPolicy),
+            onTap: () => _openUrl(
               context,
               'Privacy Policy',
-              'Privacy policy will be available at oracle-saju.web.app/privacy',
+              AppUrls.privacyPolicy,
+              AppUrls.privacyPolicy,
+              '개인정보처리방침 페이지를 열 수 없습니다. 네트워크 상태 또는 URL 설정을 확인해 주세요.',
             ),
+            onTap: () => _launchExternalUrl(context, AppUrls.privacyPolicy),
+            onTap: () => _openExternalLink(context, AppUrls.privacyPolicy),
           ),
 
           _buildSettingCard(
             theme,
             icon: Icons.article_outlined,
             title: appState.t('settings.terms'),
-            onTap: () => _showInfoDialog(
+            onTap: () => _openLegalUrl(context, AppUrls.termsOfService),
+            onTap: () => _openUrl(
               context,
               'Terms of Service',
-              'Terms of service will be available at oracle-saju.web.app/terms',
+              AppUrls.termsOfService,
+              AppUrls.termsOfService,
+              '이용약관 페이지를 열 수 없습니다. 네트워크 상태 또는 URL 설정을 확인해 주세요.',
             ),
+            onTap: () => _launchExternalUrl(context, AppUrls.termsOfService),
+            onTap: () => _openExternalLink(context, AppUrls.termsOfService),
           ),
 
           _buildSettingCard(
@@ -218,19 +203,79 @@ class SettingsScreen extends StatelessWidget {
     }
   }
 
-  void _showInfoDialog(BuildContext context, String title, String content) {
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: Text(title),
-        content: Text(content),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: const Text('OK'),
+  Future<void> _openLegalUrl(BuildContext context, String url) async {
+    if (!AppUrls.isValidUrl(url)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('법적 문서 URL이 올바르지 않습니다.')),
+      );
+  Future<void> _showInfoDialog(
+    BuildContext context,
+    String title,
+    String url,
+  ) async {
+    if (!AppUrls.isValidUrl(url)) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('$title URL is invalid.')),
+  Future<void> _openUrl(
+    BuildContext context,
+    String url,
+    String errorMessage,
+  ) async {
+    final uri = Uri.tryParse(url);
+
+    if (uri == null || !AppUrls.isValidUrl(url)) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(errorMessage)),
+  Future<void> _launchExternalUrl(BuildContext context, String urlString) async {
+    if (!AppUrls.isValidUrl(urlString)) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('링크가 아직 설정되지 않았습니다. 배포 설정을 확인해주세요.'),
           ),
-        ],
-      ),
-    );
+        );
+      }
+      return;
+    }
+
+    final uri = Uri.parse(url);
+    final opened = await launchUrl(uri, mode: LaunchMode.externalApplication);
+    if (!opened && context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('문서를 열 수 없습니다. 잠시 후 다시 시도해주세요.')),
+      );
+    }
+    final launched = await launchUrl(uri, mode: LaunchMode.externalApplication);
+
+    if (!launched && context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Could not open $title.')),
+      );
+    }
+    final launched = await launchUrl(uri, mode: LaunchMode.externalApplication);
+    if (!launched && context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(errorMessage)),
+      );
+    }
+    final uri = Uri.parse(urlString);
+    final launched = await launchUrl(uri, mode: LaunchMode.externalApplication);
+    if (!launched && context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('외부 링크를 열 수 없습니다. 잠시 후 다시 시도해주세요.')),
+      );
+    }
+  Future<void> _openExternalLink(BuildContext context, String url) async {
+    if (!AppUrls.isValidUrl(url)) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('배포 URL 미설정')));
+      return;
+    }
+
+    final uri = Uri.parse(url);
+    await launchUrl(uri, mode: LaunchMode.externalApplication);
   }
 }
