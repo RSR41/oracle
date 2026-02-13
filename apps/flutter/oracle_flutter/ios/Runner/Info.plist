@@ -24,6 +24,12 @@
 		<string>$(FLUTTER_BUILD_NUMBER)</string>
 		<key>LSRequiresIPhoneOS</key>
 		<true/>
+		<key>NSCameraUsageDescription</key>
+		<string>We need camera access so you can take photos for physiognomy analysis.</string>
+		<key>NSPhotoLibraryAddUsageDescription</key>
+		<string>We need photo library add access so you can save edited or analyzed images.</string>
+		<key>NSPhotoLibraryUsageDescription</key>
+		<string>We need photo library access so you can select photos for physiognomy analysis.</string>
 		<key>UILaunchStoryboardName</key>
 		<string>LaunchScreen</string>
 		<key>UIMainStoryboardFile</key>
