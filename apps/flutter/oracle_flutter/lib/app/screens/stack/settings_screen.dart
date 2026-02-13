@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:oracle_flutter/app/config/app_urls.dart';
 import 'package:oracle_flutter/app/state/app_state.dart';
 import 'package:oracle_flutter/app/theme/app_colors.dart';
 import 'package:oracle_flutter/app/i18n/translations.dart';
@@ -107,22 +109,14 @@ class SettingsScreen extends StatelessWidget {
             theme,
             icon: Icons.privacy_tip_outlined,
             title: appState.t('settings.privacy'),
-            onTap: () => _showInfoDialog(
-              context,
-              'Privacy Policy',
-              'Privacy policy will be available at oracle-saju.web.app/privacy',
-            ),
+            onTap: () => _openExternalLink(context, AppUrls.privacyPolicy),
           ),
 
           _buildSettingCard(
             theme,
             icon: Icons.article_outlined,
             title: appState.t('settings.terms'),
-            onTap: () => _showInfoDialog(
-              context,
-              'Terms of Service',
-              'Terms of service will be available at oracle-saju.web.app/terms',
-            ),
+            onTap: () => _openExternalLink(context, AppUrls.termsOfService),
           ),
 
           _buildSettingCard(
@@ -218,19 +212,15 @@ class SettingsScreen extends StatelessWidget {
     }
   }
 
-  void _showInfoDialog(BuildContext context, String title, String content) {
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: Text(title),
-        content: Text(content),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: const Text('OK'),
-          ),
-        ],
-      ),
-    );
+  Future<void> _openExternalLink(BuildContext context, String url) async {
+    if (!AppUrls.isValidUrl(url)) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('배포 URL 미설정')));
+      return;
+    }
+
+    final uri = Uri.parse(url);
+    await launchUrl(uri, mode: LaunchMode.externalApplication);
   }
 }
