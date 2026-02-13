@@ -89,7 +89,7 @@ class AppRouter {
             GoRoute(
               path: '/meeting',
               redirect: (context, state) =>
-                  FeatureFlags.showBetaFeatures ? null : '/home',
+                  FeatureFlags.featureMeeting ? null : '/home',
               pageBuilder: (context, state) {
                 final appState = Provider.of<AppState>(context);
                 if (!appState.hasSajuProfile) {
@@ -150,7 +150,7 @@ class AppRouter {
             GoRoute(
               path: '/compatibility',
               redirect: (context, state) =>
-                  FeatureFlags.showBetaFeatures ? null : '/home',
+                  FeatureFlags.featureCompatibility ? null : '/home',
               pageBuilder: (context, state) =>
                   const NoTransitionPage(child: CompatibilityScreen()),
             ),
@@ -170,10 +170,14 @@ class AppRouter {
         // Stack Screens (No Bottom Nav)
         GoRoute(
           path: '/face',
+          redirect: (context, state) =>
+              FeatureFlags.featureFace ? null : '/home',
           builder: (context, state) => const FaceReadingScreen(),
         ),
         GoRoute(
           path: '/face-result',
+          redirect: (context, state) =>
+              FeatureFlags.featureFace ? null : '/home',
           builder: (context, state) {
             final extra = state.extra as Map<String, dynamic>;
             return FaceResultScreen(
@@ -209,10 +213,14 @@ class AppRouter {
         ),
         GoRoute(
           path: '/dream',
+          redirect: (context, state) =>
+              FeatureFlags.featureDream ? null : '/home',
           builder: (context, state) => const DreamInputScreen(),
         ),
         GoRoute(
           path: '/dream-result',
+          redirect: (context, state) =>
+              FeatureFlags.featureDream ? null : '/home',
           builder: (context, state) {
             final extra = state.extra as Map<String, dynamic>;
             return DreamResultScreen(
@@ -223,6 +231,8 @@ class AppRouter {
         ),
         GoRoute(
           path: '/meeting/chat',
+          redirect: (context, state) =>
+              FeatureFlags.featureMeeting ? null : '/home',
           builder: (context, state) {
             final extra = state.extra as Map<String, dynamic>;
             return MeetingChatScreen(
@@ -260,11 +270,15 @@ class AppRouter {
         ),
         GoRoute(
           path: '/compat-check',
+          redirect: (context, state) =>
+              FeatureFlags.featureCompatibility ? null : '/home',
           builder: (context, state) =>
               const ComingSoonScreen(title: 'Compatibility Check'),
         ),
         GoRoute(
           path: '/compat-result',
+          redirect: (context, state) =>
+              FeatureFlags.featureCompatibility ? null : '/home',
           builder: (context, state) =>
               const ComingSoonScreen(title: 'Compatibility Result'),
         ),
