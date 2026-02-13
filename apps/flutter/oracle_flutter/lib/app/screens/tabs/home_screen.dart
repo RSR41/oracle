@@ -298,6 +298,7 @@ class HomeScreen extends StatelessWidget {
                           ),
                           // Phase 2+: 꿈해몽, 궁합
                           if (FeatureFlags.enableDream)
+                          if (FeatureFlags.phase2Features) ...[
                             _buildQuickAccessBtn(
                               context,
                               icon: Icons.bedtime,
