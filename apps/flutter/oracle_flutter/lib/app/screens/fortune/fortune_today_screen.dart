@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:oracle_flutter/app/theme/app_colors.dart';
-import 'package:oracle_flutter/app/services/fortune_service.dart';
+import 'package:oracle_flutter/app/database/history_repository.dart';
 import 'package:oracle_flutter/app/models/fortune_result.dart';
-import 'package:uuid/uuid.dart';
+import 'package:oracle_flutter/app/services/fortune_content_service.dart';
+import 'package:oracle_flutter/app/state/app_state.dart';
+import 'package:oracle_flutter/app/theme/app_colors.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-import 'package:oracle_flutter/app/state/app_state.dart';
+import 'package:uuid/uuid.dart';
 
 class FortuneTodayScreen extends StatefulWidget {
   const FortuneTodayScreen({super.key});
@@ -16,23 +17,36 @@ class FortuneTodayScreen extends StatefulWidget {
 }
 
 class _FortuneTodayScreenState extends State<FortuneTodayScreen> {
-  final FortuneService _fortuneService = FortuneService();
+  final HistoryRepository _historyRepo = HistoryRepository();
+  final FortuneContentService _fortuneContentService = FortuneContentService();
   bool _isSaving = false;
+  bool _isLoading = true;
+  FortunePattern? _fortunePattern;
 
-  // Mock Data (Static for Phase 4)
-  final Map<String, dynamic> fortuneData = {
-    'overall': 85,
-    'love': 92,
-    'money': 78,
-    'health': 85,
-    'work': 88,
-    'message': '새로운 시작을 위한 준비가 필요한 날입니다. 작은 변화가 큰 결과를 가져올 수 있습니다.',
-    'luckyColor': '골드',
-    'luckyNumber': 7,
-    'luckyTime': '오후 2-4시',
-  };
+  @override
+  void initState() {
+    super.initState();
+    _loadFortunePattern();
+  }
 
-  void _handleSave() async {
+  Future<void> _loadFortunePattern() async {
+    try {
+      final pattern = await _fortuneContentService.pickTodayPattern();
+      if (!mounted) return;
+      setState(() {
+        _fortunePattern = pattern;
+        _isLoading = false;
+      });
+    } catch (_) {
+      if (!mounted) return;
+      setState(() => _isLoading = false);
+    }
+  }
+
+  Future<void> _handleSave() async {
+    final pattern = _fortunePattern;
+    if (pattern == null) return;
+
     setState(() => _isSaving = true);
 
     try {
@@ -44,13 +58,28 @@ class _FortuneTodayScreenState extends State<FortuneTodayScreen> {
         type: 'fortune',
         title: '오늘의 운세',
         date: dateStr,
-        summary: fortuneData['overall'].toString(),
-        content: fortuneData['message'],
-        overallScore: fortuneData['overall'],
+        summary: pattern.overall.toString(),
+        content: pattern.message,
+        overallScore: pattern.overall,
         createdAt: now.toIso8601String(),
       );
 
-      await _fortuneService.save(result);
+      await _historyRepo.saveWithPayload(
+        result: result,
+        payload: {
+          'patternId': pattern.id,
+          'overall': pattern.overall,
+          'love': pattern.love,
+          'money': pattern.money,
+          'health': pattern.health,
+          'work': pattern.work,
+          'message': pattern.message,
+          'luckyColor': pattern.luckyColor,
+          'luckyNumber': pattern.luckyNumber,
+          'luckyTime': pattern.luckyTime,
+          'details': pattern.details,
+        },
+      );
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -58,9 +87,8 @@ class _FortuneTodayScreenState extends State<FortuneTodayScreen> {
             content: Text(context.read<AppState>().t('fortune.saveSuccess')),
           ),
         );
-        // Optional: Navigate to History or Stay
       }
-    } catch (e) {
+    } catch (_) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -80,11 +108,27 @@ class _FortuneTodayScreenState extends State<FortuneTodayScreen> {
     final theme = Theme.of(context);
     final appState = context.watch<AppState>();
 
+    if (_isLoading) {
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    }
+
+    final pattern = _fortunePattern;
+    if (pattern == null) {
+      return Scaffold(
+        appBar: AppBar(title: Text(appState.t('fortune.today'))),
+        body: Center(
+          child: Text(
+            '운세 데이터를 불러오지 못했습니다.',
+            style: theme.textTheme.bodyMedium,
+          ),
+        ),
+      );
+    }
+
     return Scaffold(
       body: SingleChildScrollView(
         child: Column(
           children: [
-            // Header
             Padding(
               padding: const EdgeInsets.only(
                 top: 60,
@@ -109,7 +153,7 @@ class _FortuneTodayScreenState extends State<FortuneTodayScreen> {
                         ),
                       ),
                       Text(
-                        '2026년 1월 30일 (금요일)',
+                        DateFormat('yyyy년 M월 d일 (E요일)', 'ko').format(DateTime.now()),
                         style: theme.textTheme.bodySmall,
                       ),
                     ],
@@ -117,8 +161,6 @@ class _FortuneTodayScreenState extends State<FortuneTodayScreen> {
                 ],
               ),
             ),
-
-            // Overall Score
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
               child: Container(
@@ -130,13 +172,6 @@ class _FortuneTodayScreenState extends State<FortuneTodayScreen> {
                     end: Alignment.bottomRight,
                   ),
                   borderRadius: BorderRadius.circular(24),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.1),
-                      blurRadius: 10,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
                 ),
                 child: Column(
                   children: [
@@ -170,12 +205,12 @@ class _FortuneTodayScreenState extends State<FortuneTodayScreen> {
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
                         Text(
-                          '${fortuneData['overall']}',
+                          '${pattern.overall}',
                           style: const TextStyle(
                             fontSize: 48,
                             fontWeight: FontWeight.bold,
                             color: Colors.white,
-                            height: 1.0,
+                            height: 1,
                           ),
                         ),
                         const SizedBox(width: 8),
@@ -210,7 +245,7 @@ class _FortuneTodayScreenState extends State<FortuneTodayScreen> {
                           ),
                           const SizedBox(height: 8),
                           Text(
-                            fortuneData['message'],
+                            pattern.message,
                             style: const TextStyle(
                               color: Colors.white,
                               fontSize: 14,
@@ -224,38 +259,34 @@ class _FortuneTodayScreenState extends State<FortuneTodayScreen> {
                 ),
               ),
             ),
-
-            // Detail Sections
             _buildDetailSection(
               appState.t('home.love'),
-              fortuneData['love'],
+              pattern.love,
               AppColors.peach,
               Icons.favorite,
-              '오늘은 사랑하는 사람과의 관계가 더욱 깊어질 수 있는 날입니다.', // Mock content, keeping as is or key if exists
+              pattern.details['love'] ?? '',
             ),
             _buildDetailSection(
               appState.t('home.wealth'),
-              fortuneData['money'],
+              pattern.money,
               AppColors.caramel,
               Icons.attach_money,
-              '예상치 못한 작은 수입이 있을 수 있습니다.',
+              pattern.details['money'] ?? '',
             ),
             _buildDetailSection(
               appState.t('home.health'),
-              fortuneData['health'],
+              pattern.health,
               AppColors.sage,
               Icons.health_and_safety,
-              '몸 상태가 좋은 날입니다.',
+              pattern.details['health'] ?? '',
             ),
             _buildDetailSection(
               '직장/학업운',
-              fortuneData['work'],
+              pattern.work,
               AppColors.skyPastel,
               Icons.trending_up,
-              '집중력이 높아지는 시기입니다.',
+              pattern.details['work'] ?? '',
             ),
-
-            // Lucky Items
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
               child: Column(
@@ -274,29 +305,27 @@ class _FortuneTodayScreenState extends State<FortuneTodayScreen> {
                         context,
                         '🎨',
                         appState.t('fortune.luckyColor'),
-                        fortuneData['luckyColor'],
+                        pattern.luckyColor,
                       ),
                       const SizedBox(width: 10),
                       _buildLuckyItem(
                         context,
                         '🔢',
                         appState.t('fortune.luckyNumber'),
-                        fortuneData['luckyNumber'].toString(),
+                        pattern.luckyNumber.toString(),
                       ),
                       const SizedBox(width: 10),
                       _buildLuckyItem(
                         context,
                         '⏰',
                         appState.t('fortune.luckyTime'),
-                        fortuneData['luckyTime'],
+                        pattern.luckyTime,
                       ),
                     ],
                   ),
                 ],
               ),
             ),
-
-            // Buttons
             Padding(
               padding: const EdgeInsets.fromLTRB(20, 0, 20, 40),
               child: Row(
@@ -304,12 +333,6 @@ class _FortuneTodayScreenState extends State<FortuneTodayScreen> {
                   Expanded(
                     child: OutlinedButton(
                       onPressed: _isSaving ? null : _handleSave,
-                      style: OutlinedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                      ),
                       child: _isSaving
                           ? const SizedBox(
                               width: 20,
@@ -322,12 +345,8 @@ class _FortuneTodayScreenState extends State<FortuneTodayScreen> {
                   const SizedBox(width: 12),
                   Expanded(
                     child: FilledButton(
-                      onPressed: () {}, // Share Not Implemented yet
+                      onPressed: () {},
                       style: FilledButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
                         backgroundColor: AppColors.primary,
                       ),
                       child: Text(appState.t('common.share')),
@@ -359,13 +378,6 @@ class _FortuneTodayScreenState extends State<FortuneTodayScreen> {
           border: Border.all(
             color: Theme.of(context).dividerColor.withValues(alpha: 0.1),
           ),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.05),
-              blurRadius: 4,
-              offset: const Offset(0, 2),
-            ),
-          ],
         ),
         child: Column(
           children: [
@@ -391,7 +403,7 @@ class _FortuneTodayScreenState extends State<FortuneTodayScreen> {
                       const SizedBox(height: 4),
                       Text(
                         '$score점',
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontWeight: FontWeight.bold,
                           color: AppColors.primary,
                         ),
@@ -402,13 +414,7 @@ class _FortuneTodayScreenState extends State<FortuneTodayScreen> {
               ],
             ),
             const SizedBox(height: 12),
-            Text(
-              content,
-              style: TextStyle(
-                color: Theme.of(context).textTheme.bodySmall?.color,
-                fontSize: 13,
-              ),
-            ),
+            Text(content, style: const TextStyle(fontSize: 13)),
           ],
         ),
       ),
@@ -435,13 +441,7 @@ class _FortuneTodayScreenState extends State<FortuneTodayScreen> {
           children: [
             Text(emoji, style: const TextStyle(fontSize: 24)),
             const SizedBox(height: 8),
-            Text(
-              label,
-              style: TextStyle(
-                fontSize: 10,
-                color: Theme.of(context).textTheme.bodySmall?.color,
-              ),
-            ),
+            Text(label, style: const TextStyle(fontSize: 10)),
             const SizedBox(height: 4),
             Text(
               value,

@@ -1,31 +1,20 @@
-import 'dart:convert';
-import 'package:shared_preferences/shared_preferences.dart';
+import '../database/history_repository.dart';
 import '../models/fortune_result.dart';
 
+/// Backward-compatible service that now delegates to SQLite history storage.
 class FortuneService {
-  static const String _storageKey = 'oracle_history';
+  final HistoryRepository _historyRepository = HistoryRepository();
 
-  Future<void> save(FortuneResult result) async {
-    final prefs = await SharedPreferences.getInstance();
-    final List<String> history = prefs.getStringList(_storageKey) ?? [];
+  Future<void> save(FortuneResult result) =>
+      _historyRepository.saveWithPayload(result: result);
 
-    // Add new item to the beginning
-    history.insert(0, jsonEncode(result.toJson()));
-
-    await prefs.setStringList(_storageKey, history);
-  }
-
-  Future<List<FortuneResult>> getAll() async {
-    final prefs = await SharedPreferences.getInstance();
-    final List<String> history = prefs.getStringList(_storageKey) ?? [];
-
-    return history
-        .map((item) => FortuneResult.fromJson(jsonDecode(item)))
-        .toList();
-  }
+  Future<List<FortuneResult>> getAll() =>
+      _historyRepository.getAll(type: 'fortune');
 
   Future<void> clearAll() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.remove(_storageKey);
+    final all = await _historyRepository.getAll(type: 'fortune');
+    for (final item in all) {
+      await _historyRepository.delete(item.id);
+    }
   }
 }
