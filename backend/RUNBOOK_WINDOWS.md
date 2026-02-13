@@ -1,6 +1,6 @@
-# Runbook: Oracle on Windows Local (Revised)
+# Runbook: Oracle on Windows Local (Serverless Postgres First)
 
-This guide details how to run the Backend and Flutter App on a Windows machine, ensuring 8080 port availability and Flutter Web execution.
+This guide details how to run the Backend and Flutter App on a Windows machine using a managed serverless PostgreSQL database (Neon/Supabase), ensuring 8080 port availability and Flutter Web execution.
 
 ## 1. Prerequisites
 - Node.js (v18+)
@@ -8,10 +8,26 @@ This guide details how to run the Backend and Flutter App on a Windows machine, 
 - Chrome Browser
 
 ## 2. Backend (NestJS)
-**Goal:** Ensure API is listening on `http://localhost:8080`.
+**Goal:** Ensure API is listening on `http://localhost:8080` with a working Postgres connection.
 
-### A. Starting the Server
-The server is configured to **stay alive** even if Docker/DB is offline (DEV mode).
+### A. Database Connection (Neon/Supabase)
+Create/update `oracle/backend/.env` and set:
+
+```powershell
+DATABASE_URL="postgresql://<user>:<password>@<host>/<db>?sslmode=require"
+```
+
+Then run Prisma setup:
+
+```powershell
+cd oracle/backend
+npm install
+npx prisma generate
+npx prisma migrate deploy
+```
+
+### B. Starting the Server
+The server requires a valid `DATABASE_URL`.
 
 ```powershell
 cd oracle/backend
@@ -19,7 +35,7 @@ npm install
 npm run start:dev
 ```
 
-### B. Verification
+### C. Verification
 Open a new CMD terminal:
 ```powershell
 curl -i http://localhost:8080/health
@@ -28,7 +44,7 @@ curl -i http://localhost:8080/health
 # {"status":"ok",...}
 ```
 
-### C. Troubleshooting
+### D. Troubleshooting
 **Flutter Execution Fails (l10n error):**
 Ensure `pubspec.yaml` has `generate: true`:
 ```yaml
@@ -43,6 +59,11 @@ If server fails with `EADDRINUSE`:
 netstat -ano | findstr :8080
 taskkill /F /PID <PID>
 ```
+
+**DB Connection Error:**
+- Confirm `DATABASE_URL` points to your Neon/Supabase instance.
+- Confirm SSL options are included in the provider string.
+- Re-run `npx prisma migrate deploy` after updating credentials.
 
 ## 3. Flutter App
 **Goal:** Run the app on Web (Chrome).
@@ -85,4 +106,3 @@ flutter run -d windows --dart-define=API_BASE_URL=http://localhost:8080
 3. **Troubleshooting:**
    - If `ERR_CONNECTION_REFUSED`: Ensure Backend is running on port 8080.
    - If build fails: Check `android/app/build.gradle` for `minSdk` compatibility (Needs API 26+).
-
