@@ -2,7 +2,6 @@ import { Injectable, NotFoundException, BadRequestException, ForbiddenException 
 import { PrismaService } from '../prisma.service';
 import { SetupTagDto } from './dto/setup-tag.dto';
 import { AcceptTransferDto } from './dto/transfer-tag.dto';
-import { v4 as uuidv4 } from 'uuid';
 import { Prisma } from '@prisma/client';
 
 @Injectable()
@@ -101,7 +100,7 @@ export class TagsService {
         if (tag.ownerId !== userId) throw new ForbiddenException('Not your tag');
 
         // Generate 8-char code. Simple implementation.
-        const code = uuidv4().substring(0, 8).toUpperCase();
+        const code = crypto.randomUUID().replace(/-/g, '').substring(0, 8).toUpperCase();
         const expiresAt = new Date();
         expiresAt.setHours(expiresAt.getHours() + 24); // 24h
 
