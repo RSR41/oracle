@@ -77,6 +77,8 @@ dev_dependencies:
 # The following section is specific to Flutter packages.
 flutter:
   uses-material-design: true
+  assets:
+    - assets/data/
 
 flutter_launcher_icons:
   android: true
