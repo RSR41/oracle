@@ -170,10 +170,14 @@ class AppRouter {
         // Stack Screens (No Bottom Nav)
         GoRoute(
           path: '/face',
+          redirect: (context, state) =>
+              FeatureFlags.showBetaFeatures ? null : '/home',
           builder: (context, state) => const FaceReadingScreen(),
         ),
         GoRoute(
           path: '/face-result',
+          redirect: (context, state) =>
+              FeatureFlags.showBetaFeatures ? null : '/home',
           builder: (context, state) {
             final extra = state.extra as Map<String, dynamic>;
             return FaceResultScreen(
@@ -313,6 +317,8 @@ class AppRouter {
         ),
         GoRoute(
           path: '/face-detail',
+          redirect: (context, state) =>
+              FeatureFlags.showBetaFeatures ? null : '/home',
           builder: (context, state) =>
               ComingSoonScreen(title: 'Face Detail', data: state.extra),
         ),
