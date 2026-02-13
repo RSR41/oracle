@@ -2,7 +2,6 @@
 /// Ported from Android BasicFortuneEngine.kt for Phase 1 (local-only, no AI)
 library;
 
-import 'dart:math';
 import 'saju_models.dart';
 
 class SajuService {
@@ -228,8 +227,12 @@ class SajuService {
       (stemIndex + branchIndex) % 9 + 1,
     ].toSet().toList();
 
-    // 점수 계산 (50-100)
-    final score = 50 + Random(birthDate.millisecondsSinceEpoch).nextInt(50);
+    // 점수 계산 (50-100): 랜덤 제거, 동일 입력에 동일 점수 보장
+    final score = _calculateOverallScore(
+      elements: elements,
+      dayStemIndex: stemIndex,
+      dayBranchIndex: branchIndex,
+    );
 
     return SajuResult(
       yearPillar: yearPillar,
@@ -251,6 +254,19 @@ class SajuService {
       luckyNumbers: luckyNumbers,
       overallScore: score,
     );
+  }
+
+  int _calculateOverallScore({
+    required Map<String, int> elements,
+    required int dayStemIndex,
+    required int dayBranchIndex,
+  }) {
+    final maxElement = elements.values.reduce((a, b) => a > b ? a : b);
+    final minElement = elements.values.reduce((a, b) => a < b ? a : b);
+    final balanceBonus = (4 - (maxElement - minElement)).clamp(0, 4) * 5;
+    final cycleFactor = ((dayStemIndex + 1) * 3 + (dayBranchIndex + 1) * 2) % 21;
+
+    return (55 + balanceBonus + cycleFactor).clamp(50, 100);
   }
 
   Map<String, int> _calculateElements(

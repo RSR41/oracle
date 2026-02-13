@@ -47,6 +47,11 @@ flutter build appbundle --release `
 ```
 
 > ✅ 스토어 제출 빌드에서는 `TERMS_URL`, `PRIVACY_URL` 값을 반드시 주입하세요.
+  --dart-define=TERMS_URL=https://oracle-saju.github.io/oracle/legal/terms_of_service `
+  --dart-define=PRIVACY_URL=https://oracle-saju.github.io/oracle/legal/privacy_policy
+```
+
+> ✅ GitHub Pages 확정 사용자명: `oracle-saju`
 
 ### 5단계: 빌드 결과 확인
 ```powershell
