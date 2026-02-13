@@ -130,6 +130,26 @@ flutter build appbundle --release `
 - (E4) 심사 계정에서 재현 불가(서버 플래그 의존, 문서화 미비)
 - (E5) 리뷰 코멘트 대응 자료(테스트 계정, 시나리오, 영상/캡처) 부재
 
+### 4-1. 에뮬레이터 테스트 (옵션)
+```powershell
+flutter run --release `
+  --dart-define=BETA_FEATURES=false `
+  --dart-define=AI_ONLINE=false
+```
+- **체크 포인트**:
+  - [ ] 앱 실행 후 크래시 없음
+  - [ ] "오늘의 운세" 등 MVP 기능 정상 동작
+  - [ ] "AI 분석" / "소개팅" 메뉴가 보이지 않음 (또는 동작 안함)
+  - [ ] 설정 > 이용약관 클릭 시 브라우저 열림
+  - [ ] 이용약관/개인정보 URL 실제 접근 확인 (HTTPS, 404 없음)
+
+### 4-2. Google Play Console 업로드
+1. Google Play Console 로그인
+2. 앱 선택 > **프로덕션** (또는 비공개 테스트)
+3. **새 버전 만들기**
+4. `app-release.aab` 업로드
+5. 버전 이름 입력 (예: `1.1.0 Release`)
+6. 검토 제출
 ---
 
 ## 5) 최종 점검 체크리스트

@@ -8,6 +8,7 @@ import '../../state/app_state.dart';
 import '../../navigation/nav_state.dart';
 import '../../i18n/translations.dart';
 import '../../database/history_repository.dart';
+import '../../config/app_urls.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import '../../config/app_urls.dart';
@@ -78,6 +79,13 @@ class SettingsScreen extends StatelessWidget {
     }
   }
 
+  Future<void> _openExternalUrl(BuildContext context, String url) async {
+    final uri = Uri.parse(url);
+    final opened = await launchUrl(uri, mode: LaunchMode.externalApplication);
+
+    if (!opened && context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('링크를 열 수 없습니다. 잠시 후 다시 시도해주세요.')),
   Future<void> _openLegalUrl(
     BuildContext context,
     String label,
@@ -188,11 +196,14 @@ class SettingsScreen extends StatelessWidget {
               leading: const Icon(Icons.description),
               title: const Text('이용약관'),
               trailing: const Icon(Icons.open_in_new),
+              onTap: () => _openExternalUrl(context, AppUrls.termsOfService),
               onTap: () => _openLegalUrl(context, '이용약관', AppUrls.termsOfService),
             ),
             ListTile(
               leading: const Icon(Icons.privacy_tip),
               title: const Text('개인정보처리방침'),
+              trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+              onTap: () => _openExternalUrl(context, AppUrls.privacyPolicy),
               trailing: const Icon(Icons.open_in_new),
               onTap: () => _openLegalUrl(context, '개인정보처리방침', AppUrls.privacyPolicy),
             ),
