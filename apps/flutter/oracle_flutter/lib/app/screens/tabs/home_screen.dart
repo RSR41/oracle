@@ -297,7 +297,7 @@ class HomeScreen extends StatelessWidget {
                             route: '/tarot',
                           ),
                           // Phase 2+: 꿈해몽, 궁합
-                          if (FeatureFlags.showBetaFeatures) ...[
+                          if (FeatureFlags.phase2Features) ...[
                             _buildQuickAccessBtn(
                               context,
                               icon: Icons.bedtime,

@@ -89,7 +89,7 @@ class AppRouter {
             GoRoute(
               path: '/meeting',
               redirect: (context, state) =>
-                  FeatureFlags.showBetaFeatures ? null : '/home',
+                  FeatureFlags.canUseMeeting ? null : '/home',
               pageBuilder: (context, state) {
                 final appState = Provider.of<AppState>(context);
                 if (!appState.hasSajuProfile) {
@@ -150,7 +150,7 @@ class AppRouter {
             GoRoute(
               path: '/compatibility',
               redirect: (context, state) =>
-                  FeatureFlags.showBetaFeatures ? null : '/home',
+                  FeatureFlags.phase2Features ? null : '/home',
               pageBuilder: (context, state) =>
                   const NoTransitionPage(child: CompatibilityScreen()),
             ),
@@ -223,6 +223,8 @@ class AppRouter {
         ),
         GoRoute(
           path: '/meeting/chat',
+          redirect: (context, state) =>
+              FeatureFlags.canUseMeeting ? null : '/home',
           builder: (context, state) {
             final extra = state.extra as Map<String, dynamic>;
             return MeetingChatScreen(
