@@ -83,6 +83,8 @@ class SettingsScreen extends StatelessWidget {
             title: appState.t('settings.privacy'),
             onTap: () => _openUrl(
               context,
+              'Privacy Policy',
+              AppUrls.privacyPolicy,
               AppUrls.privacyPolicy,
               '개인정보처리방침 페이지를 열 수 없습니다. 네트워크 상태 또는 URL 설정을 확인해 주세요.',
             ),
@@ -96,6 +98,8 @@ class SettingsScreen extends StatelessWidget {
             title: appState.t('settings.terms'),
             onTap: () => _openUrl(
               context,
+              'Terms of Service',
+              AppUrls.termsOfService,
               AppUrls.termsOfService,
               '이용약관 페이지를 열 수 없습니다. 네트워크 상태 또는 URL 설정을 확인해 주세요.',
             ),
@@ -196,6 +200,15 @@ class SettingsScreen extends StatelessWidget {
     }
   }
 
+  Future<void> _showInfoDialog(
+    BuildContext context,
+    String title,
+    String url,
+  ) async {
+    if (!AppUrls.isValidUrl(url)) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('$title URL is invalid.')),
   Future<void> _openUrl(
     BuildContext context,
     String url,
@@ -219,6 +232,14 @@ class SettingsScreen extends StatelessWidget {
       return;
     }
 
+    final uri = Uri.parse(url);
+    final launched = await launchUrl(uri, mode: LaunchMode.externalApplication);
+
+    if (!launched && context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Could not open $title.')),
+      );
+    }
     final launched = await launchUrl(uri, mode: LaunchMode.externalApplication);
     if (!launched && context.mounted) {
       ScaffoldMessenger.of(context).showSnackBar(

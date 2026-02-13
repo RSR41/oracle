@@ -1,5 +1,6 @@
 /// 앱 전역 URL 관리
 ///
+/// 법적 고지는 외부 URL 열기 방식으로 단일화한다.
 /// ## 법적 페이지 URL
 /// - dart-define으로 빌드 시 주입 가능
 /// - 주입이 없으면 기본 배포 URL 사용
@@ -11,9 +12,11 @@
 ///   --dart-define=PRIVACY_URL=https://oracle-saju.web.app/privacy
 /// ```
 class AppUrls {
-  AppUrls._(); // private 생성자 (인스턴스 생성 방지)
+  AppUrls._();
 
   /// 이용약관 URL
+  static const String termsOfService = String.fromEnvironment(
+    'TERMS_URL',
   ///
   /// 우선순위:
   /// 1. dart-define으로 주입된 값 (TERMS_URL)
@@ -33,6 +36,8 @@ class AppUrls {
   );
 
   /// 개인정보처리방침 URL
+  static const String privacyPolicy = String.fromEnvironment(
+    'PRIVACY_URL',
   ///
   /// 우선순위:
   /// 1. dart-define으로 주입된 값 (PRIVACY_URL)
@@ -52,6 +57,11 @@ class AppUrls {
   );
 
   /// URL 유효성 검증
+  static bool isValidUrl(String url) {
+    if (!url.startsWith('https://')) return false;
+    if (url.contains('example.com')) return false;
+    if (url.contains('YOUR_USERNAME')) return false;
+    if (url.contains('oracle-user.github.io')) return false;
   ///
   /// placeholder 또는 유효하지 않은 URL 감지
   /// - example.com 포함 → 유효하지 않음
