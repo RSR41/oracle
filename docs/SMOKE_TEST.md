@@ -2,6 +2,8 @@
 
 이 체크리스트는 `BETA_FEATURES=false` 설정으로 빌드된 출시 버전의 무결성을 검증하기 위한 것입니다.
 
+> 스토어 메타데이터/정책 입력 상태는 [STORE_SUBMISSION_CHECKLIST.md](./STORE_SUBMISSION_CHECKLIST.md)에서 함께 관리하세요.
+
 ## 1. 앱 설치 및 브랜딩
 - [ ] **아이콘 확인**: 홈 화면의 앱 아이콘이 사전에 설정한 Placeholder(또는 실제 아이콘)로 노출되는가?
 - [ ] **앱 이름 확인**: 아이콘 아래 표시 이름이 "Oracle 사주"인가?
