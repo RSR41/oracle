@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:oracle_flutter/app/config/app_urls.dart';
 import 'package:oracle_flutter/app/state/app_state.dart';
 import 'package:oracle_flutter/app/theme/app_colors.dart';
 import 'package:oracle_flutter/app/i18n/translations.dart';
@@ -110,6 +112,7 @@ class SettingsScreen extends StatelessWidget {
             icon: Icons.privacy_tip_outlined,
             title: appState.t('settings.privacy'),
             onTap: () => _launchExternalUrl(context, AppUrls.privacyPolicy),
+            onTap: () => _openExternalLink(context, AppUrls.privacyPolicy),
           ),
 
           _buildSettingCard(
@@ -117,6 +120,7 @@ class SettingsScreen extends StatelessWidget {
             icon: Icons.article_outlined,
             title: appState.t('settings.terms'),
             onTap: () => _launchExternalUrl(context, AppUrls.termsOfService),
+            onTap: () => _openExternalLink(context, AppUrls.termsOfService),
           ),
 
           _buildSettingCard(
@@ -231,5 +235,15 @@ class SettingsScreen extends StatelessWidget {
         const SnackBar(content: Text('외부 링크를 열 수 없습니다. 잠시 후 다시 시도해주세요.')),
       );
     }
+  Future<void> _openExternalLink(BuildContext context, String url) async {
+    if (!AppUrls.isValidUrl(url)) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('배포 URL 미설정')));
+      return;
+    }
+
+    final uri = Uri.parse(url);
+    await launchUrl(uri, mode: LaunchMode.externalApplication);
   }
 }

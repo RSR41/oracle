@@ -17,30 +17,30 @@ class AppUrls {
   ///
   /// 우선순위:
   /// 1. dart-define으로 주입된 값 (TERMS_URL)
-  /// 2. fallback: GitHub Pages URL (USERNAME 교체 필요)
+  /// 2. fallback: 확정된 GitHub Pages URL
   ///
   /// ⚠️ 스토어 제출 전 필수:
   /// - dart-define으로 실제 URL 주입, 또는
   /// - 아래 fallback URL의 oracle-user를 실제 도메인으로 교체
   static const String termsOfService = String.fromEnvironment(
     'TERMS_URL',
-    // TODO(DEPLOY): GitHub Pages 배포 후 oracle-user를 실제 사용자명으로 교체
-    defaultValue: 'https://oracle-user.github.io/oracle/legal/terms_of_service',
+    // 확정된 GitHub Pages URL
+    defaultValue: 'https://oracle-saju.github.io/oracle/legal/terms_of_service',
   );
 
   /// 개인정보처리방침 URL
   ///
   /// 우선순위:
   /// 1. dart-define으로 주입된 값 (PRIVACY_URL)
-  /// 2. fallback: GitHub Pages URL (USERNAME 교체 필요)
+  /// 2. fallback: 확정된 GitHub Pages URL
   ///
   /// ⚠️ 스토어 제출 전 필수:
   /// - dart-define으로 실제 URL 주입, 또는
   /// - 아래 fallback URL의 oracle-user를 실제 도메인으로 교체
   static const String privacyPolicy = String.fromEnvironment(
     'PRIVACY_URL',
-    // TODO(DEPLOY): GitHub Pages 배포 후 oracle-user를 실제 사용자명으로 교체
-    defaultValue: 'https://oracle-user.github.io/oracle/legal/privacy_policy',
+    // 확정된 GitHub Pages URL
+    defaultValue: 'https://oracle-saju.github.io/oracle/legal/privacy_policy',
   );
 
   /// URL 유효성 검증
