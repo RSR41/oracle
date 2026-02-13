@@ -19,9 +19,9 @@ class AppUrls {
   /// 1. dart-define으로 주입된 값 (TERMS_URL)
   /// 2. fallback: GitHub Pages URL (USERNAME 교체 필요)
   ///
-  /// ⚠️ 스토어 제출 전:
+  /// ⚠️ 스토어 제출 전 필수:
   /// - dart-define으로 실제 URL 주입, 또는
-  /// - 아래 fallback URL의 oracle-user를 실제 GitHub 사용자명으로 교체
+  /// - 아래 fallback URL의 oracle-user를 실제 도메인으로 교체
   static const String termsOfService = String.fromEnvironment(
     'TERMS_URL',
     // TODO(DEPLOY): GitHub Pages 배포 후 oracle-user를 실제 사용자명으로 교체
@@ -34,9 +34,9 @@ class AppUrls {
   /// 1. dart-define으로 주입된 값 (PRIVACY_URL)
   /// 2. fallback: GitHub Pages URL (USERNAME 교체 필요)
   ///
-  /// ⚠️ 스토어 제출 전:
+  /// ⚠️ 스토어 제출 전 필수:
   /// - dart-define으로 실제 URL 주입, 또는
-  /// - 아래 fallback URL의 oracle-user를 실제 GitHub 사용자명으로 교체
+  /// - 아래 fallback URL의 oracle-user를 실제 도메인으로 교체
   static const String privacyPolicy = String.fromEnvironment(
     'PRIVACY_URL',
     // TODO(DEPLOY): GitHub Pages 배포 후 oracle-user를 실제 사용자명으로 교체
@@ -48,11 +48,13 @@ class AppUrls {
   /// placeholder 또는 유효하지 않은 URL 감지
   /// - example.com 포함 → 유효하지 않음
   /// - YOUR_USERNAME 포함 → 유효하지 않음 (fallback 미교체)
+  /// - oracle-user.github.io 포함 → 유효하지 않음 (fallback 미교체)
   /// - https:// 미시작 → 유효하지 않음
   static bool isValidUrl(String url) {
     if (!url.startsWith('https://')) return false;
     if (url.contains('example.com')) return false;
     if (url.contains('YOUR_USERNAME')) return false; // fallback 미교체 감지
+    if (url.contains('oracle-user.github.io')) return false; // fallback 미교체 감지
     return Uri.tryParse(url) != null;
   }
 }
