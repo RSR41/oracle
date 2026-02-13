@@ -65,10 +65,10 @@ cd apps/flutter/oracle_flutter
 flutter build appbundle --release `
   --dart-define=BETA_FEATURES=false `
   --dart-define=AI_ONLINE=false `
-  --dart-define=TERMS_URL=https://<YOUR_GITHUB_ID>.github.io/oracle/legal/terms_of_service `
-  --dart-define=PRIVACY_URL=https://<YOUR_GITHUB_ID>.github.io/oracle/legal/privacy_policy
+  --dart-define=TERMS_URL=https://oracle-saju.github.io/oracle/legal/terms_of_service `
+  --dart-define=PRIVACY_URL=https://oracle-saju.github.io/oracle/legal/privacy_policy
 ```
-> `<YOUR_GITHUB_ID>`를 실제 GitHub 아이디로 교체하세요.
+> `oracle-saju`를 실제 GitHub 아이디로 교체하세요.
 
 ### 3-2. 산출물 확인
 빌드가 완료되면 아래 경로에 AAB 파일이 생성됩니다.
