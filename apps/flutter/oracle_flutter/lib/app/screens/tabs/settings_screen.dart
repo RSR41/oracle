@@ -1,3 +1,8 @@
+export '../stack/settings_screen.dart' show SettingsScreen;
+/// 설정 화면 구현은 stack/settings_screen.dart 를 단일 소스로 사용합니다.
+///
+/// 기존 import 경로 호환을 위해 tabs 경로에서는 동일 구현을 재-export 합니다.
+export 'package:oracle_flutter/app/screens/stack/settings_screen.dart';
 import 'package:flutter/material.dart';
 import '../../state/app_state.dart';
 import '../../navigation/nav_state.dart';
@@ -6,6 +11,7 @@ import '../../database/history_repository.dart';
 import '../../config/app_urls.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
+import '../../config/app_urls.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 /// 설정 화면
@@ -80,6 +86,26 @@ class SettingsScreen extends StatelessWidget {
     if (!opened && context.mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('링크를 열 수 없습니다. 잠시 후 다시 시도해주세요.')),
+  Future<void> _openLegalUrl(
+    BuildContext context,
+    String label,
+    String url,
+  ) async {
+    if (!AppUrls.isValidUrl(url)) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('$label URL이 올바르지 않습니다.')),
+        );
+      }
+      return;
+    }
+
+    final uri = Uri.parse(url);
+    final launched = await launchUrl(uri, mode: LaunchMode.externalApplication);
+
+    if (!launched && context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('$label 페이지를 열 수 없습니다.')),
       );
     }
   }
@@ -171,12 +197,15 @@ class SettingsScreen extends StatelessWidget {
               title: const Text('이용약관'),
               trailing: const Icon(Icons.open_in_new),
               onTap: () => _openExternalUrl(context, AppUrls.termsOfService),
+              onTap: () => _openLegalUrl(context, '이용약관', AppUrls.termsOfService),
             ),
             ListTile(
               leading: const Icon(Icons.privacy_tip),
               title: const Text('개인정보처리방침'),
               trailing: const Icon(Icons.arrow_forward_ios, size: 16),
               onTap: () => _openExternalUrl(context, AppUrls.privacyPolicy),
+              trailing: const Icon(Icons.open_in_new),
+              onTap: () => _openLegalUrl(context, '개인정보처리방침', AppUrls.privacyPolicy),
             ),
             ListTile(
               leading: const Icon(Icons.code),
@@ -197,3 +226,6 @@ class SettingsScreen extends StatelessWidget {
     );
   }
 }
+/// 기존 탭 설정 화면은 스택 설정 화면으로 통합되었습니다.
+/// import 호환성을 위해 스택 설정 화면을 re-export 합니다.
+export '../stack/settings_screen.dart';

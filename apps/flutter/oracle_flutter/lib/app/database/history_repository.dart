@@ -6,12 +6,14 @@ import '../models/fortune_result.dart';
 /// Repository for History items using SQLite storage.
 /// Provides CRUD operations for all fortune-related results.
 class HistoryRepository {
+  static const String historyTable = 'history';
+
   final DatabaseHelper _dbHelper = DatabaseHelper.instance;
 
   /// Save a new history item
   Future<void> save(FortuneResult result) async {
     final db = await _dbHelper.database;
-    await db.insert('history', {
+    await db.insert(historyTable, {
       'id': result.id,
       'type': result.type,
       'title': result.title,
@@ -32,7 +34,7 @@ class HistoryRepository {
     List<String>? mediaPaths,
   }) async {
     final db = await _dbHelper.database;
-    await db.insert('history', {
+    await db.insert(historyTable, {
       'id': result.id,
       'type': result.type,
       'title': result.title,
@@ -53,13 +55,13 @@ class HistoryRepository {
     List<Map<String, dynamic>> maps;
     if (type != null) {
       maps = await db.query(
-        'history',
+        historyTable,
         where: 'type = ?',
         whereArgs: [type],
         orderBy: 'createdAt DESC',
       );
     } else {
-      maps = await db.query('history', orderBy: 'createdAt DESC');
+      maps = await db.query(historyTable, orderBy: 'createdAt DESC');
     }
 
     return maps.map((map) => FortuneResult.fromJson(map)).toList();
@@ -68,7 +70,7 @@ class HistoryRepository {
   /// Get a single item by ID
   Future<FortuneResult?> getById(String id) async {
     final db = await _dbHelper.database;
-    final maps = await db.query('history', where: 'id = ?', whereArgs: [id]);
+    final maps = await db.query(historyTable, where: 'id = ?', whereArgs: [id]);
 
     if (maps.isEmpty) return null;
     return FortuneResult.fromJson(maps.first);
@@ -78,7 +80,7 @@ class HistoryRepository {
   Future<Map<String, dynamic>?> getPayload(String id) async {
     final db = await _dbHelper.database;
     final maps = await db.query(
-      'history',
+      historyTable,
       columns: ['payloadJson'],
       where: 'id = ?',
       whereArgs: [id],
@@ -91,20 +93,20 @@ class HistoryRepository {
   /// Delete a single item
   Future<void> delete(String id) async {
     final db = await _dbHelper.database;
-    await db.delete('history', where: 'id = ?', whereArgs: [id]);
+    await db.delete(historyTable, where: 'id = ?', whereArgs: [id]);
   }
 
   /// Clear all history
   Future<void> clearAll() async {
     final db = await _dbHelper.database;
-    await db.delete('history');
+    await db.delete(historyTable);
   }
 
   /// Get count of items by type
   Future<Map<String, int>> getCountByType() async {
     final db = await _dbHelper.database;
     final result = await db.rawQuery(
-      'SELECT type, COUNT(*) as count FROM history GROUP BY type',
+      'SELECT type, COUNT(*) as count FROM $historyTable GROUP BY type',
     );
 
     return {for (var row in result) row['type'] as String: row['count'] as int};
@@ -121,7 +123,7 @@ class HistoryRepository {
 
     if (type != null) {
       maps = await db.query(
-        'history',
+        historyTable,
         where: 'type = ?',
         whereArgs: [type],
         orderBy: 'createdAt DESC',
@@ -130,7 +132,7 @@ class HistoryRepository {
       );
     } else {
       maps = await db.query(
-        'history',
+        historyTable,
         orderBy: 'createdAt DESC',
         limit: limit,
         offset: offset,
@@ -148,7 +150,7 @@ class HistoryRepository {
 
     for (int i = 0; i < count; i++) {
       final createdAt = now.subtract(Duration(minutes: i)).toIso8601String();
-      batch.insert('history', {
+      batch.insert(historyTable, {
         'id': 'dummy_$i',
         'type': i % 2 == 0 ? 'today' : 'dream',
         'title': '더미 운세 결과 $i',
