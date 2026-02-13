@@ -1,3 +1,15 @@
+/// FeatureFlags: 기능별 플래그 및 AI 기능 제어를 위한 중앙 관리 클래스
+class FeatureFlags {
+  // ========================================
+  // 기능별 플래그
+  // ========================================
+
+  /// 미팅 기능은 현재 항상 비활성화합니다.
+  static const bool featureMeeting = false;
+
+  static const String _faceEnv = String.fromEnvironment(
+    'FEATURE_FACE',
+    defaultValue: 'true',
 /// FeatureFlags: 베타 기능 및 AI 기능 제어를 위한 중앙 관리 클래스
 
 import 'package:flutter/foundation.dart';
@@ -67,7 +79,20 @@ class FeatureFlags {
     'BETA_FEATURES',
     defaultValue: '',
   );
+  static const bool featureFace = _faceEnv == 'true' || _faceEnv == '1';
 
+  static const String _dreamEnv = String.fromEnvironment(
+    'FEATURE_DREAM',
+    defaultValue: 'true',
+  );
+  static const bool featureDream = _dreamEnv == 'true' || _dreamEnv == '1';
+
+  static const String _compatibilityEnv = String.fromEnvironment(
+    'FEATURE_COMPATIBILITY',
+    defaultValue: 'true',
+  );
+  static const bool featureCompatibility =
+      _compatibilityEnv == 'true' || _compatibilityEnv == '1';
   /// 전체 베타 기본값
   /// - 기존 BETA_FEATURES 동작과의 하위 호환용
   static const bool _betaDefault = _betaEnv == 'true' || _betaEnv == '1';
@@ -148,6 +173,9 @@ class FeatureFlags {
   /// AI 온라인 기능 활성화 여부
   static const bool aiOnline = _aiEnv == 'true' || _aiEnv == '1';
 
+  /// 하위 호환용 베타 플래그 (기능별 플래그 사용 권장)
+  static bool get showBetaFeatures =>
+      featureMeeting || featureFace || featureDream || featureCompatibility;
   static bool _didPrintDiagnostics = false;
 
   static SubmissionProfile get submissionProfile {
@@ -170,6 +198,7 @@ class FeatureFlags {
   static String get buildModeName {
     if (aiOnline && phase2Features) return 'FULL_DEV';
     if (aiOnline) return 'AI_ENABLED';
+    if (showBetaFeatures) return 'FEATURE_TEST';
     if (_betaDefault || showBetaFeatures) return 'BETA_TEST';
     if (phase2Features) return 'BETA_TEST';
     return 'STORE_RELEASE';

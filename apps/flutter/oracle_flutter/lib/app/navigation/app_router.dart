@@ -127,6 +127,7 @@ class AppRouter {
               // - STORE_RELEASE: 비공개
               // - STORE_PLUS/FULL_DEV: 저위험(local-only) 기능만 공개
               redirect: (context, state) =>
+                  FeatureFlags.featureMeeting ? null : '/home',
                   FeatureFlags.enableMeeting ? null : '/home',
                   FeatureFlags.canUseMeeting ? null : '/home',
                   FeatureFlags.allowPhase2LowRisk ? null : '/home',
@@ -203,6 +204,7 @@ class AppRouter {
               // - STORE_RELEASE: 비공개
               // - STORE_PLUS/FULL_DEV: 저위험(local-only) 기능만 공개
               redirect: (context, state) =>
+                  FeatureFlags.featureCompatibility ? null : '/home',
                   FeatureFlags.enableCompatibility ? null : '/home',
                   FeatureFlags.phase2Features ? null : '/home',
                   FeatureFlags.allowPhase2LowRisk ? null : '/home',
@@ -254,6 +256,7 @@ class AppRouter {
         GoRoute(
           path: '/face',
           redirect: (context, state) =>
+              FeatureFlags.featureFace ? null : '/home',
               FeatureFlags.enableFace ? null : '/home',
               FeatureFlags.showBetaFeatures ? null : '/home',
               FeatureFlags.allowPhase2Sensitive ? null : '/home',
@@ -262,6 +265,7 @@ class AppRouter {
         GoRoute(
           path: '/face-result',
           redirect: (context, state) =>
+              FeatureFlags.featureFace ? null : '/home',
               FeatureFlags.enableFace ? null : '/home',
               FeatureFlags.showBetaFeatures ? null : '/home',
               FeatureFlags.allowPhase2Sensitive ? null : '/home',
@@ -332,6 +336,7 @@ class AppRouter {
         GoRoute(
           path: '/dream',
           redirect: (context, state) =>
+              FeatureFlags.featureDream ? null : '/home',
               FeatureFlags.enableDream ? null : '/home',
               FeatureFlags.allowPhase2Sensitive ? null : '/home',
           builder: (context, state) => const DreamInputScreen(),
@@ -339,6 +344,7 @@ class AppRouter {
         GoRoute(
           path: '/dream-result',
           redirect: (context, state) =>
+              FeatureFlags.featureDream ? null : '/home',
               FeatureFlags.enableDream ? null : '/home',
               FeatureFlags.allowPhase2Sensitive ? null : '/home',
           builder: (context, state) {
@@ -352,6 +358,7 @@ class AppRouter {
         GoRoute(
           path: '/meeting/chat',
           redirect: (context, state) =>
+              FeatureFlags.featureMeeting ? null : '/home',
               FeatureFlags.canUseMeeting ? null : '/home',
               FeatureFlags.allowPhase2LowRisk ? null : '/home',
           builder: (context, state) {
@@ -420,6 +427,7 @@ class AppRouter {
         GoRoute(
           path: '/compat-check',
           redirect: (context, state) =>
+              FeatureFlags.featureCompatibility ? null : '/home',
               FeatureFlags.allowPhase2LowRisk ? null : '/home',
           builder: (context, state) =>
               const ComingSoonScreen(title: 'Compatibility Check'),
@@ -427,6 +435,7 @@ class AppRouter {
         GoRoute(
           path: '/compat-result',
           redirect: (context, state) =>
+              FeatureFlags.featureCompatibility ? null : '/home',
               FeatureFlags.allowPhase2LowRisk ? null : '/home',
           builder: (context, state) =>
               const ComingSoonScreen(title: 'Compatibility Result'),
