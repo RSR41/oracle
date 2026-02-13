@@ -42,11 +42,11 @@ flutter build appbundle --release --dart-define=BETA_FEATURES=false
 ```powershell
 flutter build appbundle --release `
   --dart-define=BETA_FEATURES=false `
-  --dart-define=TERMS_URL=https://YOUR_USERNAME.github.io/oracle/legal/terms_of_service `
-  --dart-define=PRIVACY_URL=https://YOUR_USERNAME.github.io/oracle/legal/privacy_policy
+  --dart-define=TERMS_URL=https://destiny-saju.github.io/oracle/legal/terms_of_service `
+  --dart-define=PRIVACY_URL=https://destiny-saju.github.io/oracle/legal/privacy_policy
 ```
 
-> ⚠️ `YOUR_USERNAME`을 실제 GitHub 사용자명으로 교체!
+> ✅ 스토어 제출 빌드에서는 `TERMS_URL`, `PRIVACY_URL` 값을 반드시 주입하세요.
 
 ### 5단계: 빌드 결과 확인
 ```powershell
