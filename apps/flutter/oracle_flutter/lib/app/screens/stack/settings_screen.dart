@@ -5,6 +5,8 @@ import 'package:oracle_flutter/app/config/app_urls.dart';
 import 'package:oracle_flutter/app/state/app_state.dart';
 import 'package:oracle_flutter/app/theme/app_colors.dart';
 import 'package:oracle_flutter/app/i18n/translations.dart';
+import 'package:oracle_flutter/app/config/app_urls.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
@@ -109,6 +111,7 @@ class SettingsScreen extends StatelessWidget {
             theme,
             icon: Icons.privacy_tip_outlined,
             title: appState.t('settings.privacy'),
+            onTap: () => _launchExternalUrl(context, AppUrls.privacyPolicy),
             onTap: () => _openExternalLink(context, AppUrls.privacyPolicy),
           ),
 
@@ -116,6 +119,7 @@ class SettingsScreen extends StatelessWidget {
             theme,
             icon: Icons.article_outlined,
             title: appState.t('settings.terms'),
+            onTap: () => _launchExternalUrl(context, AppUrls.termsOfService),
             onTap: () => _openExternalLink(context, AppUrls.termsOfService),
           ),
 
@@ -212,6 +216,25 @@ class SettingsScreen extends StatelessWidget {
     }
   }
 
+  Future<void> _launchExternalUrl(BuildContext context, String urlString) async {
+    if (!AppUrls.isValidUrl(urlString)) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('링크가 아직 설정되지 않았습니다. 배포 설정을 확인해주세요.'),
+          ),
+        );
+      }
+      return;
+    }
+
+    final uri = Uri.parse(urlString);
+    final launched = await launchUrl(uri, mode: LaunchMode.externalApplication);
+    if (!launched && context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('외부 링크를 열 수 없습니다. 잠시 후 다시 시도해주세요.')),
+      );
+    }
   Future<void> _openExternalLink(BuildContext context, String url) async {
     if (!AppUrls.isValidUrl(url)) {
       ScaffoldMessenger.of(
