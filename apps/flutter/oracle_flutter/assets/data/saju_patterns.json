@@ -45,3 +45,169 @@
     "luckyColor": "네이비"
   }
 ]
+    {
+        "id": "ohaeng_mok",
+        "type": "오행",
+        "code": "목",
+        "nameKo": "목(木)",
+        "nameEn": "Wood",
+        "descriptionKo": "성장과 발전을 상징합니다. 봄의 기운으로 새로운 시작과 창의성을 나타냅니다.",
+        "descriptionEn": "Symbolizes growth and development. Represents spring energy, new beginnings and creativity.",
+        "attributeKo": "성장,인자,창의성,유연성",
+        "attributeEn": "growth,benevolence,creativity,flexibility"
+    },
+    {
+        "id": "ohaeng_hwa",
+        "type": "오행",
+        "code": "화",
+        "nameKo": "화(火)",
+        "nameEn": "Fire",
+        "descriptionKo": "열정과 에너지를 상징합니다. 여름의 기운으로 활력과 표현력을 나타냅니다.",
+        "descriptionEn": "Symbolizes passion and energy. Represents summer energy, vitality and expression.",
+        "attributeKo": "열정,예의,표현력,따뜻함",
+        "attributeEn": "passion,courtesy,expression,warmth"
+    },
+    {
+        "id": "ohaeng_to",
+        "type": "오행",
+        "code": "토",
+        "nameKo": "토(土)",
+        "nameEn": "Earth",
+        "descriptionKo": "안정과 중심을 상징합니다. 사계절의 전환점으로 균형과 조화를 나타냅니다.",
+        "descriptionEn": "Symbolizes stability and center. Represents seasonal transitions, balance and harmony.",
+        "attributeKo": "안정,신뢰,중재,포용",
+        "attributeEn": "stability,trust,mediation,inclusiveness"
+    },
+    {
+        "id": "ohaeng_geum",
+        "type": "오행",
+        "code": "금",
+        "nameKo": "금(金)",
+        "nameEn": "Metal",
+        "descriptionKo": "결단력과 의지를 상징합니다. 가을의 기운으로 수확과 정리를 나타냅니다.",
+        "descriptionEn": "Symbolizes determination and will. Represents autumn energy, harvest and organization.",
+        "attributeKo": "결단,정의,강인함,명확성",
+        "attributeEn": "determination,justice,strength,clarity"
+    },
+    {
+        "id": "ohaeng_su",
+        "type": "오행",
+        "code": "수",
+        "nameKo": "수(水)",
+        "nameEn": "Water",
+        "descriptionKo": "지혜와 유연성을 상징합니다. 겨울의 기운으로 잠재력과 깊이를 나타냅니다.",
+        "descriptionEn": "Symbolizes wisdom and flexibility. Represents winter energy, potential and depth.",
+        "attributeKo": "지혜,적응력,깊이,소통",
+        "attributeEn": "wisdom,adaptability,depth,communication"
+    },
+    {
+        "id": "chungan_gap",
+        "type": "천간",
+        "code": "갑",
+        "nameKo": "갑(甲)",
+        "nameEn": "Gap (Yang Wood)",
+        "descriptionKo": "양목(陽木)으로 큰 나무를 상징합니다. 리더십과 정직함, 진취적 기상을 가집니다.",
+        "descriptionEn": "Yang Wood, symbolizes big trees. Represents leadership, honesty, and progressive spirit.",
+        "attributeKo": "리더십,정직,진취,강직",
+        "attributeEn": "leadership,honesty,progress,integrity"
+    },
+    {
+        "id": "chungan_eul",
+        "type": "천간",
+        "code": "을",
+        "nameKo": "을(乙)",
+        "nameEn": "Eul (Yin Wood)",
+        "descriptionKo": "음목(陰木)으로 풀과 꽃을 상징합니다. 부드러움과 적응력, 예술성을 가집니다.",
+        "descriptionEn": "Yin Wood, symbolizes grass and flowers. Represents gentleness, adaptability, and artistry.",
+        "attributeKo": "부드러움,적응력,예술성,협조",
+        "attributeEn": "gentleness,adaptability,artistry,cooperation"
+    },
+    {
+        "id": "chungan_byeong",
+        "type": "천간",
+        "code": "병",
+        "nameKo": "병(丙)",
+        "nameEn": "Byeong (Yang Fire)",
+        "descriptionKo": "양화(陽火)로 태양을 상징합니다. 밝음과 적극성, 열정적 성격을 가집니다.",
+        "descriptionEn": "Yang Fire, symbolizes the sun. Represents brightness, activeness, and passionate character.",
+        "attributeKo": "밝음,적극성,열정,관대함",
+        "attributeEn": "brightness,activeness,passion,generosity"
+    },
+    {
+        "id": "chungan_jeong",
+        "type": "천간",
+        "code": "정",
+        "nameKo": "정(丁)",
+        "nameEn": "Jeong (Yin Fire)",
+        "descriptionKo": "음화(陰火)로 촛불을 상징합니다. 따뜻함과 세심함, 내면의 열정을 가집니다.",
+        "descriptionEn": "Yin Fire, symbolizes candlelight. Represents warmth, attentiveness, and inner passion.",
+        "attributeKo": "따뜻함,세심함,헌신,지성",
+        "attributeEn": "warmth,attentiveness,dedication,intelligence"
+    },
+    {
+        "id": "chungan_mu",
+        "type": "천간",
+        "code": "무",
+        "nameKo": "무(戊)",
+        "nameEn": "Mu (Yang Earth)",
+        "descriptionKo": "양토(陽土)로 산을 상징합니다. 안정감과 신뢰성, 묵직한 존재감을 가집니다.",
+        "descriptionEn": "Yang Earth, symbolizes mountains. Represents stability, reliability, and solid presence.",
+        "attributeKo": "안정,신뢰,묵직함,포용력",
+        "attributeEn": "stability,reliability,solidity,inclusiveness"
+    },
+    {
+        "id": "jiji_ja",
+        "type": "지지",
+        "code": "자",
+        "nameKo": "자(子) - 쥐",
+        "nameEn": "Ja (Rat)",
+        "descriptionKo": "자시(23:00-01:00), 11월, 수(水) 기운. 영리함과 민첩함을 상징합니다.",
+        "descriptionEn": "23:00-01:00, November, Water energy. Symbolizes cleverness and agility.",
+        "attributeKo": "영리,민첩,사교성,적응력",
+        "attributeEn": "cleverness,agility,sociability,adaptability"
+    },
+    {
+        "id": "jiji_chuk",
+        "type": "지지",
+        "code": "축",
+        "nameKo": "축(丑) - 소",
+        "nameEn": "Chuk (Ox)",
+        "descriptionKo": "축시(01:00-03:00), 12월, 토(土) 기운. 성실함과 인내심을 상징합니다.",
+        "descriptionEn": "01:00-03:00, December, Earth energy. Symbolizes diligence and patience.",
+        "attributeKo": "성실,인내,끈기,신뢰",
+        "attributeEn": "diligence,patience,perseverance,trust"
+    },
+    {
+        "id": "jiji_in",
+        "type": "지지",
+        "code": "인",
+        "nameKo": "인(寅) - 호랑이",
+        "nameEn": "In (Tiger)",
+        "descriptionKo": "인시(03:00-05:00), 1월, 목(木) 기운. 용맹함과 리더십을 상징합니다.",
+        "descriptionEn": "03:00-05:00, January, Wood energy. Symbolizes bravery and leadership.",
+        "attributeKo": "용맹,리더십,정의감,독립성",
+        "attributeEn": "bravery,leadership,justice,independence"
+    },
+    {
+        "id": "jiji_myo",
+        "type": "지지",
+        "code": "묘",
+        "nameKo": "묘(卯) - 토끼",
+        "nameEn": "Myo (Rabbit)",
+        "descriptionKo": "묘시(05:00-07:00), 2월, 목(木) 기운. 온화함과 예술성을 상징합니다.",
+        "descriptionEn": "05:00-07:00, February, Wood energy. Symbolizes gentleness and artistry.",
+        "attributeKo": "온화,예술성,신중함,평화",
+        "attributeEn": "gentleness,artistry,prudence,peace"
+    },
+    {
+        "id": "jiji_jin",
+        "type": "지지",
+        "code": "진",
+        "nameKo": "진(辰) - 용",
+        "nameEn": "Jin (Dragon)",
+        "descriptionKo": "진시(07:00-09:00), 3월, 토(土) 기운. 권위와 성공을 상징합니다.",
+        "descriptionEn": "07:00-09:00, March, Earth energy. Symbolizes authority and success.",
+        "attributeKo": "권위,성공,카리스마,야망",
+        "attributeEn": "authority,success,charisma,ambition"
+    }
+]

@@ -53,6 +53,15 @@ class _TarotScreenState extends State<TarotScreen>
     setState(() {
       _selectedCards = [];
       _hasDrawn = false;
+    _deck = List.from(TarotDeck.majorArcana);
+    _selectedCards = [];
+    _hasDrawn = false;
+
+    final loadedDeck = await TarotDeckLoader.loadDeck();
+    if (!mounted) return;
+
+    setState(() {
+      _deck = loadedDeck;
     });
   }
 

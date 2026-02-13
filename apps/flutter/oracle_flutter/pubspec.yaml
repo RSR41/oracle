@@ -58,6 +58,7 @@ dependencies:
   # Phase E-10: AI Service HTTP client
   http: ^1.2.2
 
+dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_launcher_icons: ^0.14.3
@@ -79,6 +80,7 @@ flutter:
   assets:
     - assets/data/saju_patterns.json
     - assets/data/tarot_cards.json
+    - assets/data/
 
 flutter_launcher_icons:
   android: true
