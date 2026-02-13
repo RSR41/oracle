@@ -180,12 +180,14 @@ class AppRouter {
         GoRoute(
           path: '/face',
           redirect: (context, state) =>
+              FeatureFlags.showBetaFeatures ? null : '/home',
               FeatureFlags.allowPhase2Sensitive ? null : '/home',
           builder: (context, state) => const FaceReadingScreen(),
         ),
         GoRoute(
           path: '/face-result',
           redirect: (context, state) =>
+              FeatureFlags.showBetaFeatures ? null : '/home',
               FeatureFlags.allowPhase2Sensitive ? null : '/home',
           builder: (context, state) {
             final extra = state.extra as Map<String, dynamic>;
@@ -342,6 +344,8 @@ class AppRouter {
         ),
         GoRoute(
           path: '/face-detail',
+          redirect: (context, state) =>
+              FeatureFlags.showBetaFeatures ? null : '/home',
           builder: (context, state) =>
               ComingSoonScreen(title: 'Face Detail', data: state.extra),
         ),
