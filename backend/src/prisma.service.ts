@@ -7,23 +7,16 @@ export class PrismaService extends PrismaClient implements OnModuleInit, OnModul
     private readonly logger = new Logger(PrismaService.name);
 
     constructor(config: ConfigService) {
-        const fallback = 'postgresql://postgres:password123@127.0.0.1:5433/ef_db?schema=public&connect_timeout=5';
         const envUrl = config.get<string>('DATABASE_URL') || process.env.DATABASE_URL;
-        const isProduction = process.env.NODE_ENV === 'production';
 
         if (!envUrl) {
-            if (isProduction) {
-                throw new Error('❌ [PrismaService] DATABASE_URL is required in PRODUCTION. Fallback is disabled.');
-            }
-            console.warn('⚠️ [PrismaService] DATABASE_URL env not found. Using DEV fallback.');
+            throw new Error('❌ [PrismaService] DATABASE_URL is required. Set a PostgreSQL connection string (Neon/Supabase recommended).');
         }
-
-        const url = envUrl || fallback;
 
         super({
             datasources: {
                 db: {
-                    url,
+                    url: envUrl,
                 },
             },
             // log: ['query', 'info', 'warn', 'error'], // Optional: Enable prisma logs in dev
@@ -31,19 +24,12 @@ export class PrismaService extends PrismaClient implements OnModuleInit, OnModul
     }
 
     async onModuleInit() {
-        const isProduction = process.env.NODE_ENV === 'production';
-
         try {
             await this.$connect();
             this.logger.log('Prisma connected to database');
         } catch (error) {
-            if (isProduction) {
-                throw error; // Production must crash if DB is missing
-            } else {
-                this.logger.error(`❌ DB Connection failed: ${error.message}`);
-                this.logger.warn('⚠️ Server is starting WITHOUT Database. DB-dependent endpoints will fail.');
-                // We deliberately swallow the error in DEV so the app can start listening on port 8080
-            }
+            this.logger.error(`❌ DB Connection failed: ${error.message}`);
+            throw error;
         }
     }
 

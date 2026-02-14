@@ -1,22 +1,21 @@
-import { Injectable, UnauthorizedException, ConflictException } from '@nestjs/common';
+import { Inject, Injectable, UnauthorizedException, ConflictException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { PrismaService } from '../prisma.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 import * as bcrypt from 'bcrypt';
+import { AUTH_REPOSITORY } from '../repository/repository.tokens';
+import type { AuthRepository } from '../repository/interfaces/auth.repository';
 
 @Injectable()
 export class AuthService {
     constructor(
-        private prisma: PrismaService,
+        @Inject(AUTH_REPOSITORY) private readonly authRepository: AuthRepository,
         private jwtService: JwtService,
     ) { }
 
     async register(dto: RegisterDto) {
         // Check if user exists
-        const existing = await this.prisma.user.findUnique({
-            where: { email: dto.email },
-        });
+        const existing = await this.authRepository.findUserByEmail(dto.email);
 
         if (existing) {
             throw new ConflictException('Email already in use');
@@ -26,12 +25,10 @@ export class AuthService {
         const hashedPassword = await bcrypt.hash(dto.password, 10);
 
         // Create user
-        const user = await this.prisma.user.create({
-            data: {
-                email: dto.email,
-                password: hashedPassword,
-                name: dto.name,
-            },
+        const user = await this.authRepository.createUser({
+            email: dto.email,
+            password: hashedPassword,
+            name: dto.name,
         });
 
         return {
@@ -45,9 +42,7 @@ export class AuthService {
     }
 
     async login(dto: LoginDto) {
-        const user = await this.prisma.user.findUnique({
-            where: { email: dto.email },
-        });
+        const user = await this.authRepository.findUserByEmail(dto.email);
 
         if (!user) {
             throw new UnauthorizedException('Invalid credentials');
