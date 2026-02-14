@@ -6,8 +6,6 @@ import 'package:oracle_flutter/app/state/app_state.dart';
 import 'package:oracle_flutter/app/theme/app_colors.dart';
 import 'package:oracle_flutter/app/models/tarot_card.dart';
 import 'package:oracle_flutter/app/services/tarot/tarot_data_service.dart';
-import 'package:oracle_flutter/app/services/tarot_content_service.dart';
-import 'package:oracle_flutter/app/services/fortune_service.dart';
 
 class TarotScreen extends StatefulWidget {
   const TarotScreen({super.key});
@@ -20,9 +18,6 @@ class _TarotScreenState extends State<TarotScreen>
     with SingleTickerProviderStateMixin {
   final _random = Random();
   final TarotDataService _tarotDataService = TarotDataService();
-  final TarotContentService _tarotContentService = TarotContentService();
-  final FortuneService _fortuneService = FortuneService();
-
   List<TarotCard> _deck = [];
   List<TarotCard> _selectedCards = [];
   bool _isShuffling = false;
@@ -58,47 +53,8 @@ class _TarotScreenState extends State<TarotScreen>
   }
 
   void _initDeck() {
-    try {
-      final cards = await _tarotContentService.loadDeck();
-      if (!mounted) return;
-      setState(() {
-        _deck = cards;
-        _selectedCards = [];
-        _hasDrawn = false;
-        _isLoadingDeck = false;
-      });
-    } catch (_) {
-      if (!mounted) return;
-      setState(() => _isLoadingDeck = false);
-    }
-  }
-
-  void _resetDraw() {
-    setState(() {
-      _selectedCards = [];
-      _hasDrawn = false;
-  Future<void> _initDeck() async {
-    try {
-      final cards = await _fortuneService.loadTarotCards();
-      _deck = cards.isEmpty ? List.from(TarotDeck.majorArcana) : cards;
-    } catch (_) {
-      _deck = List.from(TarotDeck.majorArcana);
-    }
-
-    if (!mounted) return;
-    setState(() {
-      _selectedCards = [];
-      _hasDrawn = false;
-    _deck = List.from(TarotDeck.majorArcana);
     _selectedCards = [];
     _hasDrawn = false;
-
-    final loadedDeck = await TarotDeckLoader.loadDeck();
-    if (!mounted) return;
-
-    setState(() {
-      _deck = loadedDeck;
-    });
   }
 
   Future<void> _shuffle() async {
@@ -118,7 +74,7 @@ class _TarotScreenState extends State<TarotScreen>
   }
 
   void _drawCards(int count) {
-    if (_hasDrawn || _deck.isEmpty) return;
+    if (_hasDrawn) return;
 
     final drawnCards = <TarotCard>[];
     for (int i = 0; i < count && i < _deck.length; i++) {
@@ -146,13 +102,6 @@ class _TarotScreenState extends State<TarotScreen>
 
     if (_isLoadingDeck) {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
-    }
-
-    if (_deck.isEmpty) {
-      return Scaffold(
-        appBar: AppBar(title: Text(appState.t('fortune.tarot'))),
-        body: const Center(child: Text('타로 카드 데이터를 불러오지 못했습니다.')),
-      );
     }
 
     return Scaffold(
