@@ -1,0 +1,2 @@
+export const AUTH_REPOSITORY = Symbol('AUTH_REPOSITORY');
+export const HISTORY_REPOSITORY = Symbol('HISTORY_REPOSITORY');

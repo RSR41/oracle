@@ -4,8 +4,13 @@ import 'package:oracle_flutter/app/state/app_state.dart';
 import 'package:oracle_flutter/app/theme/app_colors.dart';
 import 'package:oracle_flutter/app/i18n/translations.dart';
 
+import 'settings_info_section.dart';
+
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
+
+  static const _appVersion = 'v1.1.0 (Phase 1)';
+  static const _contactEmail = 'support@oracle-saju.com';
 
   @override
   Widget build(BuildContext context) {
@@ -20,11 +25,8 @@ class SettingsScreen extends StatelessWidget {
       body: ListView(
         padding: const EdgeInsets.all(20),
         children: [
-          // App Settings Section
           _buildSectionHeader(appState.t('settings.appSettings'), theme),
           const SizedBox(height: 12),
-
-          // Theme Setting
           _buildSettingCard(
             theme,
             icon: Icons.color_lens,
@@ -54,8 +56,6 @@ class SettingsScreen extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 12),
-
-          // Language Setting
           _buildSettingCard(
             theme,
             icon: Icons.language,
@@ -74,14 +74,9 @@ class SettingsScreen extends StatelessWidget {
               ],
             ),
           ),
-
           const SizedBox(height: 32),
-
-          // Account Section
           _buildSectionHeader(appState.t('settings.account'), theme),
           const SizedBox(height: 12),
-
-          // Clear Profile
           _buildSettingCard(
             theme,
             icon: Icons.person_off,
@@ -89,52 +84,34 @@ class SettingsScreen extends StatelessWidget {
             subtitle: appState.t('settings.clearProfileDesc'),
             onTap: () => _showClearProfileDialog(context, appState),
           ),
-
           const SizedBox(height: 32),
-
-          // About Section
-          _buildSectionHeader(appState.t('settings.about'), theme),
+          _buildSectionHeader('법적/앱 정보', theme),
           const SizedBox(height: 12),
-
-          _buildSettingCard(
-            theme,
-            icon: Icons.info_outline,
-            title: appState.t('settings.version'),
-            subtitle: 'v1.1.0 (Phase 1)',
-          ),
-
-          _buildSettingCard(
-            theme,
-            icon: Icons.privacy_tip_outlined,
-            title: appState.t('settings.privacy'),
-            onTap: () => _showInfoDialog(
+          SettingsInfoSection(
+            appVersion: _appVersion,
+            contactEmail: _contactEmail,
+            onShowTerms: () => _showInfoDialog(
               context,
-              'Privacy Policy',
-              'Privacy policy will be available at oracle-saju.web.app/privacy',
+              '이용약관',
+              '이용약관 전문은 oracle-saju.web.app/terms 에서 확인할 수 있습니다.',
+            ),
+            onShowPrivacy: () => _showInfoDialog(
+              context,
+              '개인정보처리방침',
+              '개인정보처리방침 전문은 oracle-saju.web.app/privacy 에서 확인할 수 있습니다.',
+            ),
+            onShowOpenSourceLicenses: () => showLicensePage(
+              context: context,
+              applicationName: 'Oracle',
+              applicationVersion: _appVersion,
+            ),
+            onShowDataDeletionGuide: () => _showInfoDialog(
+              context,
+              '데이터 삭제 안내',
+              '설정 > ${appState.t('settings.clearProfile')} 메뉴에서 삭제할 수 있으며, 삭제 후 복구할 수 없습니다.',
             ),
           ),
-
-          _buildSettingCard(
-            theme,
-            icon: Icons.article_outlined,
-            title: appState.t('settings.terms'),
-            onTap: () => _showInfoDialog(
-              context,
-              'Terms of Service',
-              'Terms of service will be available at oracle-saju.web.app/terms',
-            ),
-          ),
-
-          _buildSettingCard(
-            theme,
-            icon: Icons.mail_outline,
-            title: appState.t('settings.contact'),
-            subtitle: 'support@oracle-saju.com',
-          ),
-
           const SizedBox(height: 32),
-
-          // Footer
           Center(
             child: Text(
               '© 2026 ORACLE. All rights reserved.',
