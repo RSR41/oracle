@@ -1,137 +1,117 @@
 import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:provider/provider.dart';
-import 'package:url_launcher/url_launcher.dart';
-
-import '../../../core/constants/app_colors.dart';
-import '../../state/app_state.dart';
-import '../../config/app_urls.dart';
-import 'package:oracle_flutter/app/config/app_urls.dart';
 import 'package:oracle_flutter/app/state/app_state.dart';
 import 'package:oracle_flutter/app/theme/app_colors.dart';
 import 'package:oracle_flutter/app/i18n/translations.dart';
-import 'package:oracle_flutter/app/config/app_urls.dart';
-import 'package:url_launcher/url_launcher.dart';
+
+import 'settings_info_section.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
 
+  static const _appVersion = 'v1.1.0 (Phase 1)';
+  static const _contactEmail = 'support@oracle-saju.com';
+
   @override
   Widget build(BuildContext context) {
-    final appState = context.watch<AppState>();
     final theme = Theme.of(context);
+    final appState = context.watch<AppState>();
 
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(appState.t('settings.title')),
+        centerTitle: true,
+      ),
+      body: ListView(
+        padding: const EdgeInsets.all(20),
         children: [
-          // Profile Section
-          _buildSectionHeader(appState.t('settings.profile'), theme),
-          const SizedBox(height: 16),
-
+          _buildSectionHeader(appState.t('settings.appSettings'), theme),
+          const SizedBox(height: 12),
           _buildSettingCard(
             theme,
-            icon: Icons.person_outline,
-            title: appState.t('profile.name'),
-            subtitle: appState.profile.name?.isNotEmpty == true
-                ? appState.profile.name
-                : appState.t('profile.notSet'),
+            icon: Icons.color_lens,
+            title: appState.t('settings.theme'),
+            trailing: DropdownButton<AppThemePreference>(
+              value: appState.theme,
+              underline: const SizedBox(),
+              onChanged: (value) {
+                if (value != null) {
+                  appState.setTheme(value);
+                }
+              },
+              items: [
+                DropdownMenuItem(
+                  value: AppThemePreference.system,
+                  child: Text(appState.t('settings.system')),
+                ),
+                DropdownMenuItem(
+                  value: AppThemePreference.light,
+                  child: Text(appState.t('settings.light')),
+                ),
+                DropdownMenuItem(
+                  value: AppThemePreference.dark,
+                  child: Text(appState.t('settings.dark')),
+                ),
+              ],
+            ),
           ),
-
+          const SizedBox(height: 12),
           _buildSettingCard(
             theme,
-            icon: Icons.cake_outlined,
-            title: appState.t('profile.birthDate'),
-            subtitle: appState.profile.birthDate?.isNotEmpty == true
-                ? appState.profile.birthDate
-                : appState.t('profile.notSet'),
+            icon: Icons.language,
+            title: appState.t('settings.language'),
+            trailing: DropdownButton<AppLanguage>(
+              value: appState.language,
+              underline: const SizedBox(),
+              onChanged: (value) {
+                if (value != null) {
+                  appState.setLanguage(value);
+                }
+              },
+              items: const [
+                DropdownMenuItem(value: AppLanguage.ko, child: Text('한국어')),
+                DropdownMenuItem(value: AppLanguage.en, child: Text('English')),
+              ],
+            ),
           ),
-
+          const SizedBox(height: 32),
+          _buildSectionHeader(appState.t('settings.account'), theme),
+          const SizedBox(height: 12),
           _buildSettingCard(
             theme,
-            icon: Icons.access_time,
-            title: appState.t('profile.birthTime'),
-            subtitle: appState.profile.birthTime?.isNotEmpty == true
-                ? appState.profile.birthTime
-                : appState.t('profile.notSet'),
-          ),
-
-          _buildSettingCard(
-            theme,
-            icon: Icons.delete_outline,
+            icon: Icons.person_off,
             title: appState.t('settings.clearProfile'),
-            trailing: const Icon(Icons.chevron_right, color: Colors.red),
+            subtitle: appState.t('settings.clearProfileDesc'),
             onTap: () => _showClearProfileDialog(context, appState),
           ),
-
           const SizedBox(height: 32),
-
-          // App Settings
-          _buildSectionHeader(appState.t('settings.appInfo'), theme),
-          const SizedBox(height: 16),
-
-          _buildSettingCard(
-            theme,
-            icon: Icons.info_outline,
-            title: appState.t('settings.version'),
-            subtitle: 'v1.1.0 (Phase 1)',
-          ),
-
-          _buildSettingCard(
-            theme,
-            icon: Icons.privacy_tip_outlined,
-            title: appState.t('settings.privacy'),
-            onTap: () => _openLegalUrl(context, AppUrls.privacyPolicy),
-            subtitle: AppUrls.privacyPolicy,
-            onTap: () => _openLegalUrl(
-              context,
-              '개인정보처리방침',
-              AppUrls.privacyPolicy,
-            onTap: () => _openLegalUrl(context, AppUrls.privacyPolicy),
-            onTap: () => _openUrl(
-              context,
-              'Privacy Policy',
-              AppUrls.privacyPolicy,
-              AppUrls.privacyPolicy,
-              '개인정보처리방침 페이지를 열 수 없습니다. 네트워크 상태 또는 URL 설정을 확인해 주세요.',
-            ),
-            onTap: () => _launchExternalUrl(context, AppUrls.privacyPolicy),
-            onTap: () => _openExternalLink(context, AppUrls.privacyPolicy),
-          ),
-
-          _buildSettingCard(
-            theme,
-            icon: Icons.article_outlined,
-            title: appState.t('settings.terms'),
-            onTap: () => _openLegalUrl(context, AppUrls.termsOfService),
-            subtitle: AppUrls.termsOfService,
-            onTap: () => _openLegalUrl(
+          _buildSectionHeader('법적/앱 정보', theme),
+          const SizedBox(height: 12),
+          SettingsInfoSection(
+            appVersion: _appVersion,
+            contactEmail: _contactEmail,
+            onShowTerms: () => _showInfoDialog(
               context,
               '이용약관',
-              AppUrls.termsOfService,
-            onTap: () => _openLegalUrl(context, AppUrls.termsOfService),
-            onTap: () => _openUrl(
-              context,
-              'Terms of Service',
-              AppUrls.termsOfService,
-              AppUrls.termsOfService,
-              '이용약관 페이지를 열 수 없습니다. 네트워크 상태 또는 URL 설정을 확인해 주세요.',
+              '이용약관 전문은 oracle-saju.web.app/terms 에서 확인할 수 있습니다.',
             ),
-            onTap: () => _launchExternalUrl(context, AppUrls.termsOfService),
-            onTap: () => _openExternalLink(context, AppUrls.termsOfService),
+            onShowPrivacy: () => _showInfoDialog(
+              context,
+              '개인정보처리방침',
+              '개인정보처리방침 전문은 oracle-saju.web.app/privacy 에서 확인할 수 있습니다.',
+            ),
+            onShowOpenSourceLicenses: () => showLicensePage(
+              context: context,
+              applicationName: 'Oracle',
+              applicationVersion: _appVersion,
+            ),
+            onShowDataDeletionGuide: () => _showInfoDialog(
+              context,
+              '데이터 삭제 안내',
+              '설정 > ${appState.t('settings.clearProfile')} 메뉴에서 삭제할 수 있으며, 삭제 후 복구할 수 없습니다.',
+            ),
           ),
-
-          _buildSettingCard(
-            theme,
-            icon: Icons.mail_outline,
-            title: appState.t('settings.contact'),
-            subtitle: 'support@oracle-saju.com',
-          ),
-
           const SizedBox(height: 32),
-
-          // Footer
           Center(
             child: Text(
               '© 2026 ORACLE. All rights reserved.',
@@ -144,25 +124,6 @@ class SettingsScreen extends StatelessWidget {
         ],
       ),
     );
-  }
-
-  Future<void> _openLegalUrl(
-    BuildContext context,
-    String label,
-    String url,
-  ) async {
-    if (!AppUrls.isValidUrl(url)) {
-      _showInfoDialog(context, '$label URL 오류', '유효하지 않은 URL입니다.\n$url');
-      return;
-    }
-
-    final uri = Uri.parse(url);
-    final opened = await launchUrl(uri, mode: LaunchMode.externalApplication);
-    if (!opened && context.mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('$label 페이지를 열 수 없습니다.\n$url')),
-      );
-    }
   }
 
   Widget _buildSectionHeader(String title, ThemeData theme) {
@@ -234,87 +195,19 @@ class SettingsScreen extends StatelessWidget {
     }
   }
 
-  Future<void> _openLegalUrl(BuildContext context, String url) async {
-    final uri = Uri.parse(url);
-    final isLaunched = await launchUrl(uri, mode: LaunchMode.externalApplication);
-
-    if (!isLaunched && context.mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Unable to open legal page. Please try again.')),
-      );
-    }
-    if (!AppUrls.isValidUrl(url)) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('법적 문서 URL이 올바르지 않습니다.')),
-      );
-  Future<void> _showInfoDialog(
-    BuildContext context,
-    String title,
-    String url,
-  ) async {
-    if (!AppUrls.isValidUrl(url)) {
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('$title URL is invalid.')),
-  Future<void> _openUrl(
-    BuildContext context,
-    String url,
-    String errorMessage,
-  ) async {
-    final uri = Uri.tryParse(url);
-
-    if (uri == null || !AppUrls.isValidUrl(url)) {
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(errorMessage)),
-  Future<void> _launchExternalUrl(BuildContext context, String urlString) async {
-    if (!AppUrls.isValidUrl(urlString)) {
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('링크가 아직 설정되지 않았습니다. 배포 설정을 확인해주세요.'),
+  void _showInfoDialog(BuildContext context, String title, String content) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(title),
+        content: Text(content),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('OK'),
           ),
-        );
-      }
-      return;
-    }
-
-    final uri = Uri.parse(url);
-    final opened = await launchUrl(uri, mode: LaunchMode.externalApplication);
-    if (!opened && context.mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('문서를 열 수 없습니다. 잠시 후 다시 시도해주세요.')),
-      );
-    }
-    final launched = await launchUrl(uri, mode: LaunchMode.externalApplication);
-
-    if (!launched && context.mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Could not open $title.')),
-      );
-    }
-    final launched = await launchUrl(uri, mode: LaunchMode.externalApplication);
-    if (!launched && context.mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(errorMessage)),
-      );
-    }
-    final uri = Uri.parse(urlString);
-    final launched = await launchUrl(uri, mode: LaunchMode.externalApplication);
-    if (!launched && context.mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('외부 링크를 열 수 없습니다. 잠시 후 다시 시도해주세요.')),
-      );
-    }
-  Future<void> _openExternalLink(BuildContext context, String url) async {
-    if (!AppUrls.isValidUrl(url)) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('배포 URL 미설정')));
-      return;
-    }
-
-    final uri = Uri.parse(url);
-    await launchUrl(uri, mode: LaunchMode.externalApplication);
+        ],
+      ),
+    );
   }
 }
