@@ -1,4 +1,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!--
+      image_picker(Android): 최신 플러그인 기준으로 갤러리/카메라 호출은 시스템 인텐트를 사용하므로
+      기본적으로 추가 권한 선언이 필요하지 않습니다.
+      (READ_EXTERNAL_STORAGE/READ_MEDIA_IMAGES/CAMERA 미선언 유지)
+    -->
     <application
         android:label="Oracle 사주"
         android:name="${applicationName}"

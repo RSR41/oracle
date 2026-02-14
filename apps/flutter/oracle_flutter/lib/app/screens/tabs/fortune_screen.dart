@@ -425,7 +425,9 @@ class FortuneScreen extends StatelessWidget {
                 ),
 
                 // Phase 2+: 꿈해몽 섹션
-                if (FeatureFlags.showBetaFeatures) ...[
+                if (FeatureFlags.featureDream) ...[
+                if (FeatureFlags.enableDream) ...[
+                if (FeatureFlags.phase2Features) ...[
                   const SizedBox(height: 32),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 20),
