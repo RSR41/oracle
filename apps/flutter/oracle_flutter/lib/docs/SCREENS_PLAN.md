@@ -14,7 +14,7 @@
 | 9 | `Connection.tsx` | `lib/app/screens/stack/connection_screen.dart` | 📅 Planned | |
 | 10 | `IdealType.tsx` | `lib/app/screens/stack/ideal_type_screen.dart` | 📅 Planned | |
 | 11 | `Chat.tsx` | `lib/app/screens/stack/chat_screen.dart` | 📅 Planned | |
-| 12 | `Settings.tsx` | `lib/app/screens/tabs/settings_screen.dart` | 📅 Planned | Tab or Stack? React has it separate. |
+| 12 | `Settings.tsx` | `lib/app/screens/stack/settings_screen.dart` | 📅 Planned | Stack route (/settings) + 약관/개인정보는 placeholder 다이얼로그 정책 유지. |
 
 ## Standards
 - **Styling**: Use HSL/Hex from React exactly or use Phase 33 Theme tokens.
