@@ -1,0 +1,117 @@
+/* Common */
+"common.back" = "Back";
+"common.save" = "Save";
+"common.delete" = "Delete";
+"common.cancel" = "Cancel";
+"common.confirm" = "Confirm";
+"common.history" = "History";
+"common.settings" = "Settings";
+"common.saveHistory" = "Save to History";
+"common.alreadySaved" = "Already Saved";
+"common.notEntered" = "Not Entered";
+"common.male" = "Male";
+"common.female" = "Female";
+"common.solar" = "Solar";
+"common.lunar" = "Lunar";
+"common.result" = "Result";
+"common.retry" = "Retry";
+
+/* Tabs */
+"tab.fortune" = "Fortune";
+"tab.tarot" = "Tarot";
+"tab.dream" = "Dream";
+"tab.face" = "Face";
+"tab.settings" = "Settings";
+
+/* Menu */
+"menu.saju" = "Saju/Fortune";
+"menu.manse" = "Manseok";
+"menu.compatibility" = "Compatibility";
+"menu.face" = "Face Reading";
+"menu.tarot" = "Tarot";
+"menu.dream" = "Dream";
+"menu.comingSoon" = "Coming Soon!";
+
+/* Profile */
+"profile.setup.title" = "Profile Setup";
+"profile.nickname" = "Nickname";
+"profile.nickname.placeholder" = "Enter nickname";
+"profile.birthDate" = "Birth Date (yyyy-MM-dd)";
+"profile.birthTime" = "Birth Time (HH:mm)";
+"profile.birthTime.unknown" = "Unknown";
+"profile.gender" = "Gender";
+"profile.calendarType" = "Calendar Type";
+"profile.saveForLater" = "Save profile for later";
+
+/* Input */
+"input.viewResult" = "View Result";
+"input.leapMonth" = "Leap Month";
+"input.error.nickname.required" = "Please enter a nickname";
+"input.error.date.format" = "Invalid date format";
+"input.error.time.format" = "Invalid time format";
+"input.error.date.year" = "Year must be 1900-2100";
+
+/* Result */
+"result.title" = "Saju Result";
+"result.summary.title" = "🔮 Today's Fortune";
+"result.pillars.title" = "📊 Four Pillars";
+"result.luckyColor" = "🍀 Lucky Color";
+"result.luckyNumber" = "🔢 Lucky Number";
+"result.inputSummary" = "Input Info";
+"result.generatedAt %@" = "Analyzed at: %@";
+"result.retry" = "Try Again";
+
+/* History */
+"history.empty" = "No history found";
+"history.saju.title" = "My Saju Fortune";
+"history.clear.title" = "Delete All";
+"history.clear.confirm" = "Delete all history records?";
+
+/* Settings */
+"settings.theme.light" = "Light";
+"settings.theme.dark" = "Dark";
+"settings.theme.system" = "System";
+"settings.language.korean" = "Korean";
+"settings.language.english" = "English";
+"settings.language.system" = "System";
+"settings.language.title" = "Language";
+"settings.language.desc" = "Select the language for the app";
+"settings.theme.title" = "Theme";
+"settings.theme.desc" = "Select the app theme";
+"settings.calendar.title" = "Default Calendar";
+"settings.calendar.desc" = "Select the default calendar type";
+"settings.privacy.title" = "Privacy Notice";
+"settings.privacy.desc" = "This app values your privacy.";
+"settings.privacy.bullet1" = "All data is stored only on your device";
+"settings.privacy.bullet2" = "No data is sent to external servers";
+"settings.info.title" = "App Info";
+"settings.info.version" = "Version";
+
+/* Tarot */
+"tarot.title" = "Tarot Reading";
+"tarot.instruction" = "Calm your mind and select 3 cards";
+"tarot.viewResult" = "View Result";
+"tarot.reversed" = "Reversed";
+"tarot.upright" = "Upright";
+"tarot.summary" = "Summary";
+"tarot.detail" = "Detailed Interpretation";
+
+/* Dream */
+"dream.title" = "Dream Interpretation";
+"dream.search.placeholder" = "Search keywords from your dream...";
+"dream.popular" = "Popular Keywords";
+"dream.empty" = "No results found";
+"dream.meaning" = "Interpretation";
+
+/* Face */
+"face.title" = "Face Reading";
+"face.upload.hint" = "Select a face photo to analyze";
+"face.gallery" = "Choose from Gallery";
+"face.guide" = "Front-facing photos provide the most accurate results";
+"face.analyze" = "Analyze Face";
+"face.ready" = "Ready for Analysis";
+"face.retake" = "Analyze Again";
+"face.security" = "All photos are deleted immediately after analysis and are not sent to any server.";
+"face.terms.title" = "Privacy Consent";
+"face.terms.message" = "Face photos will be used for face reading analysis. Photos are deleted immediately after analysis and are not transmitted externally.";
+"face.terms.agree" = "Agree and Continue";

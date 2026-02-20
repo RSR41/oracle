@@ -1,0 +1,117 @@
+/* 공통 */
+"common.back" = "뒤로";
+"common.save" = "저장";
+"common.delete" = "삭제";
+"common.cancel" = "취소";
+"common.confirm" = "확인";
+"common.history" = "히스토리";
+"common.settings" = "설정";
+"common.saveHistory" = "히스토리에 저장";
+"common.alreadySaved" = "이미 저장됨";
+"common.notEntered" = "미입력";
+"common.male" = "남성";
+"common.female" = "여성";
+"common.solar" = "양력";
+"common.lunar" = "음력";
+"common.result" = "결과";
+"common.retry" = "다시하기";
+
+/* 탭 */
+"tab.fortune" = "사주";
+"tab.tarot" = "타로";
+"tab.dream" = "꿈해몽";
+"tab.face" = "관상";
+"tab.settings" = "설정";
+
+/* 메뉴 */
+"menu.saju" = "사주/운세";
+"menu.manse" = "만세력";
+"menu.compatibility" = "궁합";
+"menu.face" = "관상";
+"menu.tarot" = "타로";
+"menu.dream" = "꿈해몽";
+"menu.comingSoon" = "준비 중입니다!";
+
+/* 프로필 */
+"profile.setup.title" = "프로필 설정";
+"profile.nickname" = "닉네임";
+"profile.nickname.placeholder" = "닉네임을 입력하세요";
+"profile.birthDate" = "생년월일 (yyyy-MM-dd)";
+"profile.birthTime" = "출생 시간 (HH:mm)";
+"profile.birthTime.unknown" = "모름";
+"profile.gender" = "성별";
+"profile.calendarType" = "달력 타입";
+"profile.saveForLater" = "다음을 위해 프로필 저장";
+
+/* 입력 */
+"input.viewResult" = "결과 보기";
+"input.leapMonth" = "윤달";
+"input.error.nickname.required" = "닉네임을 입력해 주세요";
+"input.error.date.format" = "날짜 형식이 올바르지 않습니다";
+"input.error.time.format" = "시간 형식이 올바르지 않습니다";
+"input.error.date.year" = "연도는 1900~2100 사이여야 합니다";
+
+/* 결과 */
+"result.title" = "사주 결과";
+"result.summary.title" = "🔮 오늘의 총운";
+"result.pillars.title" = "📊 사주 팔자";
+"result.luckyColor" = "🍀 행운의 색";
+"result.luckyNumber" = "🔢 행운의 숫자";
+"result.inputSummary" = "입력 정보";
+"result.generatedAt %@" = "분석 시각: %@";
+"result.retry" = "다시 입력";
+
+/* 히스토리 */
+"history.empty" = "히스토리가 없습니다";
+"history.saju.title" = "나의 사주 운세";
+"history.clear.title" = "전체 삭제";
+"history.clear.confirm" = "모든 히스토리를 삭제하시겠습니까?";
+
+/* 설정 */
+"settings.theme.light" = "라이트";
+"settings.theme.dark" = "다크";
+"settings.theme.system" = "시스템";
+"settings.language.korean" = "한국어";
+"settings.language.english" = "영어";
+"settings.language.system" = "시스템";
+"settings.language.title" = "언어 설정";
+"settings.language.desc" = "앱에서 사용할 언어를 선택하세요";
+"settings.theme.title" = "테마 설정";
+"settings.theme.desc" = "앱 테마를 선택하세요";
+"settings.calendar.title" = "기본 달력";
+"settings.calendar.desc" = "기본으로 사용할 달력 타입을 선택하세요";
+"settings.privacy.title" = "개인정보 안내";
+"settings.privacy.desc" = "이 앱은 사용자의 개인정보를 중요하게 생각합니다.";
+"settings.privacy.bullet1" = "모든 데이터는 기기에만 저장됩니다";
+"settings.privacy.bullet2" = "외부 서버로 전송되지 않습니다";
+"settings.info.title" = "앱 정보";
+"settings.info.version" = "버전";
+
+/* 타로 */
+"tarot.title" = "타로 상담";
+"tarot.instruction" = "마음을 가라앉히고 3장의 카드를 선택하세요";
+"tarot.viewResult" = "결과 보기";
+"tarot.reversed" = "역방향";
+"tarot.upright" = "정방향";
+"tarot.summary" = "해석 요약";
+"tarot.detail" = "상세 해석";
+
+/* 꿈해몽 */
+"dream.title" = "꿈해몽";
+"dream.search.placeholder" = "꿈에서 본 키워드 검색...";
+"dream.popular" = "인기 키워드";
+"dream.empty" = "검색 결과가 없습니다";
+"dream.meaning" = "해석";
+
+/* 관상 */
+"face.title" = "관상 분석";
+"face.upload.hint" = "분석할 얼굴 사진을 선택하세요";
+"face.gallery" = "갤러리에서 선택";
+"face.guide" = "정면 사진이 가장 정확한 결과를 제공합니다";
+"face.analyze" = "관상 분석하기";
+"face.ready" = "분석 준비 완료";
+"face.retake" = "다시 분석하기";
+"face.security" = "모든 사진은 분석 후 즉시 삭제되며, 서버로 전송되지 않습니다.";
+"face.terms.title" = "개인정보 동의";
+"face.terms.message" = "관상 분석을 위해 얼굴 사진을 사용합니다. 사진은 분석 후 즉시 삭제되며 외부로 전송되지 않습니다.";
+"face.terms.agree" = "동의하고 계속";
