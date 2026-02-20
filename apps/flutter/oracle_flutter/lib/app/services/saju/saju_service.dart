@@ -264,7 +264,8 @@ class SajuService {
     final maxElement = elements.values.reduce((a, b) => a > b ? a : b);
     final minElement = elements.values.reduce((a, b) => a < b ? a : b);
     final balanceBonus = (4 - (maxElement - minElement)).clamp(0, 4) * 5;
-    final cycleFactor = ((dayStemIndex + 1) * 3 + (dayBranchIndex + 1) * 2) % 21;
+    final cycleFactor =
+        ((dayStemIndex + 1) * 3 + (dayBranchIndex + 1) * 2) % 21;
 
     return (55 + balanceBonus + cycleFactor).clamp(50, 100);
   }
@@ -414,5 +415,55 @@ class SajuService {
               ? yearBranchIndex + 12
               : yearBranchIndex],
     );
+  }
+
+  /// 오행 영문명 반환 (이미지 매핑용)
+  static String getElementEnglish(String element) {
+    switch (element) {
+      case '목':
+        return 'wood';
+      case '화':
+        return 'fire';
+      case '토':
+        return 'earth';
+      case '금':
+        return 'metal';
+      case '수':
+        return 'water';
+      default:
+        return 'fire'; // Default fallback
+    }
+  }
+
+  /// 띠 영문명 반환 (이미지 매핑용)
+  static String getZodiacEnglish(String zodiac) {
+    switch (zodiac) {
+      case '쥐':
+        return 'rat';
+      case '소':
+        return 'ox';
+      case '호랑이':
+        return 'tiger';
+      case '토끼':
+        return 'rabbit';
+      case '용':
+        return 'dragon';
+      case '뱀':
+        return 'snake';
+      case '말':
+        return 'horse';
+      case '양':
+        return 'sheep';
+      case '원숭이':
+        return 'monkey';
+      case '닭':
+        return 'Chicken'; // Match file name case
+      case '개':
+        return 'dog';
+      case '돼지':
+        return 'pig';
+      default:
+        return 'rat';
+    }
   }
 }

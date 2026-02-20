@@ -81,6 +81,11 @@ flutter:
     - assets/brand/
     - assets/data/saju_patterns.json
     - assets/data/tarot_cards.json
+    - assets/images/splash/
+    - assets/images/icons/
+    - assets/images/five_elements/
+    - assets/images/zodiac/
+    - assets/images/tarot/
     - assets/data/
 
 flutter_launcher_icons:

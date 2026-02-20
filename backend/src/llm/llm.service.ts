@@ -1,5 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 import {
     LLMProvider,
     LLMOptions,
@@ -118,26 +119,43 @@ export class LlmService implements LLMProvider {
 
     private async callGemini(prompt: string, options?: LLMOptions): Promise<LLMResponse> {
         const apiKey = this.configService.get<string>('GEMINI_API_KEY');
-        const model = this.configService.get<string>('GEMINI_MODEL', 'gemini-1.5-flash');
+        const modelName = this.configService.get<string>('GEMINI_MODEL', 'gemini-3.1-pro');
 
         if (!apiKey) {
             throw new Error('GEMINI_API_KEY가 설정되지 않았습니다');
         }
 
-        // TODO: 실제 Gemini API 호출 구현
-        // const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`, {
-        //   method: 'POST',
-        //   headers: { 'Content-Type': 'application/json', 'x-goog-api-key': apiKey },
-        //   body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] }),
-        // });
+        try {
+            const genAI = new GoogleGenerativeAI(apiKey);
+            const model = genAI.getGenerativeModel({
+                model: modelName,
+                generationConfig: {
+                    temperature: options?.temperature ?? 0.7,
+                    maxOutputTokens: this.maxTokens,
+                },
+            });
 
-        // 개발용 더미 응답
-        this.logger.warn('Gemini API 더미 응답 반환 (실제 연동 필요)');
-        return {
-            content: this.getDummyResponse(),
-            model,
-            usage: { promptTokens: 100, completionTokens: 200, totalTokens: 300 },
-        };
+            const result = await model.generateContent({
+                contents: [{ role: 'user', parts: [{ text: prompt }] }],
+                systemInstruction: options?.systemPrompt,
+            });
+
+            const response = await result.response;
+            const content = response.text();
+
+            return {
+                content,
+                model: modelName,
+                usage: {
+                    promptTokens: response.usageMetadata?.promptTokenCount || 0,
+                    completionTokens: response.usageMetadata?.candidatesTokenCount || 0,
+                    totalTokens: response.usageMetadata?.totalTokenCount || 0,
+                },
+            };
+        } catch (error) {
+            this.logger.error(`Gemini API 호출 중 오류 발생: ${error.message}`);
+            throw error;
+        }
     }
 
     private async callOpenAI(prompt: string, options?: LLMOptions): Promise<LLMResponse> {

@@ -284,32 +284,30 @@ class HomeScreen extends StatelessWidget {
                         children: [
                           _buildQuickAccessBtn(
                             context,
-                            icon: Icons.calendar_month,
+                            imagePath: 'assets/images/icons/icon_manse.png',
                             label: appState.t('home.calendar'),
-                            color: AppColors.sage,
                             route: '/calendar',
                           ),
                           _buildQuickAccessBtn(
                             context,
-                            icon: Icons.shuffle,
+                            imagePath: 'assets/images/icons/icon_tarot.png',
                             label: appState.t('home.tarot'),
-                            color: AppColors.skyPastel,
                             route: '/tarot',
                           ),
                           // Phase 2+: 꿈해몽, 궁합
                           if (FeatureFlags.showBetaFeatures) ...[
                             _buildQuickAccessBtn(
                               context,
-                              icon: Icons.bedtime,
+                              imagePath: 'assets/images/icons/icon_dream.png',
                               label: appState.t('home.dream'),
-                              color: AppColors.caramel,
                               route: '/dream',
                             ),
                             _buildQuickAccessBtn(
                               context,
-                              icon: Icons.favorite,
+                              // TODO: 궁합 아이콘 추가 필요 (현재 꿈해몽과 동일하거나 기본 아이콘 사용)
+                              imagePath:
+                                  'assets/images/icons/icon_daily_fortune.png',
                               label: appState.t('home.compatibility'),
-                              color: AppColors.peach,
                               route: '/compatibility',
                             ),
                           ],
@@ -437,9 +435,8 @@ class HomeScreen extends StatelessWidget {
 
   Widget _buildQuickAccessBtn(
     BuildContext context, {
-    required IconData icon,
+    required String imagePath,
     required String label,
-    required Color color,
     required String route,
   }) {
     return GestureDetector(
@@ -460,7 +457,7 @@ class HomeScreen extends StatelessWidget {
                 ),
               ],
             ),
-            child: Icon(icon, color: color, size: 28),
+            child: Image.asset(imagePath, width: 48, height: 48),
           ),
           const SizedBox(height: 8),
           Text(
