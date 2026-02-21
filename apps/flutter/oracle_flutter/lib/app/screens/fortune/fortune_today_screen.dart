@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:oracle_flutter/app/models/fortune_result.dart';
 import 'package:oracle_flutter/app/services/fortune_daily_service.dart';
-import 'package:oracle_flutter/app/database/history_repository.dart';
+import 'package:oracle_flutter/app/services/fortune_service.dart';
 import 'package:oracle_flutter/app/state/app_state.dart';
 import 'package:oracle_flutter/app/theme/app_colors.dart';
 import 'package:intl/intl.dart';
@@ -18,7 +18,7 @@ class FortuneTodayScreen extends StatefulWidget {
 }
 
 class _FortuneTodayScreenState extends State<FortuneTodayScreen> {
-  final HistoryRepository _historyRepository = HistoryRepository();
+  final FortuneService _fortuneService = FortuneService();
   final FortuneDailyService _dailyService = FortuneDailyService();
   bool _isSaving = false;
   DailyFortuneData? _fortuneData;
@@ -55,7 +55,7 @@ class _FortuneTodayScreenState extends State<FortuneTodayScreen> {
         createdAt: now.toIso8601String(),
       );
 
-      await _historyRepository.save(result);
+      await _fortuneService.save(result);
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
