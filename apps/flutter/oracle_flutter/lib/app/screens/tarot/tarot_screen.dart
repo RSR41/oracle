@@ -385,15 +385,13 @@ class _TarotScreenState extends State<TarotScreen>
                 ),
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(8),
-                  child: card.id <= 21
-                      ? Image.asset(
-                          'assets/images/tarot/card_${card.id}.png',
-                          fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) {
-                            return _buildFallbackCard(card);
-                          },
-                        )
-                      : _buildFallbackCard(card),
+                  child: Image.asset(
+                    'assets/images/tarot/card_${card.id}.png',
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) {
+                      return _buildFallbackCard(card);
+                    },
+                  ),
                 ),
               ),
             ),
