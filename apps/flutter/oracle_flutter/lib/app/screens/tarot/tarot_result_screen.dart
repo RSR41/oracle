@@ -9,11 +9,13 @@ import 'package:oracle_flutter/app/models/tarot_card.dart';
 import 'package:oracle_flutter/app/models/fortune_result.dart';
 import 'package:oracle_flutter/app/database/history_repository.dart';
 import 'package:oracle_flutter/app/i18n/translations.dart';
+import 'package:share_plus/share_plus.dart';
 
 class TarotResultScreen extends StatefulWidget {
   final List<TarotCard> cards;
+  final String? question;
 
-  const TarotResultScreen({super.key, required this.cards});
+  const TarotResultScreen({super.key, required this.cards, this.question});
 
   @override
   State<TarotResultScreen> createState() => _TarotResultScreenState();
@@ -72,6 +74,40 @@ class _TarotResultScreenState extends State<TarotResultScreen> {
       if (mounted) {
         setState(() => _isSaving = false);
       }
+    }
+  }
+
+
+
+  Future<void> _handleShare() async {
+    final appState = context.read<AppState>();
+    final isKorean = appState.language == AppLanguage.ko;
+
+    final cardLines = widget.cards.map((card) {
+      final name = isKorean ? card.nameKo : card.name;
+      final orientation = card.isReversed ? appState.t('tarot.reversed') : '정방향';
+      final meaning = card.isReversed
+          ? (isKorean ? card.reversedKo : card.reversed)
+          : (isKorean ? card.uprightKo : card.upright);
+      return '- $name ($orientation): $meaning';
+    }).join('\n');
+
+    final shareLines = <String>[
+      '타로 리딩 결과',
+      if (widget.question != null && widget.question!.trim().isNotEmpty)
+        '질문: ${widget.question!.trim()}',
+      '',
+      '선택 카드',
+      cardLines,
+    ];
+
+    try {
+      await Share.share(shareLines.join('\n'), subject: '타로 리딩 결과');
+    } catch (_) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(context.read<AppState>().t('fortune.saveError'))),
+      );
     }
   }
 
@@ -267,6 +303,19 @@ class _TarotResultScreenState extends State<TarotResultScreen> {
                             child: CircularProgressIndicator(strokeWidth: 2),
                           )
                         : Text(appState.t('common.save')),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: OutlinedButton(
+                    onPressed: _handleShare,
+                    style: OutlinedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    child: Text(appState.t('common.share')),
                   ),
                 ),
                 const SizedBox(width: 12),

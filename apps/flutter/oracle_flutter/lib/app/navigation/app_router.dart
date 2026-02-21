@@ -207,7 +207,14 @@ class AppRouter {
         GoRoute(
           path: '/tarot-result',
           builder: (context, state) {
-            final cards = state.extra as List<TarotCard>;
+            final extra = state.extra;
+            if (extra is Map<String, dynamic>) {
+              final cards = extra['cards'] as List<TarotCard>;
+              final question = extra['question'] as String?;
+              return TarotResultScreen(cards: cards, question: question);
+            }
+
+            final cards = extra as List<TarotCard>;
             return TarotResultScreen(cards: cards);
           },
         ),

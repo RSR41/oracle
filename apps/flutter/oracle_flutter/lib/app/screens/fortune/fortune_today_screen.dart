@@ -7,6 +7,7 @@ import 'package:oracle_flutter/app/state/app_state.dart';
 import 'package:oracle_flutter/app/theme/app_colors.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:uuid/uuid.dart';
 
 class FortuneTodayScreen extends StatefulWidget {
@@ -71,6 +72,34 @@ class _FortuneTodayScreenState extends State<FortuneTodayScreen> {
       if (mounted) {
         setState(() => _isSaving = false);
       }
+    }
+  }
+
+
+
+  Future<void> _handleShare() async {
+    final data = _fortuneData;
+    if (data == null) return;
+
+    final dateText = DateFormat('yyyy년 M월 d일 (E)', 'ko_KR').format(DateTime.now());
+    final shareText = [
+      '[$dateText 오늘의 운세]',
+      '종합점수: ${data.overall}/100',
+      '한줄 메시지: ${data.message}',
+      '',
+      '행운 아이템',
+      '- 색상: ${data.luckyColor}',
+      '- 숫자: ${data.luckyNumber}',
+      '- 시간: ${data.luckyTime}',
+    ].join('\n');
+
+    try {
+      await Share.share(shareText, subject: '오늘의 운세');
+    } catch (_) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(context.read<AppState>().t('fortune.saveError'))),
+      );
     }
   }
 
@@ -220,7 +249,7 @@ class _FortuneTodayScreenState extends State<FortuneTodayScreen> {
                   const SizedBox(width: 12),
                   Expanded(
                     child: FilledButton(
-                      onPressed: () {},
+                      onPressed: _handleShare,
                       style: FilledButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 16),
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
