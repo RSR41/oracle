@@ -98,7 +98,7 @@ class _FortuneTodayScreenState extends State<FortuneTodayScreen> {
     } catch (_) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(context.read<AppState>().t('fortune.saveError'))),
+        SnackBar(content: Text(context.read<AppState>().t('common.shareError'))),
       );
     }
   }

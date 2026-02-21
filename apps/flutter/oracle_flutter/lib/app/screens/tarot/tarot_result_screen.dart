@@ -54,7 +54,10 @@ class _TarotResultScreenState extends State<TarotResultScreen> {
 
       await _historyRepo.saveWithPayload(
         result: fortuneResult,
-        payload: {'cards': widget.cards.map((c) => c.toJson()).toList()},
+        payload: {
+          'cards': widget.cards.map((c) => c.toJson()).toList(),
+          if (widget.question != null) 'question': widget.question,
+        },
       );
 
       if (mounted) {
@@ -85,7 +88,9 @@ class _TarotResultScreenState extends State<TarotResultScreen> {
 
     final cardLines = widget.cards.map((card) {
       final name = isKorean ? card.nameKo : card.name;
-      final orientation = card.isReversed ? appState.t('tarot.reversed') : '정방향';
+      final orientation = card.isReversed
+          ? appState.t('tarot.reversed')
+          : (isKorean ? '정방향' : 'Upright');
       final meaning = card.isReversed
           ? (isKorean ? card.reversedKo : card.reversed)
           : (isKorean ? card.uprightKo : card.upright);
@@ -93,20 +98,25 @@ class _TarotResultScreenState extends State<TarotResultScreen> {
     }).join('\n');
 
     final shareLines = <String>[
-      '타로 리딩 결과',
+      isKorean ? '타로 리딩 결과' : 'Tarot Reading Result',
       if (widget.question != null && widget.question!.trim().isNotEmpty)
-        '질문: ${widget.question!.trim()}',
+        isKorean
+            ? '질문: ${widget.question!.trim()}'
+            : 'Question: ${widget.question!.trim()}',
       '',
-      '선택 카드',
+      isKorean ? '선택 카드' : 'Selected Cards',
       cardLines,
     ];
 
     try {
-      await Share.share(shareLines.join('\n'), subject: '타로 리딩 결과');
+      await Share.share(
+        shareLines.join('\n'),
+        subject: isKorean ? '타로 리딩 결과' : 'Tarot Reading Result',
+      );
     } catch (_) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(context.read<AppState>().t('fortune.saveError'))),
+        SnackBar(content: Text(context.read<AppState>().t('common.shareError'))),
       );
     }
   }

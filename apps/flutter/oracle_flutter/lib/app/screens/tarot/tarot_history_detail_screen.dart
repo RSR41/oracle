@@ -69,7 +69,9 @@ class _TarotHistoryDetailScreenState extends State<TarotHistoryDetailScreen> {
 
     final cardLines = _cards.map((card) {
       final name = isKorean ? card.nameKo : card.name;
-      final orientation = card.isReversed ? appState.t('tarot.reversed') : '정방향';
+      final orientation = card.isReversed
+          ? appState.t('tarot.reversed')
+          : (isKorean ? '정방향' : 'Upright');
       final meaning = card.isReversed
           ? (isKorean ? card.reversedKo : card.reversed)
           : (isKorean ? card.uprightKo : card.upright);
@@ -77,19 +79,23 @@ class _TarotHistoryDetailScreenState extends State<TarotHistoryDetailScreen> {
     }).join('\n');
 
     final shareText = [
-      '타로 기록 상세',
-      if (_question != null && _question!.trim().isNotEmpty) '질문: ${_question!.trim()}',
+      isKorean ? '타로 기록 상세' : 'Tarot History Detail',
+      if (_question != null && _question!.trim().isNotEmpty)
+        (isKorean ? '질문: ${_question!.trim()}' : 'Question: ${_question!.trim()}'),
       '',
-      '선택 카드',
-      if (cardLines.isEmpty) '(카드 정보 없음)' else cardLines,
+      isKorean ? '선택 카드' : 'Selected Cards',
+      if (cardLines.isEmpty) (isKorean ? '(카드 정보 없음)' : '(No card data)') else cardLines,
     ].join('\n');
 
     try {
-      await Share.share(shareText, subject: '타로 기록 상세');
+      await Share.share(
+        shareText,
+        subject: isKorean ? '타로 기록 상세' : 'Tarot History Detail',
+      );
     } catch (_) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(context.read<AppState>().t('fortune.saveError'))),
+        SnackBar(content: Text(context.read<AppState>().t('common.shareError'))),
       );
     }
   }
