@@ -65,7 +65,10 @@ class _HistoryScreenState extends State<HistoryScreen> {
     }
 
     try {
+      final query = _buildFilterQuery();
       final data = await _historyRepo.getHistoryPaged(
+        where: query.where,
+        whereArgs: query.whereArgs,
         limit: _pageSize,
         offset: 0,
       );
@@ -109,7 +112,10 @@ class _HistoryScreenState extends State<HistoryScreen> {
     });
 
     try {
+      final query = _buildFilterQuery();
       final data = await _historyRepo.getHistoryPaged(
+        where: query.where,
+        whereArgs: query.whereArgs,
         limit: _pageSize,
         offset: _offset,
       );
@@ -135,6 +141,23 @@ class _HistoryScreenState extends State<HistoryScreen> {
   Future<void> _handleClearAll() async {
     await _historyRepo.clearAll();
     _loadInitialData();
+  }
+
+  ({String? where, List<Object?>? whereArgs}) _buildFilterQuery() {
+    switch (_currentFilter) {
+      case 'SAJU':
+        return (
+          where: "type = ? OR type LIKE ?",
+          whereArgs: ['fortune', '%saju%'],
+        );
+      case 'TAROT':
+        return (where: 'type = ?', whereArgs: ['tarot']);
+      case 'MEETING':
+        return (where: 'type LIKE ?', whereArgs: ['meeting_%']);
+      case 'ALL':
+      default:
+        return (where: null, whereArgs: null);
+    }
   }
 
   @override
@@ -188,26 +211,13 @@ class _HistoryScreenState extends State<HistoryScreen> {
       return const Center(child: CircularProgressIndicator());
     }
 
-    // UI 필터링 적용
-    final displayItems = _items.where((item) {
-      final isMeeting = item.type.startsWith('meeting_');
-      if (_currentFilter == 'SAJU') {
-        return item.type == 'fortune' || item.type.contains('saju');
-      }
-      if (_currentFilter == 'TAROT') {
-        return item.type == 'tarot';
-      }
-      if (_currentFilter == 'MEETING') return isMeeting;
-      return true;
-    }).toList();
-
     return Column(
       children: [
         _buildFilterBar(theme),
         Expanded(
           child: _isMeetingLocked
-              ? _buildMeetingSectionList(context, appState, theme, displayItems)
-              : _buildListArea(context, appState, theme, displayItems),
+              ? _buildMeetingSectionList(context, appState, theme, _items)
+              : _buildListArea(context, appState, theme, _items),
         ),
       ],
     );
@@ -296,7 +306,15 @@ class _HistoryScreenState extends State<HistoryScreen> {
       ),
       selected: isSelected,
       onSelected: (selected) {
-        setState(() => _currentFilter = value);
+        if (!selected || _currentFilter == value) return;
+        setState(() {
+          _currentFilter = value;
+          _items = [];
+          _offset = 0;
+          _hasMore = true;
+          _hasError = false;
+        });
+        _loadInitialData();
       },
       selectedColor: AppColors.primary,
       checkmarkColor: Colors.white,
@@ -377,7 +395,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
             );
           }
 
-          if (_hasMore && _currentFilter == 'ALL') {
+          if (_hasMore) {
             return const Padding(
               padding: EdgeInsets.symmetric(vertical: 32),
               child: Center(child: CircularProgressIndicator()),
@@ -388,7 +406,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
             padding: const EdgeInsets.symmetric(vertical: 32),
             child: Center(
               child: Text(
-                _currentFilter == 'ALL' ? '모든 기록을 불러왔습니다.' : '필터링된 결과의 끝입니다.',
+                '모든 기록을 불러왔습니다.',
                 style: TextStyle(color: theme.disabledColor, fontSize: 13),
               ),
             ),

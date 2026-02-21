@@ -115,29 +115,25 @@ class HistoryRepository {
   /// Get history items with pagination
   Future<List<FortuneResult>> getHistoryPaged({
     String? type,
+    String? where,
+    List<Object?>? whereArgs,
     int limit = 30,
     int offset = 0,
   }) async {
     final db = await _dbHelper.database;
     List<Map<String, dynamic>> maps;
 
-    if (type != null) {
-      maps = await db.query(
-        historyTable,
-        where: 'type = ?',
-        whereArgs: [type],
-        orderBy: 'createdAt DESC',
-        limit: limit,
-        offset: offset,
-      );
-    } else {
-      maps = await db.query(
-        historyTable,
-        orderBy: 'createdAt DESC',
-        limit: limit,
-        offset: offset,
-      );
-    }
+    final effectiveWhere = where ?? (type != null ? 'type = ?' : null);
+    final effectiveWhereArgs = whereArgs ?? (type != null ? <Object?>[type] : null);
+
+    maps = await db.query(
+      historyTable,
+      where: effectiveWhere,
+      whereArgs: effectiveWhereArgs,
+      orderBy: 'createdAt DESC',
+      limit: limit,
+      offset: offset,
+    );
 
     return maps.map((map) => FortuneResult.fromJson(map)).toList();
   }
