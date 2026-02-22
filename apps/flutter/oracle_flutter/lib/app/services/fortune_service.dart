@@ -1,31 +1,28 @@
-import 'dart:convert';
-import 'package:shared_preferences/shared_preferences.dart';
-import '../models/fortune_result.dart';
+import 'package:oracle_flutter/app/database/history_repository.dart';
+import 'package:oracle_flutter/app/models/fortune_result.dart';
 
+/// SQLite-backed fortune history service.
+///
+/// Legacy call sites can continue using [FortuneService], but all persistence
+/// is delegated to [HistoryRepository] so history is unified in SQLite.
 class FortuneService {
-  static const String _storageKey = 'oracle_history';
+  final HistoryRepository _historyRepository;
 
-  Future<void> save(FortuneResult result) async {
-    final prefs = await SharedPreferences.getInstance();
-    final List<String> history = prefs.getStringList(_storageKey) ?? [];
+  FortuneService({HistoryRepository? historyRepository})
+    : _historyRepository = historyRepository ?? HistoryRepository();
 
-    // Add new item to the beginning
-    history.insert(0, jsonEncode(result.toJson()));
-
-    await prefs.setStringList(_storageKey, history);
+  Future<void> save(FortuneResult result) {
+    return _historyRepository.save(result);
   }
 
-  Future<List<FortuneResult>> getAll() async {
-    final prefs = await SharedPreferences.getInstance();
-    final List<String> history = prefs.getStringList(_storageKey) ?? [];
-
-    return history
-        .map((item) => FortuneResult.fromJson(jsonDecode(item)))
-        .toList();
+  Future<List<FortuneResult>> getAll() {
+    return _historyRepository.getAll(type: 'fortune');
   }
 
   Future<void> clearAll() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.remove(_storageKey);
+    final items = await _historyRepository.getAll(type: 'fortune');
+    for (final item in items) {
+      await _historyRepository.delete(item.id);
+    }
   }
 }

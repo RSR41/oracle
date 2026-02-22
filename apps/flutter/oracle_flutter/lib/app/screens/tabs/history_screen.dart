@@ -25,7 +25,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
   final ScrollController _scrollController = ScrollController();
 
   static const int _pageSize = 20;
-  String _currentFilter = 'ALL'; // ALL, SAJU, MEETING
+  String _currentFilter = 'ALL'; // ALL, SAJU, TAROT, MEETING
 
   List<FortuneResult> _items = [];
   bool _isLoading = false;
@@ -65,7 +65,10 @@ class _HistoryScreenState extends State<HistoryScreen> {
     }
 
     try {
+      final query = _buildFilterQuery();
       final data = await _historyRepo.getHistoryPaged(
+        where: query.where,
+        whereArgs: query.whereArgs,
         limit: _pageSize,
         offset: 0,
       );
@@ -109,7 +112,10 @@ class _HistoryScreenState extends State<HistoryScreen> {
     });
 
     try {
+      final query = _buildFilterQuery();
       final data = await _historyRepo.getHistoryPaged(
+        where: query.where,
+        whereArgs: query.whereArgs,
         limit: _pageSize,
         offset: _offset,
       );
@@ -135,6 +141,23 @@ class _HistoryScreenState extends State<HistoryScreen> {
   Future<void> _handleClearAll() async {
     await _historyRepo.clearAll();
     _loadInitialData();
+  }
+
+  ({String? where, List<Object?>? whereArgs}) _buildFilterQuery() {
+    switch (_currentFilter) {
+      case 'SAJU':
+        return (
+          where: 'type = ? OR type = ? OR type LIKE ?',
+          whereArgs: ['saju', 'fortune', '%saju%'],
+        );
+      case 'TAROT':
+        return (where: 'type = ?', whereArgs: ['tarot']);
+      case 'MEETING':
+        return (where: 'type LIKE ?', whereArgs: ['meeting_%']);
+      case 'ALL':
+      default:
+        return (where: null, whereArgs: null);
+    }
   }
 
   @override
@@ -188,21 +211,13 @@ class _HistoryScreenState extends State<HistoryScreen> {
       return const Center(child: CircularProgressIndicator());
     }
 
-    // UI 필터링 적용
-    final displayItems = _items.where((item) {
-      final isMeeting = item.type.startsWith('meeting_');
-      if (_currentFilter == 'SAJU') return !isMeeting;
-      if (_currentFilter == 'MEETING') return isMeeting;
-      return true;
-    }).toList();
-
     return Column(
       children: [
         _buildFilterBar(theme),
         Expanded(
           child: _isMeetingLocked
-              ? _buildMeetingSectionList(context, appState, theme, displayItems)
-              : _buildListArea(context, appState, theme, displayItems),
+              ? _buildMeetingSectionList(context, appState, theme, _items)
+              : _buildListArea(context, appState, theme, _items),
         ),
       ],
     );
@@ -266,6 +281,8 @@ class _HistoryScreenState extends State<HistoryScreen> {
           _filterChip('전체', 'ALL'),
           const SizedBox(width: 8),
           _filterChip('사주', 'SAJU'),
+          const SizedBox(width: 8),
+          _filterChip('타로', 'TAROT'),
           // Phase 2+: Meeting filter
           if (FeatureFlags.showBetaFeatures) ...[
             const SizedBox(width: 8),
@@ -289,7 +306,15 @@ class _HistoryScreenState extends State<HistoryScreen> {
       ),
       selected: isSelected,
       onSelected: (selected) {
-        setState(() => _currentFilter = value);
+        if (!selected || _currentFilter == value) return;
+        setState(() {
+          _currentFilter = value;
+          _items = [];
+          _offset = 0;
+          _hasMore = true;
+          _hasError = false;
+        });
+        _loadInitialData();
       },
       selectedColor: AppColors.primary,
       checkmarkColor: Colors.white,
@@ -304,60 +329,48 @@ class _HistoryScreenState extends State<HistoryScreen> {
     ThemeData theme,
     List<FortuneResult> displayItems,
   ) {
-    // 에러 발생 (초기 단계)
-    if (_hasError && _items.isEmpty) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Icon(Icons.error_outline, size: 60, color: Colors.redAccent),
-            const SizedBox(height: 16),
-            const Text('데이터를 불러오지 못했습니다.'),
-            const SizedBox(height: 8),
-            ElevatedButton(
-              onPressed: _loadInitialData,
-              child: const Text('다시 시도'),
-            ),
-          ],
-        ),
-      );
-    }
-
-    // 데이터 없음 (필터링 결과 포함)
-    if (displayItems.isEmpty) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              _items.isEmpty ? Icons.history : Icons.filter_list_off,
-              size: 60,
-              color: theme.disabledColor,
-            ),
-            const SizedBox(height: 16),
-            Text(
-              _items.isEmpty ? appState.t('history.empty') : '해당 필터에 기록이 없습니다.',
-              style: theme.textTheme.bodyMedium,
-            ),
-          ],
-        ),
-      );
-    }
-
-    // 리스트 + 무한 스크롤
     return RefreshIndicator(
       onRefresh: _loadInitialData,
       child: ListView.separated(
         controller: _scrollController,
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-        itemCount: displayItems.length + 1, // Loading or End indicator
+        itemCount: displayItems.length + 1,
         separatorBuilder: (_, __) => const SizedBox(height: 12),
         itemBuilder: (context, index) {
           if (index < displayItems.length) {
             return _buildHistoryCard(context, displayItems[index]);
           }
 
-          // Footer (기존 로직 유지)
+          if (_hasError && _items.isEmpty) {
+            return Padding(
+              padding: const EdgeInsets.symmetric(vertical: 48),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(Icons.error_outline, size: 60, color: Colors.redAccent),
+                  const SizedBox(height: 16),
+                  const Text('데이터를 불러오지 못했습니다.'),
+                  const SizedBox(height: 8),
+                  ElevatedButton(onPressed: _loadInitialData, child: const Text('다시 시도')),
+                ],
+              ),
+            );
+          }
+
+          if (displayItems.isEmpty) {
+            return Padding(
+              padding: const EdgeInsets.symmetric(vertical: 48),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.history, size: 60, color: theme.disabledColor),
+                  const SizedBox(height: 16),
+                  Text(appState.t('history.empty'), style: theme.textTheme.bodyMedium),
+                ],
+              ),
+            );
+          }
+
           if (_hasError) {
             return Padding(
               padding: const EdgeInsets.symmetric(vertical: 16),
@@ -370,7 +383,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
             );
           }
 
-          if (_hasMore && _currentFilter == 'ALL') {
+          if (_hasMore) {
             return const Padding(
               padding: EdgeInsets.symmetric(vertical: 32),
               child: Center(child: CircularProgressIndicator()),
@@ -381,7 +394,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
             padding: const EdgeInsets.symmetric(vertical: 32),
             child: Center(
               child: Text(
-                _currentFilter == 'ALL' ? '모든 기록을 불러왔습니다.' : '필터링된 결과의 끝입니다.',
+                '모든 기록을 불러왔습니다.',
                 style: TextStyle(color: theme.disabledColor, fontSize: 13),
               ),
             ),
@@ -399,6 +412,10 @@ class _HistoryScreenState extends State<HistoryScreen> {
           context.push('/meeting/history/detail/${item.id}', extra: item);
         } else if (item.type.startsWith('meeting_')) {
           _showMeetingHistoryDetail(context, item);
+        } else if (item.type == 'tarot') {
+          context.push('/tarot-history-detail', extra: item);
+        } else if (item.type == 'fortune' || item.type.contains('saju')) {
+          context.push('/fortune-detail', extra: item);
         } else {
           context.push('/fortune-detail', extra: item);
         }

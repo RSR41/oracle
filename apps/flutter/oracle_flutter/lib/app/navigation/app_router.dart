@@ -23,6 +23,7 @@ import '../screens/dream/dream_input_screen.dart';
 import '../screens/dream/dream_result_screen.dart';
 import '../screens/tarot/tarot_screen.dart';
 import '../screens/tarot/tarot_result_screen.dart';
+import '../screens/tarot/tarot_history_detail_screen.dart';
 import '../screens/face/face_reading_screen.dart';
 import '../screens/face/face_result_screen.dart';
 import '../screens/calendar/calendar_screen.dart';
@@ -207,8 +208,22 @@ class AppRouter {
         GoRoute(
           path: '/tarot-result',
           builder: (context, state) {
-            final cards = state.extra as List<TarotCard>;
+            final extra = state.extra;
+            if (extra is Map<String, dynamic>) {
+              final cards = extra['cards'] as List<TarotCard>;
+              final question = extra['question'] as String?;
+              return TarotResultScreen(cards: cards, question: question);
+            }
+
+            final cards = extra as List<TarotCard>;
             return TarotResultScreen(cards: cards);
+          },
+        ),
+        GoRoute(
+          path: '/tarot-history-detail',
+          builder: (context, state) {
+            final result = state.extra as FortuneResult;
+            return TarotHistoryDetailScreen(result: result);
           },
         ),
         if (showBetaFeatures)
