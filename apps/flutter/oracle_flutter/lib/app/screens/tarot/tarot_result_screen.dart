@@ -8,6 +8,7 @@ import 'package:oracle_flutter/app/theme/app_colors.dart';
 import 'package:oracle_flutter/app/models/tarot_card.dart';
 import 'package:oracle_flutter/app/models/fortune_result.dart';
 import 'package:oracle_flutter/app/database/history_repository.dart';
+import 'package:oracle_flutter/app/history/history_payload.dart';
 import 'package:oracle_flutter/app/i18n/translations.dart';
 
 class TarotResultScreen extends StatefulWidget {
@@ -50,10 +51,23 @@ class _TarotResultScreenState extends State<TarotResultScreen> {
         createdAt: now.toIso8601String(),
       );
 
-      await _historyRepo.saveWithPayload(
+      await _historyRepo
+          .saveWithPayload(
         result: fortuneResult,
-        payload: {'cards': widget.cards.map((c) => c.toJson()).toList()},
-      );
+        payload: HistoryPayload.wrap(
+          feature: 'tarot',
+          summary: {
+            'title': fortuneResult.title,
+            'cardsCount': widget.cards.length,
+            'overallScore': score,
+            'date': fortuneResult.date,
+          },
+          data: {
+            'cards': widget.cards.map((c) => c.toJson()).toList(),
+          },
+        ),
+      )
+          .timeout(const Duration(seconds: 8));
 
       if (mounted) {
         final appState = context.read<AppState>();
@@ -62,10 +76,20 @@ class _TarotResultScreenState extends State<TarotResultScreen> {
         );
       }
     } catch (e) {
+      try {
+        await _historyRepo.logSaveError(
+          feature: 'tarot',
+          action: 'save',
+          message: e.toString(),
+          debug: {'runtimeType': e.runtimeType.toString()},
+        );
+      } catch (_) {}
       if (mounted) {
         final appState = context.read<AppState>();
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(appState.t('fortune.saveError'))),
+          SnackBar(
+            content: Text('${appState.t('fortune.saveError')} (${e.runtimeType})'),
+          ),
         );
       }
     } finally {

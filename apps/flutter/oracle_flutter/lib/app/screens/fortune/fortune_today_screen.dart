@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:share_plus/share_plus.dart';
+import 'package:oracle_flutter/app/database/history_repository.dart';
+import 'package:oracle_flutter/app/history/history_payload.dart';
 import 'package:oracle_flutter/app/models/fortune_result.dart';
 import 'package:oracle_flutter/app/services/fortune_daily_service.dart';
-import 'package:oracle_flutter/app/services/fortune_service.dart';
 import 'package:oracle_flutter/app/state/app_state.dart';
 import 'package:oracle_flutter/app/theme/app_colors.dart';
 import 'package:intl/intl.dart';
@@ -17,7 +19,7 @@ class FortuneTodayScreen extends StatefulWidget {
 }
 
 class _FortuneTodayScreenState extends State<FortuneTodayScreen> {
-  final FortuneService _fortuneService = FortuneService();
+  final HistoryRepository _historyRepo = HistoryRepository();
   final FortuneDailyService _dailyService = FortuneDailyService();
   bool _isSaving = false;
   DailyFortuneData? _fortuneData;
@@ -54,17 +56,56 @@ class _FortuneTodayScreenState extends State<FortuneTodayScreen> {
         createdAt: now.toIso8601String(),
       );
 
-      await _fortuneService.save(result);
+      await _historyRepo
+          .saveWithPayload(
+        result: result,
+        payload: HistoryPayload.wrap(
+          feature: 'fortune',
+          summary: {
+            'title': result.title,
+            'overallScore': result.overallScore,
+            'date': result.date,
+          },
+          data: {
+            'overall': data.overall,
+            'message': data.message,
+            'love': data.love,
+            'money': data.money,
+            'health': data.health,
+            'work': data.work,
+            'loveText': data.loveText,
+            'moneyText': data.moneyText,
+            'healthText': data.healthText,
+            'workText': data.workText,
+            'luckyColor': data.luckyColor,
+            'luckyNumber': data.luckyNumber,
+            'luckyTime': data.luckyTime,
+          },
+        ),
+      )
+          .timeout(const Duration(seconds: 8));
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(context.read<AppState>().t('fortune.saveSuccess'))),
         );
       }
-    } catch (_) {
+    } catch (e) {
+      try {
+        await _historyRepo.logSaveError(
+          feature: 'fortune',
+          action: 'save',
+          message: e.toString(),
+          debug: {'runtimeType': e.runtimeType.toString()},
+        );
+      } catch (_) {}
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(context.read<AppState>().t('fortune.saveError'))),
+          SnackBar(
+            content: Text(
+              '${context.read<AppState>().t('fortune.saveError')} (${e.runtimeType})',
+            ),
+          ),
         );
       }
     } finally {
@@ -72,6 +113,27 @@ class _FortuneTodayScreenState extends State<FortuneTodayScreen> {
         setState(() => _isSaving = false);
       }
     }
+  }
+
+  Future<void> _handleShare() async {
+    if (_fortuneData == null) return;
+    final data = _fortuneData!;
+    final message = StringBuffer()
+      ..writeln('오늘의 운세 (${DateFormat('yyyy-MM-dd').format(DateTime.now())})')
+      ..writeln()
+      ..writeln('종합 점수: ${data.overall}/100')
+      ..writeln('한 줄 운세: ${data.message}')
+      ..writeln()
+      ..writeln('연애운: ${data.love}점 - ${data.loveText}')
+      ..writeln('재물운: ${data.money}점 - ${data.moneyText}')
+      ..writeln('건강운: ${data.health}점 - ${data.healthText}')
+      ..writeln('직장/학업운: ${data.work}점 - ${data.workText}')
+      ..writeln()
+      ..writeln('행운의 색: ${data.luckyColor}')
+      ..writeln('행운의 숫자: ${data.luckyNumber}')
+      ..writeln('행운의 시간: ${data.luckyTime}');
+
+    await Share.share(message.toString(), subject: 'ORACLE 오늘의 운세');
   }
 
   @override
@@ -220,7 +282,7 @@ class _FortuneTodayScreenState extends State<FortuneTodayScreen> {
                   const SizedBox(width: 12),
                   Expanded(
                     child: FilledButton(
-                      onPressed: () {},
+                      onPressed: _handleShare,
                       style: FilledButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 16),
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),

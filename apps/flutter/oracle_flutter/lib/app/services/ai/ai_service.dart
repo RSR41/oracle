@@ -123,12 +123,15 @@ class AiService {
   Future<AiReadingResult> getDreamMeaning({
     required String dreamDescription,
     List<String>? keywords,
+    String? sajuContext,
   }) async {
     _checkAvailability();
 
     final response = await _postJson(ApiConfig.dreamMeaningUrl, {
       'dreamDescription': dreamDescription,
       if (keywords != null) 'keywords': keywords,
+      if (sajuContext != null && sajuContext.isNotEmpty)
+        'sajuContext': sajuContext,
     });
 
     return AiReadingResult.fromJson(response);
@@ -137,11 +140,19 @@ class AiService {
   /// 관상 AI 분석 요청 (이미지 없이 특징 수치만)
   Future<AiReadingResult> getFaceReading({
     required Map<String, dynamic> features,
+    String? imageBase64,
+    String? mimeType,
+    String? sajuContext,
   }) async {
     _checkAvailability();
 
     final response = await _postJson(ApiConfig.faceReadingUrl, {
       'features': features,
+      if (imageBase64 != null && imageBase64.isNotEmpty)
+        'imageBase64': imageBase64,
+      if (mimeType != null && mimeType.isNotEmpty) 'mimeType': mimeType,
+      if (sajuContext != null && sajuContext.isNotEmpty)
+        'sajuContext': sajuContext,
     });
 
     return AiReadingResult.fromJson(response);

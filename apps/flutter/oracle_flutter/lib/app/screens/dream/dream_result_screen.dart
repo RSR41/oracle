@@ -8,7 +8,9 @@ import 'package:oracle_flutter/app/theme/app_colors.dart';
 import 'package:oracle_flutter/app/services/dream/dream_interpreter.dart';
 import 'package:oracle_flutter/app/models/fortune_result.dart';
 import 'package:oracle_flutter/app/database/history_repository.dart';
+import 'package:oracle_flutter/app/history/history_payload.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:oracle_flutter/app/services/saju/saju_service.dart';
 
 class DreamResultScreen extends StatefulWidget {
   final String dreamContent;
@@ -26,6 +28,7 @@ class DreamResultScreen extends StatefulWidget {
 
 class _DreamResultScreenState extends State<DreamResultScreen> {
   final _historyRepo = HistoryRepository();
+  final _sajuService = SajuService();
   bool _isSaving = false;
 
   Future<void> _handleSave() async {
@@ -48,11 +51,19 @@ class _DreamResultScreenState extends State<DreamResultScreen> {
 
       await _historyRepo.saveWithPayload(
         result: fortuneResult,
-        payload: {
-          'dreamContent': widget.dreamContent,
-          ...widget.result.toJson(),
-        },
-      );
+        payload: HistoryPayload.wrap(
+          feature: 'dream',
+          summary: {
+            'title': fortuneResult.title,
+            'luckScore': widget.result.luckScore,
+            'date': fortuneResult.date,
+          },
+          data: {
+            'dreamContent': widget.dreamContent,
+            ...widget.result.toJson(),
+          },
+        ),
+      ).timeout(const Duration(seconds: 8));
 
       if (mounted) {
         final appState = context.read<AppState>();
@@ -61,6 +72,14 @@ class _DreamResultScreenState extends State<DreamResultScreen> {
         );
       }
     } catch (e) {
+      try {
+        await _historyRepo.logSaveError(
+          feature: 'dream',
+          action: 'save',
+          message: e.toString(),
+          debug: {'runtimeType': e.runtimeType.toString()},
+        );
+      } catch (_) {}
       if (mounted) {
         final appState = context.read<AppState>();
         ScaffoldMessenger.of(context).showSnackBar(
@@ -79,6 +98,23 @@ class _DreamResultScreenState extends State<DreamResultScreen> {
     final theme = Theme.of(context);
     final appState = context.watch<AppState>();
     final result = widget.result;
+    final profile = appState.profile;
+
+    String? sajuImpact;
+    if (profile != null) {
+      final birthDate = DateTime.tryParse(profile.birthDate);
+      if (birthDate != null) {
+        final saju = _sajuService.calculate(
+          birthDate: birthDate,
+          birthTime: profile.birthTime,
+          gender: profile.gender,
+        );
+        sajuImpact =
+            '오늘의 사주 흐름은 ${saju.dominantElement} 기운이 강하고 '
+            '${saju.weakestElement} 기운 보완이 필요한 상태입니다. '
+            '꿈 해석을 현실 행동으로 옮길 때 이 균형을 고려하세요.';
+      }
+    }
 
     return Scaffold(
       appBar: AppBar(
@@ -188,6 +224,30 @@ class _DreamResultScreenState extends State<DreamResultScreen> {
                   ),
                 );
               }).toList(),
+            ),
+            const SizedBox(height: 20),
+
+            // Saju Impact
+            Text(
+              '오늘 사주 영향 요약',
+              style: theme.textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: AppColors.caramel.withValues(alpha: 0.16),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                  color: AppColors.caramel.withValues(alpha: 0.25),
+                ),
+              ),
+              child: Text(
+                sajuImpact ?? '프로필(사주) 정보가 없어 꿈 상징 중심으로 해석되었습니다.',
+                style: const TextStyle(fontSize: 14, height: 1.5),
+              ),
             ),
             const SizedBox(height: 20),
 

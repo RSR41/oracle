@@ -3,13 +3,16 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
-import 'package:sqflite/sqflite.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:sqflite_common_ffi_web/sqflite_ffi_web.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'app/navigation/app_router.dart';
 import 'app/theme/app_theme.dart';
 import 'app/state/app_state.dart';
 import 'app/database/database_helper.dart';
+import 'app/config/supabase_config.dart';
+import 'app/config/feature_flags.dart';
+import 'app/services/cloud/cloud_history_sync_service.dart';
 import 'package:oracle_meeting/meeting.dart';
 
 void main() async {
@@ -44,6 +47,17 @@ void main() async {
 
     final appState = AppState();
     await appState.init();
+
+    if (SupabaseConfig.isConfigured) {
+      await Supabase.initialize(
+        url: SupabaseConfig.url,
+        anonKey: SupabaseConfig.anonKey,
+      );
+      debugPrint('Supabase initialized.');
+    }
+    if (FeatureFlags.cloudSync) {
+      await CloudHistorySyncService.syncOnStartup();
+    }
 
     runApp(
       MultiProvider(

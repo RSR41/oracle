@@ -8,6 +8,7 @@ class FeatureFlags {
   static const String _dreamEnv = String.fromEnvironment('ENABLE_DREAM', defaultValue: '');
   static const String _compatEnv = String.fromEnvironment('ENABLE_COMPATIBILITY', defaultValue: '');
   static const String _meetingEnv = String.fromEnvironment('ENABLE_MEETING', defaultValue: 'false');
+  static const String _cloudSyncEnv = String.fromEnvironment('CLOUD_SYNC', defaultValue: 'false');
 
   static const String _legacyDreamEnv = String.fromEnvironment('FEATURE_DREAM', defaultValue: '');
   static const String _legacyCompatEnv = String.fromEnvironment('FEATURE_COMPATIBILITY', defaultValue: '');
@@ -46,8 +47,9 @@ class FeatureFlags {
 
   static bool get enableMeeting => _asBool(_meetingEnv, fallback: false);
   static bool get canUseMeeting => phase2Features && enableMeeting;
+  static bool get cloudSync => _asBool(_cloudSyncEnv, fallback: false);
 
   static void printSubmissionDiagnostics() {
-    debugPrint('[FeatureFlags] phase2=$phase2Features ai=$aiOnline dream=$enableDream compat=$enableCompatibility meeting=$enableMeeting');
+    debugPrint('[FeatureFlags] phase2=$phase2Features ai=$aiOnline dream=$enableDream compat=$enableCompatibility meeting=$enableMeeting cloudSync=$cloudSync');
   }
 }

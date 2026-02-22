@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'dart:convert';
@@ -397,12 +396,15 @@ class _HistoryScreenState extends State<HistoryScreen> {
       onTap: () {
         if (_isMeetingLocked) {
           context.push('/meeting/history/detail/${item.id}', extra: item);
+        } else if (item.type == 'debug_error') {
+          _showPayloadDetail(context, item);
         } else if (item.type.startsWith('meeting_')) {
-          _showMeetingHistoryDetail(context, item);
+          _showPayloadDetail(context, item);
         } else {
           context.push('/fortune-detail', extra: item);
         }
       },
+      onLongPress: () => _showPayloadDetail(context, item),
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
@@ -499,7 +501,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
     );
   }
 
-  Future<void> _showMeetingHistoryDetail(
+  Future<void> _showPayloadDetail(
     BuildContext context,
     FortuneResult item,
   ) async {
@@ -551,6 +553,21 @@ class _HistoryScreenState extends State<HistoryScreen> {
                       _detailRow('Type', item.type),
                       _detailRow('Created', item.createdAt),
                       _detailRow('Summary', item.summary),
+                      if (item.type == 'debug_error') ...[
+                        const SizedBox(height: 8),
+                        const Text(
+                          'Debug Log',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.redAccent,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          item.content,
+                          style: const TextStyle(fontSize: 13),
+                        ),
+                      ],
                       const SizedBox(height: 16),
                       const Text(
                         'Payload (JSON)',

@@ -28,6 +28,7 @@ import '../screens/face/face_result_screen.dart';
 import '../screens/calendar/calendar_screen.dart';
 import '../models/fortune_result.dart';
 import '../database/history_repository.dart';
+import '../history/history_payload.dart';
 import 'package:oracle_meeting/meeting.dart';
 import '../models/tarot_card.dart';
 import '../services/dream/dream_interpreter.dart';
@@ -115,7 +116,18 @@ class AppRouter {
 
                         await historyRepo.saveWithPayload(
                           result: result,
-                          payload: payload['meta'],
+                          payload: HistoryPayload.wrap(
+                            feature: 'meeting',
+                            summary: {
+                              'title': result.title,
+                              'type': result.type,
+                              'date': result.date,
+                            },
+                            data: Map<String, dynamic>.from(payload),
+                            extra: payload['meta'] is Map<String, dynamic>
+                                ? Map<String, dynamic>.from(payload['meta'])
+                                : null,
+                          ),
                         );
                         debugPrint(
                           'History recorded from App side: ${payload['type']}',
@@ -168,22 +180,20 @@ class AppRouter {
         ),
 
         // Stack Screens (No Bottom Nav)
-        if (showBetaFeatures)
-          GoRoute(
-            path: '/face',
-            builder: (context, state) => const FaceReadingScreen(),
-          ),
-        if (showBetaFeatures)
-          GoRoute(
-            path: '/face-result',
-            builder: (context, state) {
-              final extra = state.extra as Map<String, dynamic>;
-              return FaceResultScreen(
-                imagePath: extra['imagePath'] as String,
-                result: extra['result'] as FaceReadingResult,
-              );
-            },
-          ),
+        GoRoute(
+          path: '/face',
+          builder: (context, state) => const FaceReadingScreen(),
+        ),
+        GoRoute(
+          path: '/face-result',
+          builder: (context, state) {
+            final extra = state.extra as Map<String, dynamic>;
+            return FaceResultScreen(
+              imagePath: extra['imagePath'] as String,
+              result: extra['result'] as FaceReadingResult,
+            );
+          },
+        ),
         if (showBetaFeatures)
           GoRoute(
             path: '/ideal-type',
@@ -211,22 +221,20 @@ class AppRouter {
             return TarotResultScreen(cards: cards);
           },
         ),
-        if (showBetaFeatures)
-          GoRoute(
-            path: '/dream',
-            builder: (context, state) => const DreamInputScreen(),
-          ),
-        if (showBetaFeatures)
-          GoRoute(
-            path: '/dream-result',
-            builder: (context, state) {
-              final extra = state.extra as Map<String, dynamic>;
-              return DreamResultScreen(
-                dreamContent: extra['dreamContent'] as String,
-                result: extra['result'] as DreamResult,
-              );
-            },
-          ),
+        GoRoute(
+          path: '/dream',
+          builder: (context, state) => const DreamInputScreen(),
+        ),
+        GoRoute(
+          path: '/dream-result',
+          builder: (context, state) {
+            final extra = state.extra as Map<String, dynamic>;
+            return DreamResultScreen(
+              dreamContent: extra['dreamContent'] as String,
+              result: extra['result'] as DreamResult,
+            );
+          },
+        ),
         if (showBetaFeatures)
           GoRoute(
             path: '/meeting/chat',

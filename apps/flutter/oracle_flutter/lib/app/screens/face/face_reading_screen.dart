@@ -5,6 +5,10 @@ import 'package:provider/provider.dart';
 import 'package:oracle_flutter/app/state/app_state.dart';
 import 'package:oracle_flutter/app/theme/app_colors.dart';
 import 'package:oracle_flutter/app/services/face/face_analyzer.dart';
+import 'package:oracle_flutter/app/services/face/remote_face_analyzer.dart';
+import 'package:oracle_flutter/app/services/ai/ai_service.dart';
+import 'package:oracle_flutter/app/config/feature_flags.dart';
+import 'package:oracle_flutter/app/services/saju/saju_service.dart';
 import 'package:oracle_flutter/app/screens/face/selected_image_preview.dart';
 
 class FaceReadingScreen extends StatefulWidget {
@@ -24,8 +28,16 @@ class FaceReadingScreen extends StatefulWidget {
 class _FaceReadingScreenState extends State<FaceReadingScreen> {
   final _picker = ImagePicker();
   final FaceAnalyzer _defaultAnalyzer = MockFaceAnalyzer();
+  final AiService _aiService = AiService();
+  final SajuService _sajuService = SajuService();
   String? _imagePath;
   bool _isAnalyzing = false;
+
+  @override
+  void dispose() {
+    _aiService.dispose();
+    super.dispose();
+  }
 
   Future<void> _pickImage(ImageSource source) async {
     try {
@@ -56,9 +68,31 @@ class _FaceReadingScreenState extends State<FaceReadingScreen> {
     setState(() => _isAnalyzing = true);
 
     try {
-      final result = await (widget.analyzer ?? _defaultAnalyzer).analyze(
-        _imagePath!,
-      );
+      final appState = context.read<AppState>();
+      String? sajuContext;
+      final profile = appState.profile;
+      if (profile != null) {
+        final birthDate = DateTime.tryParse(profile.birthDate);
+        String? birthTime = profile.birthTime;
+        if (birthDate != null) {
+          final saju = _sajuService.calculate(
+            birthDate: birthDate,
+            birthTime: birthTime,
+            gender: profile.gender,
+          );
+          sajuContext =
+              '이름:${profile.nickname}, 생년월일:${profile.birthDate}, 성별:${profile.gender}, '
+              '일주:${saju.dayPillar.ganji}, 오행강점:${saju.dominantElement}, '
+              '오행약점:${saju.weakestElement}, 종합:${saju.overallScore}';
+        }
+      }
+
+      final analyzer = widget.analyzer ??
+          (FeatureFlags.aiOnline && _aiService.isAvailable
+              ? RemoteFaceAnalyzer(_aiService, sajuContext: sajuContext)
+              : _defaultAnalyzer);
+
+      final result = await analyzer.analyze(_imagePath!);
       if (mounted) {
         context.push(
           '/face-result',

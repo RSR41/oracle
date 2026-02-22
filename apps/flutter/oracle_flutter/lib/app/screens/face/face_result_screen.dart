@@ -12,7 +12,9 @@ import 'package:oracle_flutter/app/theme/app_colors.dart';
 import 'package:oracle_flutter/app/services/face/face_analyzer.dart';
 import 'package:oracle_flutter/app/models/fortune_result.dart';
 import 'package:oracle_flutter/app/database/history_repository.dart';
+import 'package:oracle_flutter/app/history/history_payload.dart';
 import 'package:oracle_flutter/app/i18n/translations.dart';
+import 'package:oracle_flutter/app/services/saju/saju_service.dart';
 
 class FaceResultScreen extends StatefulWidget {
   final String imagePath;
@@ -30,6 +32,7 @@ class FaceResultScreen extends StatefulWidget {
 
 class _FaceResultScreenState extends State<FaceResultScreen> {
   final _historyRepo = HistoryRepository();
+  final _sajuService = SajuService();
   bool _isSaving = false;
 
   Future<void> _handleSave() async {
@@ -52,16 +55,28 @@ class _FaceResultScreenState extends State<FaceResultScreen> {
 
       // Copy image to persistent storage
       final appDir = await getApplicationDocumentsDirectory();
-      final fileName = p.basename(widget.imagePath);
-      final savedImage = await File(
-        widget.imagePath,
-      ).copy('${appDir.path}/$fileName');
+      final fileName =
+          '${DateTime.now().millisecondsSinceEpoch}_${p.basename(widget.imagePath)}';
+      final targetPath = '${appDir.path}/$fileName';
+      final sourceFile = File(widget.imagePath);
+      final savedImage = await sourceFile.copy(targetPath);
 
-      await _historyRepo.saveWithPayload(
+      await _historyRepo
+          .saveWithPayload(
         result: fortuneResult,
-        payload: widget.result.toJson(),
+        payload: HistoryPayload.wrap(
+          feature: 'faceReading',
+          summary: {
+            'title': fortuneResult.title,
+            'compatibilityScore': widget.result.compatibilityScore,
+            'date': fortuneResult.date,
+          },
+          data: widget.result.toJson(),
+          extra: {'sourceImagePath': savedImage.path},
+        ),
         mediaPaths: [savedImage.path],
-      );
+      )
+          .timeout(const Duration(seconds: 8));
 
       if (mounted) {
         final appState = context.read<AppState>();
@@ -70,6 +85,14 @@ class _FaceResultScreenState extends State<FaceResultScreen> {
         );
       }
     } catch (e) {
+      try {
+        await _historyRepo.logSaveError(
+          feature: 'faceReading',
+          action: 'save',
+          message: e.toString(),
+          debug: {'runtimeType': e.runtimeType.toString()},
+        );
+      } catch (_) {}
       if (mounted) {
         final appState = context.read<AppState>();
         ScaffoldMessenger.of(context).showSnackBar(
@@ -89,6 +112,33 @@ class _FaceResultScreenState extends State<FaceResultScreen> {
     final appState = context.watch<AppState>();
     final isKorean = appState.language == AppLanguage.ko;
     final result = widget.result;
+    final profile = appState.profile;
+
+    String? sajuSummary;
+    int sajuScore = 75;
+    if (profile != null) {
+      final birthDate = DateTime.tryParse(profile.birthDate);
+      if (birthDate != null) {
+        final saju = _sajuService.calculate(
+          birthDate: birthDate,
+          birthTime: profile.birthTime,
+          gender: profile.gender,
+        );
+        sajuSummary =
+            '일주 ${saju.dayPillar.ganji} · 오행 강점 ${saju.dominantElement} · '
+            '보완 ${saju.weakestElement} · 종합 ${saju.overallScore}점';
+        sajuScore = saju.overallScore;
+      }
+    }
+
+    final todayGanji = _sajuService.getDayGanji(DateTime.now());
+    final manseScore =
+        ((SajuService.heavenlyStems.indexOf(todayGanji.stem) + 1) * 4 +
+            (SajuService.earthlyBranches.indexOf(todayGanji.branch) + 1) * 3) %
+            41 +
+        60;
+    final todayFaceScore =
+        ((result.compatibilityScore + sajuScore + manseScore) / 3).round();
 
     return Scaffold(
       appBar: AppBar(
@@ -110,7 +160,7 @@ class _FaceResultScreenState extends State<FaceResultScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Score Card
+            // Score Card (Face + Saju + Manse)
             Container(
               width: double.infinity,
               padding: const EdgeInsets.all(24),
@@ -127,7 +177,7 @@ class _FaceResultScreenState extends State<FaceResultScreen> {
                   const Icon(Icons.face, color: Colors.white, size: 40),
                   const SizedBox(height: 12),
                   Text(
-                    '${result.compatibilityScore}',
+                    '$todayFaceScore',
                     style: const TextStyle(
                       fontSize: 48,
                       fontWeight: FontWeight.bold,
@@ -135,16 +185,63 @@ class _FaceResultScreenState extends State<FaceResultScreen> {
                     ),
                   ),
                   Text(
-                    appState.t('face.compatScore'),
+                    '오늘의 관상 점수',
                     style: TextStyle(
                       color: Colors.white.withValues(alpha: 0.9),
                       fontSize: 14,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    '관상 ${result.compatibilityScore} + 사주 $sajuScore + 만세력 $manseScore',
+                    style: TextStyle(
+                      color: Colors.white.withValues(alpha: 0.85),
+                      fontSize: 12,
                     ),
                   ),
                 ],
               ),
             ),
             const SizedBox(height: 24),
+
+            // Combined Report (Saju + Face)
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: AppColors.primary.withValues(alpha: 0.08),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                  color: AppColors.primary.withValues(alpha: 0.25),
+                ),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    '관상 + 사주 결합 리포트',
+                    style: TextStyle(fontWeight: FontWeight.w700, fontSize: 15),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    sajuSummary ?? '프로필(사주) 정보가 없어 관상 중심으로 해석되었습니다.',
+                    style: TextStyle(
+                      fontSize: 13,
+                      color: theme.textTheme.bodySmall?.color,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    '관상 해석과 사주 흐름을 함께 참고해 오늘의 행동 우선순위를 정하세요.',
+                    style: TextStyle(
+                      fontSize: 13,
+                      color: theme.textTheme.bodySmall?.color,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 20),
 
             // Overview
             Text(
@@ -170,59 +267,31 @@ class _FaceResultScreenState extends State<FaceResultScreen> {
             ),
             const SizedBox(height: 20),
 
-            // Features
+            // Part Analysis (tap)
             Text(
-              appState.t('face.features'),
+              '부위별 분석 (터치)',
               style: theme.textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.w600,
               ),
             ),
             const SizedBox(height: 8),
-            ...((isKorean ? result.featuresKo : result.features).entries.map((
-              entry,
-            ) {
-              return Container(
-                margin: const EdgeInsets.only(bottom: 8),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 12,
-                ),
-                decoration: BoxDecoration(
-                  color: theme.cardColor,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(
-                    color: theme.dividerColor.withValues(alpha: 0.1),
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: (isKorean ? result.featuresKo : result.features)
+                  .entries
+                  .map((entry) {
+                return ActionChip(
+                  label: Text(entry.key),
+                  avatar: const Icon(Icons.touch_app, size: 16),
+                  onPressed: () => _showPartComment(
+                    context,
+                    entry.key,
+                    entry.value,
                   ),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      entry.key,
-                      style: const TextStyle(fontWeight: FontWeight.w500),
-                    ),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 4,
-                      ),
-                      decoration: BoxDecoration(
-                        color: AppColors.primary.withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: Text(
-                        entry.value,
-                        style: const TextStyle(
-                          color: AppColors.primary,
-                          fontWeight: FontWeight.w500,
-                          fontSize: 13,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              );
-            })),
+                );
+              }).toList(),
+            ),
             const SizedBox(height: 20),
 
             // Advice
@@ -250,6 +319,30 @@ class _FaceResultScreenState extends State<FaceResultScreen> {
                     ),
                   ),
                 ],
+              ),
+            ),
+            const SizedBox(height: 16),
+
+            // LLM Long Review
+            Text(
+              '총평 (LLM)',
+              style: theme.textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: theme.cardColor,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                  color: theme.dividerColor.withValues(alpha: 0.1),
+                ),
+              ),
+              child: Text(
+                isKorean ? result.overviewKo : result.overview,
+                style: const TextStyle(fontSize: 14, height: 1.7),
               ),
             ),
             const SizedBox(height: 32),
@@ -293,6 +386,22 @@ class _FaceResultScreenState extends State<FaceResultScreen> {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  void _showPartComment(BuildContext context, String part, String comment) {
+    showDialog<void>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text('$part 분석'),
+        content: Text(comment, style: const TextStyle(height: 1.5)),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('닫기'),
+          ),
+        ],
       ),
     );
   }

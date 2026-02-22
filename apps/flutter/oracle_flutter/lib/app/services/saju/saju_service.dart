@@ -309,15 +309,15 @@ class SajuService {
     buffer.writeln();
     buffer.writeln('💫 총운:');
     buffer.writeln(
-      '${dayMasterElement}의 기운을 타고난 당신은 ${_getElementDescription(dayMasterElement)}',
+      '$dayMasterElement의 기운을 타고난 당신은 ${_getElementDescription(dayMasterElement)}',
     );
     buffer.writeln();
     buffer.writeln(
-      '${dominantElement}의 기운이 강하여 ${_getElementStrength(dominantElement)}',
+      '$dominantElement의 기운이 강하여 ${_getElementStrength(dominantElement)}',
     );
     if ((elements[weakestElement] ?? 0) == 0) {
       buffer.writeln(
-        '${weakestElement}의 기운이 부족하니 ${_getElementWeakness(weakestElement)}',
+        '$weakestElement의 기운이 부족하니 ${_getElementWeakness(weakestElement)}',
       );
     }
     buffer.writeln();

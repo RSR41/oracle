@@ -2,9 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:uuid/uuid.dart';
 import 'package:oracle_flutter/app/state/app_state.dart';
 import 'package:oracle_flutter/app/theme/app_colors.dart';
 import 'package:oracle_flutter/app/models/saju_profile.dart';
+import 'package:oracle_flutter/app/models/fortune_result.dart';
+import 'package:oracle_flutter/app/database/history_repository.dart';
+import 'package:oracle_flutter/app/history/history_payload.dart';
 import 'package:oracle_flutter/app/services/saju/saju_service.dart';
 import 'package:oracle_flutter/app/services/saju/saju_models.dart';
 
@@ -19,12 +23,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
   final _formKey = GlobalKey<FormState>();
   final _nicknameController = TextEditingController();
   final _sajuService = SajuService();
+  final _historyRepo = HistoryRepository();
 
   DateTime? _birthDate;
   TimeOfDay? _birthTime;
   String _gender = 'M';
   bool _isEditing = false;
   bool _isTimeUnknown = false;
+  bool _isSavingSaju = false;
   SajuResult? _sajuResult;
 
   @override
@@ -47,7 +53,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
       final profile = appState.profile!;
       _nicknameController.text = profile.nickname;
       _gender = profile.gender;
-      _birthDate = DateTime.tryParse(profile.birthDate);
       _birthDate = DateTime.tryParse(profile.birthDate);
       if (profile.birthTime != null && profile.birthTime!.isNotEmpty) {
         final parts = profile.birthTime!.split(':');
@@ -132,6 +137,77 @@ class _ProfileScreenState extends State<ProfileScreen> {
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(const SnackBar(content: Text('프로필이 저장되었습니다')));
+    }
+  }
+
+  Future<void> _saveSajuResult() async {
+    if (_sajuResult == null || _birthDate == null) return;
+
+    setState(() => _isSavingSaju = true);
+    final result = _sajuResult!;
+
+    try {
+      final now = DateTime.now();
+      final dateStr = DateFormat('yyyy-MM-dd').format(now);
+      final titleName = _nicknameController.text.trim().isEmpty
+          ? '사주 분석'
+          : '${_nicknameController.text.trim()}님의 사주';
+
+      final historyResult = FortuneResult(
+        id: const Uuid().v4(),
+        type: 'saju',
+        title: titleName,
+        date: dateStr,
+        summary: result.paljaDisplay,
+        content: result.interpretation,
+        overallScore: result.overallScore,
+        createdAt: now.toIso8601String(),
+      );
+
+      await _historyRepo
+          .saveWithPayload(
+            result: historyResult,
+            payload: HistoryPayload.wrap(
+              feature: 'saju',
+              summary: {
+                'title': historyResult.title,
+                'overallScore': historyResult.overallScore,
+                'date': historyResult.date,
+              },
+              data: {
+                'birthDate': DateFormat('yyyy-MM-dd').format(_birthDate!),
+                'birthTime': (_isTimeUnknown || _birthTime == null)
+                    ? null
+                    : '${_birthTime!.hour.toString().padLeft(2, '0')}:${_birthTime!.minute.toString().padLeft(2, '0')}',
+                'gender': _gender,
+                'profileName': _nicknameController.text.trim(),
+                ...result.toJson(),
+              },
+            ),
+          )
+          .timeout(const Duration(seconds: 8));
+
+      if (!mounted) return;
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('사주 결과가 히스토리에 저장되었습니다.')));
+    } catch (e) {
+      try {
+        await _historyRepo.logSaveError(
+          feature: 'saju',
+          action: 'save',
+          message: e.toString(),
+          debug: {'runtimeType': e.runtimeType.toString()},
+        );
+      } catch (_) {}
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('저장 중 오류가 발생했습니다. (${e.runtimeType})')),
+      );
+    } finally {
+      if (mounted) {
+        setState(() => _isSavingSaju = false);
+      }
     }
   }
 
@@ -374,7 +450,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           ],
                         ),
                         child: Image.asset(
-                          'assets/images/five_elements/${elementEng}.png',
+                          'assets/images/five_elements/$elementEng.png',
                           errorBuilder: (context, error, stackTrace) {
                             // Fallback to Icon if image missing (e.g. earth.png)
                             return Container(
@@ -505,6 +581,30 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 style: theme.textTheme.bodySmall,
               ),
             ],
+          ),
+        ),
+        const SizedBox(height: 16),
+
+        SizedBox(
+          width: double.infinity,
+          child: FilledButton.icon(
+            onPressed: _isSavingSaju ? null : _saveSajuResult,
+            icon: _isSavingSaju
+                ? const SizedBox(
+                    width: 18,
+                    height: 18,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  )
+                : const Icon(Icons.save_outlined),
+            label: Text(_isSavingSaju ? '저장 중...' : '사주 결과 저장'),
+            style: FilledButton.styleFrom(
+              backgroundColor: AppColors.primary,
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(vertical: 14),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
           ),
         ),
         const SizedBox(height: 16),

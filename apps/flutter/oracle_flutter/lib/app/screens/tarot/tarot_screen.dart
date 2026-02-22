@@ -52,11 +52,6 @@ class _TarotScreenState extends State<TarotScreen>
     });
   }
 
-  void _initDeck() {
-    _selectedCards = [];
-    _hasDrawn = false;
-  }
-
   Future<void> _shuffle() async {
     setState(() => _isShuffling = true);
     _shuffleController.repeat(reverse: true);
@@ -70,11 +65,10 @@ class _TarotScreenState extends State<TarotScreen>
       _selectedCards = [];
     });
     _shuffleController.stop();
-    _shuffleController.reset();
   }
 
   void _drawCards(int count) {
-    if (_hasDrawn) return;
+    if (_hasDrawn || _deck.isEmpty) return;
 
     final drawnCards = <TarotCard>[];
     for (int i = 0; i < count && i < _deck.length; i++) {
@@ -153,26 +147,17 @@ class _TarotScreenState extends State<TarotScreen>
             const SizedBox(height: 24),
 
             // Card Deck Display
-            AnimatedBuilder(
-              animation: _shuffleController,
-              builder: (context, child) {
-                return Transform.rotate(
-                  angle: _isShuffling ? _shuffleController.value * 0.1 : 0,
-                  child: child,
-                );
-              },
-              child: Container(
-                height: 200,
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  color: theme.cardColor,
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(
-                    color: theme.dividerColor.withValues(alpha: 0.2),
-                  ),
+            Container(
+              height: 200,
+              width: double.infinity,
+              decoration: BoxDecoration(
+                color: theme.cardColor,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(
+                  color: theme.dividerColor.withValues(alpha: 0.2),
                 ),
-                child: _hasDrawn ? _buildSelectedCards() : _buildCardBack(),
               ),
+              child: _hasDrawn ? _buildSelectedCards() : _buildCardBack(),
             ),
             const SizedBox(height: 24),
 
@@ -234,9 +219,7 @@ class _TarotScreenState extends State<TarotScreen>
                   Expanded(
                     child: OutlinedButton(
                       onPressed: () {
-                        setState(() {
-                          _loadDeck();
-                        });
+                        _loadDeck();
                       },
                       style: OutlinedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 16),
@@ -271,36 +254,58 @@ class _TarotScreenState extends State<TarotScreen>
   }
 
   Widget _buildCardBack() {
-    return Center(
-      child: Stack(
-        alignment: Alignment.center,
-        children: List.generate(5, (index) {
-          return Transform.translate(
-            offset: Offset(index * 8.0 - 16, 0),
-            child: Container(
-              width: 100,
-              height: 157, // Aspect ratio tailored for the card image
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(8),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.3),
-                    blurRadius: 4,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
+    return TweenAnimationBuilder<double>(
+      tween: Tween<double>(begin: 0, end: _isShuffling ? 1 : 0),
+      duration: const Duration(milliseconds: 280),
+      curve: Curves.easeOutCubic,
+      builder: (context, strength, _) {
+        return AnimatedBuilder(
+          animation: _shuffleController,
+          builder: (context, __) {
+            final t = _shuffleController.value;
+            return Center(
+              child: Stack(
+                alignment: Alignment.center,
+                children: List.generate(7, (index) {
+                  final baseX = (index - 3) * 6.0;
+                  final wave = sin((t * 2 * pi) + (index * 0.55)) * strength;
+                  final offsetX = baseX + wave * 22.0;
+                  final offsetY = cos((t * 2 * pi) + index) * 4.0 * strength;
+                  final angle = wave * 0.09 + (index - 3) * 0.01;
+
+                  return Transform.translate(
+                    offset: Offset(offsetX, offsetY),
+                    child: Transform.rotate(
+                      angle: angle,
+                      child: Container(
+                        width: 96,
+                        height: 150,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(8),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: 0.25),
+                              blurRadius: 4,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(8),
+                          child: Image.asset(
+                            'assets/images/tarot/back.png',
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                      ),
+                    ),
+                  );
+                }),
               ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(8),
-                child: Image.asset(
-                  'assets/images/tarot/back.png',
-                  fit: BoxFit.cover,
-                ),
-              ),
-            ),
-          );
-        }),
-      ),
+            );
+          },
+        );
+      },
     );
   }
 

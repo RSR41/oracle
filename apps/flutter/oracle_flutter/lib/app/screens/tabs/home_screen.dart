@@ -3,7 +3,6 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:oracle_flutter/app/theme/app_colors.dart';
 import 'package:oracle_flutter/app/state/app_state.dart';
-import 'package:oracle_flutter/app/config/feature_flags.dart';
 import 'package:oracle_flutter/app/widgets/starry_background.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -14,7 +13,6 @@ class HomeScreen extends StatelessWidget {
     final theme = Theme.of(context);
     final appState = context.watch<AppState>();
 
-    // 사용자 이름 (프로필 있으면 닉네임, 없으면 기본값)
     final userName = appState.profile?.nickname ?? appState.t('home.guest');
 
     // 오늘 날짜
@@ -59,28 +57,29 @@ class HomeScreen extends StatelessWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                '$userName님',
+                                dateStr,
                                 style: theme.textTheme.headlineSmall?.copyWith(
                                   fontWeight: FontWeight.w700,
-                                  color: AppColors.nightTextPrimary,
-                                ),
-                              ),
-                              const SizedBox(height: 4),
-                              Text(
-                                dateStr,
-                                style: TextStyle(
                                   color: AppColors.nightTextSecondary,
-                                  fontSize: 14,
                                 ),
                               ),
                             ],
                           ),
-                          // 설정 버튼
-                          IconButton(
-                            onPressed: () => context.push('/settings'),
-                            icon: const Icon(
-                              Icons.settings,
-                              color: AppColors.nightTextMuted,
+                          // 프로필 버튼
+                          GestureDetector(
+                            onTap: () => context.go('/profile'),
+                            child: Container(
+                              width: 42,
+                              height: 42,
+                              decoration: BoxDecoration(
+                                color: AppColors.nightSkyCard,
+                                shape: BoxShape.circle,
+                                border: Border.all(color: AppColors.nightBorder),
+                              ),
+                              child: const Icon(
+                                Icons.person_outline,
+                                color: AppColors.nightTextMuted,
+                              ),
                             ),
                           ),
                         ],
@@ -111,7 +110,7 @@ class HomeScreen extends StatelessWidget {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
-                              appState.t('home.todayFortune'),
+                              '오늘의 $userName님 운세',
                               style: const TextStyle(
                                 color: AppColors.nightSkyDark,
                                 fontWeight: FontWeight.w600,
@@ -279,8 +278,10 @@ class HomeScreen extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(height: 16),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      Wrap(
+                        alignment: WrapAlignment.spaceBetween,
+                        spacing: 16,
+                        runSpacing: 16,
                         children: [
                           _buildQuickAccessBtn(
                             context,
@@ -294,23 +295,18 @@ class HomeScreen extends StatelessWidget {
                             label: appState.t('home.tarot'),
                             route: '/tarot',
                           ),
-                          // Phase 2+: 꿈해몽, 궁합
-                          if (FeatureFlags.showBetaFeatures) ...[
-                            _buildQuickAccessBtn(
-                              context,
-                              imagePath: 'assets/images/icons/icon_dream.png',
-                              label: appState.t('home.dream'),
-                              route: '/dream',
-                            ),
-                            _buildQuickAccessBtn(
-                              context,
-                              // TODO: 궁합 아이콘 추가 필요 (현재 꿈해몽과 동일하거나 기본 아이콘 사용)
-                              imagePath:
-                                  'assets/images/icons/icon_daily_fortune.png',
-                              label: appState.t('home.compatibility'),
-                              route: '/compatibility',
-                            ),
-                          ],
+                          _buildQuickAccessBtn(
+                            context,
+                            imagePath: 'assets/images/icons/icon_face.png',
+                            label: appState.t('home.face'),
+                            route: '/face',
+                          ),
+                          _buildQuickAccessBtn(
+                            context,
+                            imagePath: 'assets/images/icons/icon_dream.png',
+                            label: appState.t('home.dream'),
+                            route: '/dream',
+                          ),
                         ],
                       ),
                     ],
@@ -444,6 +440,8 @@ class HomeScreen extends StatelessWidget {
       child: Column(
         children: [
           Container(
+            width: 88,
+            height: 88,
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
               color: AppColors.nightSkyCard,

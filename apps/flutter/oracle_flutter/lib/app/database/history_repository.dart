@@ -1,5 +1,6 @@
 import 'package:sqflite/sqflite.dart';
 import 'dart:convert';
+import 'package:uuid/uuid.dart';
 import '../database/database_helper.dart';
 import '../models/fortune_result.dart';
 
@@ -9,6 +10,29 @@ class HistoryRepository {
   static const String historyTable = 'history';
 
   final DatabaseHelper _dbHelper = DatabaseHelper.instance;
+
+  /// Full storage row used for cloud sync transport.
+  Future<List<Map<String, dynamic>>> getAllRows() async {
+    final db = await _dbHelper.database;
+    return db.query(historyTable, orderBy: 'createdAt DESC');
+  }
+
+  /// Upsert using raw row values from local/cloud transport.
+  Future<void> upsertRawRow(Map<String, dynamic> row) async {
+    final db = await _dbHelper.database;
+    await db.insert(historyTable, {
+      'id': row['id'],
+      'type': row['type'],
+      'title': row['title'],
+      'summary': row['summary'],
+      'content': row['content'],
+      'overallScore': row['overallScore'],
+      'date': row['date'],
+      'createdAt': row['createdAt'],
+      'payloadJson': row['payloadJson'],
+      'mediaPaths': row['mediaPaths'],
+    }, conflictAlgorithm: ConflictAlgorithm.replace);
+  }
 
   /// Save a new history item
   Future<void> save(FortuneResult result) async {
@@ -164,5 +188,36 @@ class HistoryRepository {
       });
     }
     await batch.commit(noResult: true);
+  }
+
+  /// Save debug error logs as history rows for in-app inspection.
+  Future<void> logSaveError({
+    required String feature,
+    required String action,
+    required String message,
+    Map<String, dynamic>? debug,
+  }) async {
+    final now = DateTime.now();
+    final result = FortuneResult(
+      id: const Uuid().v4(),
+      type: 'debug_error',
+      title: '[DEBUG] Save Error',
+      date: now.toIso8601String().split('T')[0],
+      summary: '$feature:$action',
+      content: message,
+      overallScore: 0,
+      createdAt: now.toIso8601String(),
+    );
+
+    await saveWithPayload(
+      result: result,
+      payload: {
+        'feature': feature,
+        'action': action,
+        'message': message,
+        'createdAt': now.toIso8601String(),
+        if (debug != null) 'debug': debug,
+      },
+    );
   }
 }

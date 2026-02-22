@@ -3,7 +3,11 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:oracle_flutter/app/state/app_state.dart';
 import 'package:oracle_flutter/app/theme/app_colors.dart';
+import 'package:oracle_flutter/app/services/ai/ai_service.dart';
+import 'package:oracle_flutter/app/config/feature_flags.dart';
 import 'package:oracle_flutter/app/services/dream/mock_dream_interpreter.dart';
+import 'package:oracle_flutter/app/services/dream/remote_dream_interpreter.dart';
+import 'package:oracle_flutter/app/services/saju/saju_service.dart';
 
 class DreamInputScreen extends StatefulWidget {
   const DreamInputScreen({super.key});
@@ -14,12 +18,15 @@ class DreamInputScreen extends StatefulWidget {
 
 class _DreamInputScreenState extends State<DreamInputScreen> {
   final _controller = TextEditingController();
-  final _interpreter = MockDreamInterpreter();
+  final _mockInterpreter = MockDreamInterpreter();
+  final _aiService = AiService();
+  final _sajuService = SajuService();
   bool _isAnalyzing = false;
 
   @override
   void dispose() {
     _controller.dispose();
+    _aiService.dispose();
     super.dispose();
   }
 
@@ -29,7 +36,30 @@ class _DreamInputScreenState extends State<DreamInputScreen> {
     setState(() => _isAnalyzing = true);
 
     try {
-      final result = await _interpreter.interpret(_controller.text);
+      final appState = context.read<AppState>();
+      String? sajuContext;
+      final profile = appState.profile;
+      if (profile != null) {
+        final birthDate = DateTime.tryParse(profile.birthDate);
+        if (birthDate != null) {
+          final saju = _sajuService.calculate(
+            birthDate: birthDate,
+            birthTime: profile.birthTime,
+            gender: profile.gender,
+          );
+          sajuContext =
+              '이름:${profile.nickname}, 생년월일:${profile.birthDate}, 성별:${profile.gender}, '
+              '일주:${saju.dayPillar.ganji}, 오행강점:${saju.dominantElement}, '
+              '오행약점:${saju.weakestElement}, 종합:${saju.overallScore}';
+        }
+      }
+
+      final interpreter =
+          (FeatureFlags.aiOnline && _aiService.isAvailable)
+              ? RemoteDreamInterpreter(_aiService, sajuContext: sajuContext)
+              : _mockInterpreter;
+
+      final result = await interpreter.interpret(_controller.text);
       if (mounted) {
         context.push(
           '/dream-result',

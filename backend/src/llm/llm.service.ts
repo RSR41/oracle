@@ -104,9 +104,14 @@ export class LlmService implements LLMProvider {
      * 관상 해석 생성 (이미지 없이 특징 수치만 사용)
      */
     async generateFaceReading(request: FaceReadingRequest): Promise<AiReadingResult> {
+        if (this.provider === 'gemini' && request.imageBase64) {
+            const response = await this.callGeminiVisionForFace(request);
+            return this.parseAiResult(response.content, '관상 분석');
+        }
+
         const prompt = this.buildFacePrompt(request);
         const response = await this.generateText(prompt, {
-            systemPrompt: '당신은 전통 관상학 전문가입니다. 얼굴 특징을 바탕으로 성격과 운세를 분석합니다.',
+            systemPrompt: '당신은 전통 관상학 전문가입니다. 얼굴 특징과 사주 컨텍스트를 바탕으로 성격과 운세를 분석합니다.',
             temperature: 0.6,
         });
 
@@ -119,7 +124,7 @@ export class LlmService implements LLMProvider {
 
     private async callGemini(prompt: string, options?: LLMOptions): Promise<LLMResponse> {
         const apiKey = this.configService.get<string>('GEMINI_API_KEY');
-        const modelName = this.configService.get<string>('GEMINI_MODEL', 'gemini-3.1-pro');
+        const modelName = this.configService.get<string>('GEMINI_MODEL', 'gemini-1.5-flash');
 
         if (!apiKey) {
             throw new Error('GEMINI_API_KEY가 설정되지 않았습니다');
@@ -156,6 +161,55 @@ export class LlmService implements LLMProvider {
             this.logger.error(`Gemini API 호출 중 오류 발생: ${error.message}`);
             throw error;
         }
+    }
+
+    private async callGeminiVisionForFace(request: FaceReadingRequest): Promise<LLMResponse> {
+        const apiKey = this.configService.get<string>('GEMINI_API_KEY');
+        const modelName = this.configService.get<string>('GEMINI_VISION_MODEL', 'gemini-1.5-flash');
+
+        if (!apiKey) {
+            throw new Error('GEMINI_API_KEY가 설정되지 않았습니다');
+        }
+        if (!request.imageBase64) {
+            throw new Error('imageBase64가 필요합니다');
+        }
+
+        const genAI = new GoogleGenerativeAI(apiKey);
+        const model = genAI.getGenerativeModel({
+            model: modelName,
+            generationConfig: {
+                temperature: 0.6,
+                maxOutputTokens: this.maxTokens,
+            },
+        });
+
+        const prompt = this.buildFacePrompt(request);
+        const result = await model.generateContent({
+            contents: [{
+                role: 'user',
+                parts: [
+                    { text: prompt },
+                    {
+                        inlineData: {
+                            mimeType: request.mimeType || 'image/jpeg',
+                            data: request.imageBase64,
+                        },
+                    },
+                ],
+            }],
+            systemInstruction: '당신은 관상 전문가입니다. 외모 특징과 사주 컨텍스트를 종합해 오락 목적의 해석을 JSON 형식으로 제공합니다.',
+        });
+
+        const response = await result.response;
+        return {
+            content: response.text(),
+            model: modelName,
+            usage: {
+                promptTokens: response.usageMetadata?.promptTokenCount || 0,
+                completionTokens: response.usageMetadata?.candidatesTokenCount || 0,
+                totalTokens: response.usageMetadata?.totalTokenCount || 0,
+            },
+        };
     }
 
     private async callOpenAI(prompt: string, options?: LLMOptions): Promise<LLMResponse> {
@@ -218,15 +272,36 @@ JSON 형식으로 응답해주세요.`;
         return `다음 꿈을 해석해주세요.
 꿈 내용: ${req.dreamDescription}
 ${req.keywords?.length ? `키워드: ${req.keywords.join(', ')}` : ''}
+${req.sajuContext ? `사주 컨텍스트: ${req.sajuContext}` : ''}
 
-JSON 형식으로 응답해주세요.`;
+JSON 형식으로 응답해주세요.
+{
+  "summary": "한 줄 요약",
+  "details": [
+    {"category":"상징 해석","content":"...","rating":4},
+    {"category":"오늘의 흐름","content":"...","rating":4}
+  ],
+  "caution": "주의사항"
+}`;
     }
 
     private buildFacePrompt(req: FaceReadingRequest): string {
-        return `다음 얼굴 특징을 바탕으로 관상을 분석해주세요.
+        return `다음 입력을 바탕으로 관상을 분석해주세요.
 ${JSON.stringify(req.features, null, 2)}
+${req.sajuContext ? `사주 컨텍스트: ${req.sajuContext}` : ''}
 
-JSON 형식으로 응답해주세요.`;
+JSON 형식으로 응답해주세요.
+{
+  "summary": "최소 5~7문장 길이의 자세한 총평",
+  "details": [
+    {"category":"이마","content":"...","rating":4},
+    {"category":"눈","content":"...","rating":4},
+    {"category":"코","content":"...","rating":3},
+    {"category":"입","content":"...","rating":3},
+    {"category":"턱","content":"...","rating":4}
+  ],
+  "caution": "주의사항"
+}`;
     }
 
     private parseAiResult(content: string, defaultTitle: string): AiReadingResult {

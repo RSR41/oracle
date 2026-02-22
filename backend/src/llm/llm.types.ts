@@ -64,11 +64,16 @@ export interface TarotReadingRequest {
 export interface DreamMeaningRequest {
   dreamDescription: string;  // 꿈 내용 서술
   keywords?: string[];       // 핵심 키워드
+  sajuContext?: string;      // 사주 요약 컨텍스트
 }
 
 export interface FaceReadingRequest {
-  // 이미지 자체는 받지 않음! (개인정보 보호)
-  // Flutter에서 로컬 분석 후 특징 수치만 전송
+  // 권장: Flutter에서 촬영/선택한 이미지를 base64로 전달 (Gemini Vision)
+  imageBase64?: string;
+  mimeType?: string;         // image/jpeg, image/png
+  sajuContext?: string;      // 사주 요약 컨텍스트
+
+  // fallback: 이미지 없이 특징값만 전송 가능
   features: {
     eyeDistance?: number;    // 눈 간격 비율
     noseLength?: number;     // 코 길이 비율

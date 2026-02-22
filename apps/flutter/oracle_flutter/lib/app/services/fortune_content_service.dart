@@ -30,20 +30,39 @@ class FortunePattern {
   });
 
   factory FortunePattern.fromJson(Map<String, dynamic> json) {
+    // Supports both legacy flat schema and current nested `result` schema.
+    final Map<String, dynamic> source = json.containsKey('result')
+        ? Map<String, dynamic>.from(json['result'] as Map)
+        : json;
+
+    final detailsRaw = source['details'];
+    final details = detailsRaw is Map<String, dynamic>
+        ? detailsRaw.map((key, value) => MapEntry(key, value as String))
+        : <String, String>{
+            'love': source['personality'] as String? ?? '',
+            'money': source['wealth'] as String? ?? '',
+            'health': source['health'] as String? ?? '',
+            'work': source['career'] as String? ?? '',
+          };
+
     return FortunePattern(
-      id: json['id'] as String,
-      overall: json['overall'] as int,
-      love: json['love'] as int,
-      money: json['money'] as int,
-      health: json['health'] as int,
-      work: json['work'] as int,
-      message: json['message'] as String,
-      luckyColor: json['luckyColor'] as String,
-      luckyNumber: json['luckyNumber'] as int,
-      luckyTime: json['luckyTime'] as String,
-      details: (json['details'] as Map<String, dynamic>).map(
-        (key, value) => MapEntry(key, value as String),
-      ),
+      id: '${json['id']}',
+      overall:
+          (source['overall'] as int?) ?? (source['overallScore'] as int? ?? 0),
+      love: (source['love'] as int?) ?? (source['loveScore'] as int? ?? 0),
+      money: (source['money'] as int?) ?? (source['moneyScore'] as int? ?? 0),
+      health:
+          (source['health'] as int?) ?? (source['healthScore'] as int? ?? 0),
+      work: (source['work'] as int?) ?? (source['workScore'] as int? ?? 0),
+      message: source['message'] as String? ?? '',
+      luckyColor: source['luckyColor'] is List
+          ? (source['luckyColor'] as List).first as String
+          : (source['luckyColor'] as String? ?? ''),
+      luckyNumber: source['luckyNumber'] is List
+          ? (source['luckyNumber'] as List).first as int
+          : (source['luckyNumber'] as int? ?? 0),
+      luckyTime: source['luckyTime'] as String? ?? '',
+      details: details,
     );
   }
 }

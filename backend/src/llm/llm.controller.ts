@@ -75,6 +75,10 @@ export class DreamMeaningDto implements DreamMeaningRequest {
     @IsArray()
     @IsString({ each: true })
     keywords?: string[];
+
+    @IsOptional()
+    @IsString()
+    sajuContext?: string;
 }
 
 class FaceFeatures {
@@ -96,6 +100,18 @@ class FaceFeatures {
 }
 
 export class FaceReadingDto implements FaceReadingRequest {
+    @IsOptional()
+    @IsString()
+    imageBase64?: string;
+
+    @IsOptional()
+    @IsString()
+    mimeType?: string;
+
+    @IsOptional()
+    @IsString()
+    sajuContext?: string;
+
     @ValidateNested()
     @Type(() => FaceFeatures)
     features: FaceFeatures;
