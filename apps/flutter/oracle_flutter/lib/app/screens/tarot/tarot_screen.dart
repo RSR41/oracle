@@ -23,6 +23,7 @@ class _TarotScreenState extends State<TarotScreen>
   bool _isShuffling = false;
   bool _hasDrawn = false;
   bool _isLoadingDeck = true;
+  bool _deckLoadFailed = false;
   late AnimationController _shuffleController;
 
   @override
@@ -42,14 +43,31 @@ class _TarotScreenState extends State<TarotScreen>
   }
 
   Future<void> _loadDeck() async {
-    final cards = await _tarotDataService.loadCards();
-    if (!mounted) return;
     setState(() {
-      _deck = List.from(cards);
-      _selectedCards = [];
-      _hasDrawn = false;
-      _isLoadingDeck = false;
+      _isLoadingDeck = true;
+      _deckLoadFailed = false;
     });
+
+    try {
+      final cards = await _tarotDataService.loadCards();
+      if (!mounted) return;
+      setState(() {
+        _deck = List.from(cards);
+        _selectedCards = [];
+        _hasDrawn = false;
+        _isLoadingDeck = false;
+        _deckLoadFailed = cards.isEmpty;
+      });
+    } catch (_) {
+      if (!mounted) return;
+      setState(() {
+        _deck = [];
+        _selectedCards = [];
+        _hasDrawn = false;
+        _isLoadingDeck = false;
+        _deckLoadFailed = true;
+      });
+    }
   }
 
   void _initDeck() {
@@ -102,6 +120,49 @@ class _TarotScreenState extends State<TarotScreen>
 
     if (_isLoadingDeck) {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    }
+
+    if (_deckLoadFailed) {
+      return Scaffold(
+        appBar: AppBar(
+          title: Text(appState.t('fortune.tarot')),
+          centerTitle: true,
+        ),
+        body: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(20),
+            child: Card(
+              child: Padding(
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(Icons.error_outline, color: Colors.redAccent),
+                    const SizedBox(height: 12),
+                    Text(
+                      '덱 로딩 실패',
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      '잠시 후 다시 시도해 주세요.',
+                      style: theme.textTheme.bodyMedium,
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 16),
+                    FilledButton(
+                      onPressed: _loadDeck,
+                      child: const Text('다시 시도'),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
     }
 
     return Scaffold(
@@ -233,11 +294,7 @@ class _TarotScreenState extends State<TarotScreen>
                 children: [
                   Expanded(
                     child: OutlinedButton(
-                      onPressed: () {
-                        setState(() {
-                          _loadDeck();
-                        });
-                      },
+                      onPressed: _loadDeck,
                       style: OutlinedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 16),
                         shape: RoundedRectangleBorder(
@@ -328,15 +385,13 @@ class _TarotScreenState extends State<TarotScreen>
                 ),
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(8),
-                  child: card.id <= 21
-                      ? Image.asset(
-                          'assets/images/tarot/card_${card.id}.png',
-                          fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) {
-                            return _buildFallbackCard(card);
-                          },
-                        )
-                      : _buildFallbackCard(card),
+                  child: Image.asset(
+                    'assets/images/tarot/card_${card.id}.png',
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) {
+                      return _buildFallbackCard(card);
+                    },
+                  ),
                 ),
               ),
             ),
