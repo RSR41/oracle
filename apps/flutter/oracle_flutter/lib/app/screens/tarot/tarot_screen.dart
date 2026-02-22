@@ -184,12 +184,6 @@ class _TarotScreenState extends State<TarotScreen>
               ),
               child: Column(
                 children: [
-                  const Icon(
-                    Icons.auto_awesome,
-                    size: 48,
-                    color: AppColors.primary,
-                  ),
-                  const SizedBox(height: 12),
                   Text(
                     appState.t('screen.fortune.tarotTitle'),
                     style: theme.textTheme.titleLarge?.copyWith(

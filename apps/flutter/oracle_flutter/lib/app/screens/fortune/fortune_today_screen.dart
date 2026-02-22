@@ -58,36 +58,38 @@ class _FortuneTodayScreenState extends State<FortuneTodayScreen> {
 
       await _historyRepo
           .saveWithPayload(
-        result: result,
-        payload: HistoryPayload.wrap(
-          feature: 'fortune',
-          summary: {
-            'title': result.title,
-            'overallScore': result.overallScore,
-            'date': result.date,
-          },
-          data: {
-            'overall': data.overall,
-            'message': data.message,
-            'love': data.love,
-            'money': data.money,
-            'health': data.health,
-            'work': data.work,
-            'loveText': data.loveText,
-            'moneyText': data.moneyText,
-            'healthText': data.healthText,
-            'workText': data.workText,
-            'luckyColor': data.luckyColor,
-            'luckyNumber': data.luckyNumber,
-            'luckyTime': data.luckyTime,
-          },
-        ),
-      )
+            result: result,
+            payload: HistoryPayload.wrap(
+              feature: 'fortune',
+              summary: {
+                'title': result.title,
+                'overallScore': result.overallScore,
+                'date': result.date,
+              },
+              data: {
+                'overall': data.overall,
+                'message': data.message,
+                'love': data.love,
+                'money': data.money,
+                'health': data.health,
+                'work': data.work,
+                'loveText': data.loveText,
+                'moneyText': data.moneyText,
+                'healthText': data.healthText,
+                'workText': data.workText,
+                'luckyColor': data.luckyColor,
+                'luckyNumber': data.luckyNumber,
+                'luckyTime': data.luckyTime,
+              },
+            ),
+          )
           .timeout(const Duration(seconds: 8));
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(context.read<AppState>().t('fortune.saveSuccess'))),
+          SnackBar(
+            content: Text(context.read<AppState>().t('fortune.saveSuccess')),
+          ),
         );
       }
     } catch (e) {
@@ -151,19 +153,35 @@ class _FortuneTodayScreenState extends State<FortuneTodayScreen> {
         child: Column(
           children: [
             Padding(
-              padding: const EdgeInsets.only(top: 60, left: 20, right: 20, bottom: 20),
+              padding: const EdgeInsets.only(
+                top: 60,
+                left: 20,
+                right: 20,
+                bottom: 20,
+              ),
               child: Row(
                 children: [
-                  IconButton(icon: const Icon(Icons.arrow_back), onPressed: () => context.pop()),
+                  IconButton(
+                    icon: const Icon(Icons.arrow_back),
+                    onPressed: () => context.pop(),
+                  ),
                   const SizedBox(width: 8),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
                         appState.t('fortune.today'),
-                        style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+                        style: theme.textTheme.titleLarge?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
-                      Text(DateFormat('yyyy년 M월 d일 (E)', 'ko_KR').format(DateTime.now()), style: theme.textTheme.bodySmall),
+                      Text(
+                        DateFormat(
+                          'yyyy년 M월 d일 (E)',
+                          'ko_KR',
+                        ).format(DateTime.now()),
+                        style: theme.textTheme.bodySmall,
+                      ),
                     ],
                   ),
                 ],
@@ -190,32 +208,36 @@ class _FortuneTodayScreenState extends State<FortuneTodayScreen> {
                 ),
                 child: Column(
                   children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          appState.t('fortune.overall'),
-                          style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w600),
-                        ),
-                        Container(
-                          padding: const EdgeInsets.all(8),
-                          decoration: BoxDecoration(
-                            color: Colors.white.withValues(alpha: 0.2),
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: const Icon(Icons.auto_awesome, color: Colors.white, size: 20),
-                        ),
-                      ],
+                    Text(
+                      appState.t('fortune.overall'),
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 18,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                     const SizedBox(height: 16),
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
-                        Text('${data.overall}', style: const TextStyle(fontSize: 48, fontWeight: FontWeight.bold, color: Colors.white, height: 1.0)),
+                        Text(
+                          '${data.overall}',
+                          style: const TextStyle(
+                            fontSize: 48,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                            height: 1.0,
+                          ),
+                        ),
                         const SizedBox(width: 8),
                         Padding(
                           padding: const EdgeInsets.only(bottom: 8),
-                          child: Text('/ 100', style: TextStyle(color: Colors.white.withValues(alpha: 0.9))),
+                          child: Text(
+                            '/ 100',
+                            style: TextStyle(
+                              color: Colors.white.withValues(alpha: 0.9),
+                            ),
+                          ),
                         ),
                       ],
                     ),
@@ -230,9 +252,22 @@ class _FortuneTodayScreenState extends State<FortuneTodayScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(appState.t('screen.fortune.oneLiner'), style: TextStyle(color: Colors.white.withValues(alpha: 0.9), fontSize: 12)),
+                          Text(
+                            appState.t('screen.fortune.oneLiner'),
+                            style: TextStyle(
+                              color: Colors.white.withValues(alpha: 0.9),
+                              fontSize: 12,
+                            ),
+                          ),
                           const SizedBox(height: 8),
-                          Text(data.message, style: const TextStyle(color: Colors.white, fontSize: 14, height: 1.5)),
+                          Text(
+                            data.message,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 14,
+                              height: 1.5,
+                            ),
+                          ),
                         ],
                       ),
                     ),
@@ -240,24 +275,68 @@ class _FortuneTodayScreenState extends State<FortuneTodayScreen> {
                 ),
               ),
             ),
-            _buildDetailSection(appState.t('home.love'), data.love, AppColors.peach, Icons.favorite, data.loveText),
-            _buildDetailSection(appState.t('home.wealth'), data.money, AppColors.caramel, Icons.attach_money, data.moneyText),
-            _buildDetailSection(appState.t('home.health'), data.health, AppColors.sage, Icons.health_and_safety, data.healthText),
-            _buildDetailSection('직장/학업운', data.work, AppColors.skyPastel, Icons.trending_up, data.workText),
+            _buildDetailSection(
+              appState.t('home.love'),
+              data.love,
+              AppColors.peach,
+              Icons.favorite,
+              data.loveText,
+            ),
+            _buildDetailSection(
+              appState.t('home.wealth'),
+              data.money,
+              AppColors.caramel,
+              Icons.attach_money,
+              data.moneyText,
+            ),
+            _buildDetailSection(
+              appState.t('home.health'),
+              data.health,
+              AppColors.sage,
+              Icons.health_and_safety,
+              data.healthText,
+            ),
+            _buildDetailSection(
+              '직장/학업운',
+              data.work,
+              AppColors.skyPastel,
+              Icons.trending_up,
+              data.workText,
+            ),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(appState.t('fortune.luckyItems'), style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600)),
+                  Text(
+                    appState.t('fortune.luckyItems'),
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
                   const SizedBox(height: 12),
                   Row(
                     children: [
-                      _buildLuckyItem(context, '🎨', appState.t('fortune.luckyColor'), data.luckyColor),
+                      _buildLuckyItem(
+                        context,
+                        '🎨',
+                        appState.t('fortune.luckyColor'),
+                        data.luckyColor,
+                      ),
                       const SizedBox(width: 10),
-                      _buildLuckyItem(context, '🔢', appState.t('fortune.luckyNumber'), data.luckyNumber.toString()),
+                      _buildLuckyItem(
+                        context,
+                        '🔢',
+                        appState.t('fortune.luckyNumber'),
+                        data.luckyNumber.toString(),
+                      ),
                       const SizedBox(width: 10),
-                      _buildLuckyItem(context, '⏰', appState.t('fortune.luckyTime'), data.luckyTime),
+                      _buildLuckyItem(
+                        context,
+                        '⏰',
+                        appState.t('fortune.luckyTime'),
+                        data.luckyTime,
+                      ),
                     ],
                   ),
                 ],
@@ -272,10 +351,16 @@ class _FortuneTodayScreenState extends State<FortuneTodayScreen> {
                       onPressed: _isSaving ? null : _handleSave,
                       style: OutlinedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
                       ),
                       child: _isSaving
-                          ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2))
+                          ? const SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            )
                           : Text(appState.t('common.save')),
                     ),
                   ),
@@ -285,7 +370,9 @@ class _FortuneTodayScreenState extends State<FortuneTodayScreen> {
                       onPressed: _handleShare,
                       style: FilledButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
                         backgroundColor: AppColors.primary,
                       ),
                       child: Text(appState.t('common.share')),
@@ -300,7 +387,13 @@ class _FortuneTodayScreenState extends State<FortuneTodayScreen> {
     );
   }
 
-  Widget _buildDetailSection(String title, int score, Color color, IconData icon, String content) {
+  Widget _buildDetailSection(
+    String title,
+    int score,
+    Color color,
+    IconData icon,
+    String content,
+  ) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 6),
       child: Container(
@@ -308,9 +401,15 @@ class _FortuneTodayScreenState extends State<FortuneTodayScreen> {
         decoration: BoxDecoration(
           color: Theme.of(context).cardColor,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: Theme.of(context).dividerColor.withValues(alpha: 0.1)),
+          border: Border.all(
+            color: Theme.of(context).dividerColor.withValues(alpha: 0.1),
+          ),
           boxShadow: [
-            BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 4, offset: const Offset(0, 2)),
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.05),
+              blurRadius: 4,
+              offset: const Offset(0, 2),
+            ),
           ],
         ),
         child: Column(
@@ -319,7 +418,10 @@ class _FortuneTodayScreenState extends State<FortuneTodayScreen> {
               children: [
                 Container(
                   padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(color: color, borderRadius: BorderRadius.circular(12)),
+                  decoration: BoxDecoration(
+                    color: color,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
                   child: Icon(icon, color: Colors.white, size: 20),
                 ),
                 const SizedBox(width: 12),
@@ -327,38 +429,69 @@ class _FortuneTodayScreenState extends State<FortuneTodayScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(title, style: const TextStyle(fontWeight: FontWeight.w600)),
+                      Text(
+                        title,
+                        style: const TextStyle(fontWeight: FontWeight.w600),
+                      ),
                       const SizedBox(height: 4),
-                      Text('$score점', style: const TextStyle(fontWeight: FontWeight.bold, color: AppColors.primary)),
+                      Text(
+                        '$score점',
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.primary,
+                        ),
+                      ),
                     ],
                   ),
                 ),
               ],
             ),
             const SizedBox(height: 12),
-            Text(content, style: TextStyle(color: Theme.of(context).textTheme.bodySmall?.color, fontSize: 13)),
+            Text(
+              content,
+              style: TextStyle(
+                color: Theme.of(context).textTheme.bodySmall?.color,
+                fontSize: 13,
+              ),
+            ),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildLuckyItem(BuildContext context, String emoji, String label, String value) {
+  Widget _buildLuckyItem(
+    BuildContext context,
+    String emoji,
+    String label,
+    String value,
+  ) {
     return Expanded(
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 16),
         decoration: BoxDecoration(
           color: Theme.of(context).cardColor,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: Theme.of(context).dividerColor.withValues(alpha: 0.1)),
+          border: Border.all(
+            color: Theme.of(context).dividerColor.withValues(alpha: 0.1),
+          ),
         ),
         child: Column(
           children: [
             Text(emoji, style: const TextStyle(fontSize: 24)),
             const SizedBox(height: 8),
-            Text(label, style: TextStyle(fontSize: 10, color: Theme.of(context).textTheme.bodySmall?.color)),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 10,
+                color: Theme.of(context).textTheme.bodySmall?.color,
+              ),
+            ),
             const SizedBox(height: 4),
-            Text(value, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 12)),
+            Text(
+              value,
+              style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 12),
+            ),
           ],
         ),
       ),

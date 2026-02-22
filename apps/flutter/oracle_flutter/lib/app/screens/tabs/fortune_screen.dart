@@ -79,43 +79,26 @@ class FortuneScreen extends StatelessWidget {
                       ),
                       child: Column(
                         children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    dateStr,
-                                    style: TextStyle(
-                                      color: AppColors.nightSkyDark.withValues(
-                                        alpha: 0.7,
-                                      ),
-                                      fontSize: 13,
-                                      fontWeight: FontWeight.w600,
-                                    ),
+                              Text(
+                                dateStr,
+                                style: TextStyle(
+                                  color: AppColors.nightSkyDark.withValues(
+                                    alpha: 0.7,
                                   ),
-                                  const SizedBox(height: 4),
-                                  Text(
-                                    appState.t('fortune.today'),
-                                    style: const TextStyle(
-                                      color: AppColors.nightSkyDark,
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              Container(
-                                padding: const EdgeInsets.all(8),
-                                decoration: BoxDecoration(
-                                  color: Colors.white.withValues(alpha: 0.3),
-                                  shape: BoxShape.circle,
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w600,
                                 ),
-                                child: const Icon(
-                                  Icons.auto_awesome,
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                appState.t('fortune.today'),
+                                style: const TextStyle(
                                   color: AppColors.nightSkyDark,
-                                  size: 20,
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
                                 ),
                               ),
                             ],
@@ -198,157 +181,273 @@ class FortuneScreen extends StatelessWidget {
                 // Calendar / Manseryeok
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        appState.t('fortune.calendar'),
-                        style: const TextStyle(
-                          color: AppColors.nightTextPrimary,
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
+                  child: GestureDetector(
+                    onTap: () => context.push('/calendar'),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: AppColors.nightSkyDark,
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(color: AppColors.nightBorder),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.2),
+                            blurRadius: 12,
+                            offset: const Offset(0, 6),
+                          ),
+                        ],
                       ),
-                      const SizedBox(height: 12),
-                      OracleCard(
-                        title: appState.t('fortune.calendar'),
-                        description: appState.t('fortune.calendarDesc'),
-                        icon: const Icon(
-                          Icons.calendar_month,
-                          color: Colors.white,
-                        ),
-                        accentColor: AppColors.sage,
-                        onTap: () => context.push('/calendar'),
-                        child: Padding(
-                          padding: const EdgeInsets.only(top: 16),
-                          child: Container(
-                            padding: const EdgeInsets.all(16),
-                            decoration: BoxDecoration(
-                              color: AppColors.nightSkyDark,
-                              borderRadius: BorderRadius.circular(12),
-                              border: Border.all(color: AppColors.nightBorder),
+                      child: Padding(
+                        padding: const EdgeInsets.all(24),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              appState.t('fortune.calendar'),
+                              style: const TextStyle(
+                                fontSize: 24,
+                                fontWeight: FontWeight.bold,
+                                color: AppColors.starGold,
+                                height: 1.2,
+                              ),
                             ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  appState.t('fortune.weekFortune'),
-                                  style: const TextStyle(
-                                    color: AppColors.nightTextSecondary,
-                                    fontSize: 12,
+                            const SizedBox(height: 8),
+                            Text(
+                              appState.t('fortune.calendarDesc'),
+                              style: const TextStyle(
+                                fontSize: 14,
+                                color: AppColors.nightTextSecondary,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                            const SizedBox(height: 20),
+                            Container(
+                              padding: const EdgeInsets.all(16),
+                              decoration: BoxDecoration(
+                                color: AppColors.nightSkyDark.withValues(
+                                  alpha: 0.3,
+                                ),
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(
+                                  color: AppColors.nightBorder.withValues(
+                                    alpha: 0.5,
                                   ),
                                 ),
-                                const SizedBox(height: 12),
-                                Row(
-                                  children:
-                                      [
-                                        appState.t('common.mon'),
-                                        appState.t('common.tue'),
-                                        appState.t('common.wed'),
-                                        appState.t('common.thu'),
-                                        appState.t('common.fri'),
-                                      ].asMap().entries.map((entry) {
-                                        final idx = entry.key;
-                                        final day = entry.value;
-                                        final isToday = idx == now.weekday - 1;
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    appState.t('fortune.weekFortune'),
+                                    style: const TextStyle(
+                                      color: AppColors.nightTextSecondary,
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 12),
+                                  Row(
+                                    children:
+                                        [
+                                          appState.t('common.sun'),
+                                          appState.t('common.mon'),
+                                          appState.t('common.tue'),
+                                          appState.t('common.wed'),
+                                          appState.t('common.thu'),
+                                          appState.t('common.fri'),
+                                          appState.t('common.sat'),
+                                        ].asMap().entries.map((entry) {
+                                          final idx = entry.key;
+                                          final day = entry.value;
+                                          final todayIdx = now.weekday == 7
+                                              ? 0
+                                              : now.weekday;
+                                          final isToday = idx == todayIdx;
+                                          return Expanded(
+                                            child: Column(
+                                              children: [
+                                                Text(
+                                                  day,
+                                                  style: TextStyle(
+                                                    fontSize: 11,
+                                                    color: isToday
+                                                        ? AppColors.starGold
+                                                        : AppColors
+                                                              .nightTextMuted,
+                                                    fontWeight: isToday
+                                                        ? FontWeight.bold
+                                                        : FontWeight.normal,
+                                                  ),
+                                                ),
+                                                const SizedBox(height: 8),
+                                                Container(
+                                                  height: 4,
+                                                  width: double.infinity,
+                                                  margin:
+                                                      const EdgeInsets.symmetric(
+                                                        horizontal: 4,
+                                                      ),
+                                                  decoration: BoxDecoration(
+                                                    color: isToday
+                                                        ? AppColors.starGold
+                                                        : AppColors.nightBorder,
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                          2,
+                                                        ),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          );
+                                        }).toList(),
+                                  ),
+                                  const SizedBox(height: 16),
+                                  SizedBox(
+                                    height: 90,
+                                    child: Row(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.end,
+                                      children: List.generate(7, (idx) {
+                                        final dayOfYear = now
+                                            .difference(
+                                              DateTime(now.year, 1, 1),
+                                            )
+                                            .inDays;
+                                        final weekStart =
+                                            dayOfYear -
+                                            (now.weekday == 7
+                                                ? 0
+                                                : now.weekday);
+                                        final seed = (weekStart + idx) * 7 + 42;
+                                        final score = 50 + (seed * 31 % 51);
+                                        final barHeight = (score / 100) * 70;
+                                        final todayIdx = now.weekday == 7
+                                            ? 0
+                                            : now.weekday;
+                                        final isToday = idx == todayIdx;
                                         return Expanded(
-                                          child: Column(
-                                            children: [
-                                              Text(
-                                                day,
-                                                style: TextStyle(
-                                                  fontSize: 12,
-                                                  color: isToday
-                                                      ? AppColors.starGold
-                                                      : AppColors
-                                                            .nightTextMuted,
-                                                  fontWeight: isToday
-                                                      ? FontWeight.bold
-                                                      : FontWeight.normal,
+                                          child: Padding(
+                                            padding: const EdgeInsets.symmetric(
+                                              horizontal: 4,
+                                            ),
+                                            child: Column(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.end,
+                                              children: [
+                                                Text(
+                                                  '$score',
+                                                  style: TextStyle(
+                                                    fontSize: 9,
+                                                    color: isToday
+                                                        ? AppColors.starGold
+                                                        : AppColors
+                                                              .nightTextMuted,
+                                                    fontWeight: isToday
+                                                        ? FontWeight.bold
+                                                        : FontWeight.normal,
+                                                  ),
                                                 ),
-                                              ),
-                                              const SizedBox(height: 8),
-                                              Container(
-                                                height: 4,
-                                                width: double.infinity,
-                                                margin:
-                                                    const EdgeInsets.symmetric(
-                                                      horizontal: 6,
-                                                    ),
-                                                decoration: BoxDecoration(
-                                                  color: isToday
-                                                      ? AppColors.starGold
-                                                      : AppColors.nightBorder,
-                                                  borderRadius:
-                                                      BorderRadius.circular(2),
+                                                const SizedBox(height: 4),
+                                                Container(
+                                                  height: barHeight,
+                                                  width: double.infinity,
+                                                  decoration: BoxDecoration(
+                                                    color: isToday
+                                                        ? AppColors.starGold
+                                                        : AppColors.starGold
+                                                              .withValues(
+                                                                alpha: 0.3,
+                                                              ),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                          4,
+                                                        ),
+                                                  ),
                                                 ),
-                                              ),
-                                            ],
+                                              ],
+                                            ),
                                           ),
                                         );
-                                      }).toList(),
-                                ),
-                              ],
+                                      }),
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
-                          ),
+                          ],
                         ),
                       ),
-                    ],
+                    ),
                   ),
                 ),
                 const SizedBox(height: 32),
 
-                // Saju Analysis - Profile 탭으로 이동
+                // Saju Analysis
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        appState.t('fortune.analysis'),
-                        style: const TextStyle(
-                          color: AppColors.nightTextPrimary,
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-                      OracleCard(
-                        title: appState.t('fortune.analysis'),
-                        description: appState.t('fortune.analysisDesc'),
-                        icon: const Icon(
-                          Icons.trending_up,
-                          color: Colors.white,
-                        ),
-                        accentColor: AppColors.primary,
-                        onTap: () =>
-                            context.go('/profile'), // Profile 탭으로 이동하여 사주 결과 표시
-                        child: Padding(
-                          padding: const EdgeInsets.only(top: 16),
-                          child: Row(
-                            children: [
-                              _buildSajuInfo(
-                                theme,
-                                appState.t('fortune.fiveElements'),
-                                '목(木)',
-                              ),
-                              const SizedBox(width: 8),
-                              _buildSajuInfo(
-                                theme,
-                                appState.t('fortune.tenGods'),
-                                '편관',
-                              ),
-                              const SizedBox(width: 8),
-                              _buildSajuInfo(
-                                theme,
-                                appState.t('fortune.majorCycle'),
-                                '길운',
-                              ),
-                            ],
+                  child: GestureDetector(
+                    onTap: () => context.go('/profile'),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: AppColors.nightSkyDark,
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(color: AppColors.nightBorder),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.2),
+                            blurRadius: 12,
+                            offset: const Offset(0, 6),
                           ),
+                        ],
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(24),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              appState.t('fortune.analysis'),
+                              style: const TextStyle(
+                                fontSize: 24,
+                                fontWeight: FontWeight.bold,
+                                color: AppColors.starGold,
+                                height: 1.2,
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              appState.t('fortune.analysisDesc'),
+                              style: const TextStyle(
+                                fontSize: 14,
+                                color: AppColors.nightTextSecondary,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                            const SizedBox(height: 20),
+                            Row(
+                              children: [
+                                _buildSajuInfo(
+                                  theme,
+                                  appState.t('fortune.fiveElements'),
+                                  '목(木)',
+                                ),
+                                const SizedBox(width: 8),
+                                _buildSajuInfo(
+                                  theme,
+                                  appState.t('fortune.tenGods'),
+                                  '편관',
+                                ),
+                                const SizedBox(width: 8),
+                                _buildSajuInfo(
+                                  theme,
+                                  appState.t('fortune.majorCycle'),
+                                  '길운',
+                                ),
+                              ],
+                            ),
+                          ],
                         ),
                       ),
-                    ],
+                    ),
                   ),
                 ),
                 const SizedBox(height: 32),
@@ -356,71 +455,49 @@ class FortuneScreen extends StatelessWidget {
                 // 타로 섹션
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        appState.t('fortune.tarot'),
-                        style: const TextStyle(
-                          color: AppColors.nightTextPrimary,
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-                      OracleCard(
-                        title: appState.t('fortune.tarot'),
-                        description: appState.t('fortune.tarotDesc'),
-                        icon: const Icon(Icons.shuffle, color: Colors.white),
-                        accentColor: AppColors.skyPastel,
-                        onTap: () => context.push('/tarot'),
-                        child: Padding(
-                          padding: const EdgeInsets.only(top: 16),
-                          child: SizedBox(
-                            height: 100, // 높이 제한
-                            child: Row(
-                              children: [1, 2, 3].map((cardNumber) {
-                                return Expanded(
-                                  child: Container(
-                                    margin: EdgeInsets.only(
-                                      right: cardNumber == 3 ? 0 : 8,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      color: AppColors.nightSkyDark,
-                                      border: Border.all(
-                                        color: AppColors.starGold.withValues(
-                                          alpha: 0.3,
-                                        ),
-                                        width: 1,
-                                      ),
-                                      borderRadius: BorderRadius.circular(8),
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: Colors.black.withValues(
-                                            alpha: 0.2,
-                                          ),
-                                          blurRadius: 4,
-                                          offset: const Offset(0, 2),
-                                        ),
-                                      ],
-                                    ),
-                                    child: Center(
-                                      child: Icon(
-                                        Icons.shuffle,
-                                        color: AppColors.starGold.withValues(
-                                          alpha: 0.5,
-                                        ),
-                                        size: 24,
-                                      ),
-                                    ),
-                                  ),
-                                );
-                              }).toList(),
-                            ),
+                  child: GestureDetector(
+                    onTap: () => context.push('/tarot'),
+                    child: Container(
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        color: AppColors.nightSkyDark,
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(color: AppColors.nightBorder),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.2),
+                            blurRadius: 12,
+                            offset: const Offset(0, 6),
                           ),
+                        ],
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(24),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              appState.t('fortune.tarot'),
+                              style: const TextStyle(
+                                fontSize: 24,
+                                fontWeight: FontWeight.bold,
+                                color: AppColors.starGold,
+                                height: 1.2,
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              appState.t('fortune.tarotDesc'),
+                              style: const TextStyle(
+                                fontSize: 14,
+                                color: AppColors.nightTextSecondary,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
-                    ],
+                    ),
                   ),
                 ),
 

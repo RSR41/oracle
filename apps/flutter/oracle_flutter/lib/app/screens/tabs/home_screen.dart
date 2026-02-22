@@ -4,9 +4,36 @@ import 'package:provider/provider.dart';
 import 'package:oracle_flutter/app/theme/app_colors.dart';
 import 'package:oracle_flutter/app/state/app_state.dart';
 import 'package:oracle_flutter/app/widgets/starry_background.dart';
+import 'package:oracle_flutter/app/services/fortune_daily_service.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  final FortuneDailyService _dailyService = FortuneDailyService();
+  DailyFortuneData? _fortuneData;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadFortune();
+  }
+
+  Future<void> _loadFortune() async {
+    final data = await _dailyService.getFortune(DateTime.now());
+    if (!mounted) return;
+    setState(() => _fortuneData = data);
+  }
+
+  String _scoreToStatus(int score, AppState appState) {
+    if (score >= 70) return appState.t('home.status.good');
+    if (score >= 40) return appState.t('home.status.normal');
+    return appState.t('home.status.caution');
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -19,15 +46,12 @@ class HomeScreen extends StatelessWidget {
     final now = DateTime.now();
     final dateStr = '${now.year}년 ${now.month}월 ${now.day}일';
 
-    // 랜덤 조언 (데모용)
-    final advices = [
-      '새로운 시작을 하기에 좋은 날입니다.',
-      '주변 사람들에게 친절을 베푸세요.',
-      '오늘은 잠시 휴식을 취하는 것이 좋습니다.',
-      '뜻밖의 행운이 찾아올 수 있습니다.',
-      '자신의 직관을 믿고 나아가세요.',
-    ];
-    final randomAdvice = advices[now.day % advices.length];
+    // 사주 기반 데이터
+    final data = _fortuneData;
+    final overallScore = data?.overall ?? 0;
+    final adviceText = data?.message ?? '운세를 불러오는 중...';
+    final luckyColor = data?.luckyColor ?? '-';
+    final luckyNumber = data?.luckyNumber.toString() ?? '-';
 
     return Scaffold(
       extendBodyBehindAppBar: true,
@@ -74,7 +98,9 @@ class HomeScreen extends StatelessWidget {
                               decoration: BoxDecoration(
                                 color: AppColors.nightSkyCard,
                                 shape: BoxShape.circle,
-                                border: Border.all(color: AppColors.nightBorder),
+                                border: Border.all(
+                                  color: AppColors.nightBorder,
+                                ),
                               ),
                               child: const Icon(
                                 Icons.person_outline,
@@ -106,38 +132,21 @@ class HomeScreen extends StatelessWidget {
                     ),
                     child: Column(
                       children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              '오늘의 $userName님 운세',
-                              style: const TextStyle(
-                                color: AppColors.nightSkyDark,
-                                fontWeight: FontWeight.w600,
-                                fontSize: 16,
-                              ),
-                            ),
-                            Container(
-                              padding: const EdgeInsets.all(4),
-                              decoration: BoxDecoration(
-                                color: Colors.white.withValues(alpha: 0.3),
-                                shape: BoxShape.circle,
-                              ),
-                              child: const Icon(
-                                Icons.auto_awesome,
-                                color: AppColors.nightSkyDark,
-                                size: 16,
-                              ),
-                            ),
-                          ],
+                        Text(
+                          '오늘의 $userName님 운세',
+                          style: const TextStyle(
+                            color: AppColors.nightSkyDark,
+                            fontWeight: FontWeight.w600,
+                            fontSize: 16,
+                          ),
                         ),
                         const SizedBox(height: 16),
                         Row(
                           crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
-                            const Text(
-                              '85',
-                              style: TextStyle(
+                            Text(
+                              '$overallScore',
+                              style: const TextStyle(
                                 fontSize: 56,
                                 fontWeight: FontWeight.bold,
                                 color: AppColors.nightSkyDark,
@@ -166,17 +175,17 @@ class HomeScreen extends StatelessWidget {
                           children: [
                             _buildScoreItem(
                               appState.t('home.love'),
-                              appState.t('home.status.good'),
+                              _scoreToStatus(data?.love ?? 0, appState),
                             ),
                             const SizedBox(width: 12),
                             _buildScoreItem(
                               appState.t('home.wealth'),
-                              appState.t('home.status.normal'),
+                              _scoreToStatus(data?.money ?? 0, appState),
                             ),
                             const SizedBox(width: 12),
                             _buildScoreItem(
                               appState.t('home.health'),
-                              appState.t('home.status.caution'),
+                              _scoreToStatus(data?.health ?? 0, appState),
                             ),
                           ],
                         ),
@@ -246,7 +255,7 @@ class HomeScreen extends StatelessWidget {
                             const SizedBox(width: 16),
                             Expanded(
                               child: Text(
-                                randomAdvice,
+                                adviceText,
                                 style: const TextStyle(
                                   color: AppColors.nightTextPrimary,
                                   fontSize: 15,
@@ -278,34 +287,42 @@ class HomeScreen extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(height: 16),
-                      Wrap(
-                        alignment: WrapAlignment.spaceBetween,
-                        spacing: 16,
-                        runSpacing: 16,
+                      Row(
                         children: [
-                          _buildQuickAccessBtn(
-                            context,
-                            imagePath: 'assets/images/icons/icon_manse.png',
-                            label: appState.t('home.calendar'),
-                            route: '/calendar',
+                          Expanded(
+                            child: _buildQuickAccessBtn(
+                              context,
+                              imagePath: 'assets/images/icons/icon_manse.png',
+                              label: appState.t('home.calendar'),
+                              route: '/calendar',
+                            ),
                           ),
-                          _buildQuickAccessBtn(
-                            context,
-                            imagePath: 'assets/images/icons/icon_tarot.png',
-                            label: appState.t('home.tarot'),
-                            route: '/tarot',
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: _buildQuickAccessBtn(
+                              context,
+                              imagePath: 'assets/images/icons/icon_tarot.png',
+                              label: appState.t('home.tarot'),
+                              route: '/tarot',
+                            ),
                           ),
-                          _buildQuickAccessBtn(
-                            context,
-                            imagePath: 'assets/images/icons/icon_face.png',
-                            label: appState.t('home.face'),
-                            route: '/face',
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: _buildQuickAccessBtn(
+                              context,
+                              imagePath: 'assets/images/icons/icon_face.png',
+                              label: appState.t('home.face'),
+                              route: '/face',
+                            ),
                           ),
-                          _buildQuickAccessBtn(
-                            context,
-                            imagePath: 'assets/images/icons/icon_dream.png',
-                            label: appState.t('home.dream'),
-                            route: '/dream',
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: _buildQuickAccessBtn(
+                              context,
+                              imagePath: 'assets/images/icons/icon_dream.png',
+                              label: appState.t('home.dream'),
+                              route: '/dream',
+                            ),
                           ),
                         ],
                       ),
@@ -334,8 +351,8 @@ class HomeScreen extends StatelessWidget {
                         children: [
                           Expanded(
                             child: _buildLuckyItem(
-                              '행운의 색',
-                              '골드',
+                              appState.t('fortune.luckyColor'),
+                              luckyColor,
                               Icons.palette,
                               AppColors.starGold,
                             ),
@@ -343,8 +360,8 @@ class HomeScreen extends StatelessWidget {
                           const SizedBox(width: 12),
                           Expanded(
                             child: _buildLuckyItem(
-                              '행운의 숫자',
-                              '7',
+                              appState.t('fortune.luckyNumber'),
+                              luckyNumber,
                               Icons.looks_one,
                               AppColors.starOrange,
                             ),
@@ -440,9 +457,9 @@ class HomeScreen extends StatelessWidget {
       child: Column(
         children: [
           Container(
-            width: 88,
-            height: 88,
-            padding: const EdgeInsets.all(16),
+            width: double.infinity,
+            height: 72,
+            padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
               color: AppColors.nightSkyCard,
               borderRadius: BorderRadius.circular(20),

@@ -47,8 +47,32 @@ function score(seed, min = 72, max = 94) {
   return min + (seed % span);
 }
 
+const personalityPhrases = [
+  '판단이 빠르고 실행력이 좋습니다.',
+  '관계 조율 능력이 뛰어나고 신뢰를 얻기 쉽습니다.',
+  '분석력이 좋아 복잡한 문제를 구조화하는 데 강합니다.',
+  '직관과 현실 감각의 균형이 좋습니다.',
+  '집중력이 높고 장기 목표를 지키는 힘이 있습니다.',
+];
+
+const actionPlans = [
+  '오전에는 핵심 업무 1개를 먼저 끝내세요.',
+  '중요한 대화는 오후 시간에 배치하면 유리합니다.',
+  '지출은 기록 중심으로 관리하면 운을 지킬 수 있습니다.',
+  '컨디션 관리를 위해 수분 섭취와 스트레칭을 병행하세요.',
+  '의사결정 전 체크리스트 3가지를 확인하세요.',
+];
+
+const riskFactors = [
+  '감정적인 급결정',
+  '과도한 멀티태스킹',
+  '불필요한 비교',
+  '수면 부족',
+  '충동 소비',
+];
+
 const patterns = [];
-for (let i = 0; i < 100; i += 1) {
+for (let i = 0; i < 500; i += 1) {
   const e = elements[i % elements.length];
   const base = i + 1;
   const overall = score(base * 13);
@@ -75,7 +99,7 @@ for (let i = 0; i < 100; i += 1) {
       career: careers[e],
       wealth: wealth[e],
       health: health[e],
-      message: messages[e],
+      message: `${messages[e]} ${personalityPhrases[base % personalityPhrases.length]}`,
       luckyColor: colors[e],
       luckyNumber: [((base % 9) + 1), (((base + 3) % 9) + 1), (((base + 6) % 9) + 1)],
       luckyTime: times[base % times.length],
@@ -84,6 +108,12 @@ for (let i = 0; i < 100; i += 1) {
       moneyScore: money,
       healthScore,
       workScore: work,
+      seasonalFlow: ['상승', '유지', '정비'][base % 3],
+      riskFactor: riskFactors[base % riskFactors.length],
+      actionPlan: actionPlans[base % actionPlans.length],
+      relationshipAdvice: `관계에서는 ${['경청', '명확한 표현', '타이밍 조절'][base % 3]}이 핵심입니다.`,
+      workAdvice: `업무에서는 ${['우선순위 고정', '중간 점검', '마감 역산'][base % 3]} 전략이 효과적입니다.`,
+      moneyAdvice: `재정은 ${['고정비 점검', '소액 누수 차단', '목표 예산 분리'][base % 3]}를 추천합니다.`,
     },
   });
 }
