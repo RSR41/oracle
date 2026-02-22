@@ -16,13 +16,32 @@ class TarotDataService {
       final cards = decoded
           .map((e) => TarotCard.fromJson(Map<String, dynamic>.from(e as Map)))
           .toList();
-      _cache = cards.isEmpty ? List<TarotCard>.from(TarotDeck.majorArcana) : cards;
-    } catch (e, st) {
-      debugPrint('Failed to load tarot cards: $e');
-      debugPrintStack(stackTrace: st);
-      _cache = List<TarotCard>.from(TarotDeck.majorArcana);
+      _cache = cards.isEmpty ? _fallbackDeck() : cards;
+    } catch (error, stackTrace) {
+      debugPrint('TarotDataService.loadCards failed: $error');
+      debugPrintStack(stackTrace: stackTrace);
+      _cache = _fallbackDeck();
+    }
+    return _cache!;
+  }
+
+  List<TarotCard> _fallbackDeck() {
+    if (TarotDeck.majorArcana.isNotEmpty) {
+      return List<TarotCard>.from(TarotDeck.majorArcana);
     }
 
-    return _cache!;
+    return [
+      TarotCard(
+        id: 0,
+        name: 'The Fool',
+        nameKo: '바보',
+        upright: 'New beginnings, innocence, adventure',
+        uprightKo: '새로운 시작, 순수함, 모험',
+        reversed: 'Recklessness, risk-taking, foolishness',
+        reversedKo: '무모함, 위험 감수, 어리석음',
+        description: 'A fresh start awaits. Trust your instincts.',
+        descriptionKo: '새로운 시작이 기다립니다. 본능을 믿으세요.',
+      ),
+    ];
   }
 }

@@ -24,7 +24,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
   final ScrollController _scrollController = ScrollController();
 
   static const int _pageSize = 20;
-  String _currentFilter = 'ALL'; // ALL, SAJU, MEETING
+  String _currentFilter = 'ALL'; // ALL, SAJU, TAROT, MEETING
 
   List<FortuneResult> _items = [];
   bool _isLoading = false;
@@ -190,7 +190,12 @@ class _HistoryScreenState extends State<HistoryScreen> {
     // UI 필터링 적용
     final displayItems = _items.where((item) {
       final isMeeting = item.type.startsWith('meeting_');
-      if (_currentFilter == 'SAJU') return !isMeeting;
+      if (_currentFilter == 'SAJU') {
+        return item.type == 'saju' || item.type == 'fortune';
+      }
+      if (_currentFilter == 'TAROT') {
+        return item.type == 'tarot';
+      }
       if (_currentFilter == 'MEETING') return isMeeting;
       return true;
     }).toList();
@@ -265,6 +270,8 @@ class _HistoryScreenState extends State<HistoryScreen> {
           _filterChip('전체', 'ALL'),
           const SizedBox(width: 8),
           _filterChip('사주', 'SAJU'),
+          const SizedBox(width: 8),
+          _filterChip('타로', 'TAROT'),
           // Phase 2+: Meeting filter
           if (FeatureFlags.showBetaFeatures) ...[
             const SizedBox(width: 8),
