@@ -147,8 +147,8 @@ class _HistoryScreenState extends State<HistoryScreen> {
     switch (_currentFilter) {
       case 'SAJU':
         return (
-          where: 'type = ? OR type = ?',
-          whereArgs: ['saju', 'fortune'],
+          where: 'type = ? OR type = ? OR type LIKE ?',
+          whereArgs: ['saju', 'fortune', '%saju%'],
         );
       case 'TAROT':
         return (where: 'type = ?', whereArgs: ['tarot']);
