@@ -147,8 +147,8 @@ class _HistoryScreenState extends State<HistoryScreen> {
     switch (_currentFilter) {
       case 'SAJU':
         return (
-          where: "type = ? OR type LIKE ?",
-          whereArgs: ['fortune', '%saju%'],
+          where: 'type = ? OR type = ?',
+          whereArgs: ['saju', 'fortune'],
         );
       case 'TAROT':
         return (where: 'type = ?', whereArgs: ['tarot']);
@@ -329,60 +329,48 @@ class _HistoryScreenState extends State<HistoryScreen> {
     ThemeData theme,
     List<FortuneResult> displayItems,
   ) {
-    // 에러 발생 (초기 단계)
-    if (_hasError && _items.isEmpty) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Icon(Icons.error_outline, size: 60, color: Colors.redAccent),
-            const SizedBox(height: 16),
-            const Text('데이터를 불러오지 못했습니다.'),
-            const SizedBox(height: 8),
-            ElevatedButton(
-              onPressed: _loadInitialData,
-              child: const Text('다시 시도'),
-            ),
-          ],
-        ),
-      );
-    }
-
-    // 데이터 없음 (필터링 결과 포함)
-    if (displayItems.isEmpty) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              _items.isEmpty ? Icons.history : Icons.filter_list_off,
-              size: 60,
-              color: theme.disabledColor,
-            ),
-            const SizedBox(height: 16),
-            Text(
-              _items.isEmpty ? appState.t('history.empty') : '해당 필터에 기록이 없습니다.',
-              style: theme.textTheme.bodyMedium,
-            ),
-          ],
-        ),
-      );
-    }
-
-    // 리스트 + 무한 스크롤
     return RefreshIndicator(
       onRefresh: _loadInitialData,
       child: ListView.separated(
         controller: _scrollController,
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-        itemCount: displayItems.length + 1, // Loading or End indicator
+        itemCount: displayItems.length + 1,
         separatorBuilder: (_, __) => const SizedBox(height: 12),
         itemBuilder: (context, index) {
           if (index < displayItems.length) {
             return _buildHistoryCard(context, displayItems[index]);
           }
 
-          // Footer (기존 로직 유지)
+          if (_hasError && _items.isEmpty) {
+            return Padding(
+              padding: const EdgeInsets.symmetric(vertical: 48),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(Icons.error_outline, size: 60, color: Colors.redAccent),
+                  const SizedBox(height: 16),
+                  const Text('데이터를 불러오지 못했습니다.'),
+                  const SizedBox(height: 8),
+                  ElevatedButton(onPressed: _loadInitialData, child: const Text('다시 시도')),
+                ],
+              ),
+            );
+          }
+
+          if (displayItems.isEmpty) {
+            return Padding(
+              padding: const EdgeInsets.symmetric(vertical: 48),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.history, size: 60, color: theme.disabledColor),
+                  const SizedBox(height: 16),
+                  Text(appState.t('history.empty'), style: theme.textTheme.bodyMedium),
+                ],
+              ),
+            );
+          }
+
           if (_hasError) {
             return Padding(
               padding: const EdgeInsets.symmetric(vertical: 16),
