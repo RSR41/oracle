@@ -31,6 +31,7 @@ import '../database/history_repository.dart';
 import '../history/history_payload.dart';
 import 'package:oracle_meeting/meeting.dart';
 import '../models/tarot_card.dart';
+import '../models/tarot_spread.dart';
 import '../services/dream/dream_interpreter.dart';
 import '../services/face/face_analyzer.dart';
 
@@ -220,8 +221,13 @@ class AppRouter {
             final extra = state.extra;
             if (extra is Map<String, dynamic>) {
               final cards = extra['cards'] as List<TarotCard>;
+              final spread = extra['spread'] as TarotSpread?;
               final question = extra['question'] as String?;
-              return TarotResultScreen(cards: cards, question: question);
+              return TarotResultScreen(
+                cards: cards,
+                spread: spread,
+                question: question,
+              );
             }
 
             final cards = extra as List<TarotCard>;
