@@ -49,16 +49,25 @@ void main() {
       expect(history.first.text, 'Hello');
     });
 
-    test('seedTestMessages should populate data', () async {
-      final matchId = 'seed_match';
-      await service.seedTestMessages(matchId, count: 5);
+    test('getLastMessage should return most recent message', () async {
+      final matchId = 'last_msg_match';
+      await service.sendMessage(
+        matchId: matchId,
+        myUserId: 'me',
+        content: 'First',
+        otherUserId: 'other',
+      );
+      await service.sendMessage(
+        matchId: matchId,
+        myUserId: 'me',
+        content: 'Second',
+        otherUserId: 'other',
+      );
 
-      final history = await service.getMessages(matchId);
-      expect(history.length, 5);
-      // Repository returns reversed(DESC) list -> ASC
-      // seed loop inserts 0..count
-      // i=0 is oldest
-      expect(history.first.text, '테스트 메시지 0');
+      final lastMsg = await service.getLastMessage(matchId);
+      expect(lastMsg, isNotNull);
+      // The last message sent by 'me' should be 'Second'
+      expect(lastMsg!.text, 'Second');
     });
   });
 }

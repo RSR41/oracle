@@ -31,53 +31,96 @@ class MeetingService {
     }
   }
 
+  // ─────────────────── Mock Data ───────────────────
+
+  static final _introductions = [
+    '카페에서 책 읽는 것을 좋아해요 ☕',
+    '주말에는 등산이나 캠핑을 즐겨요 🏕️',
+    '요리하는 걸 좋아하는 집순이/집돌이입니다 🍳',
+    '음악과 여행을 사랑하는 자유로운 영혼 🎵',
+    '반려동물과 함께하는 일상이 행복해요 🐕',
+    '운동을 좋아하고 건강한 라이프스타일을 추구해요 💪',
+    '영화와 넷플릭스가 취미인 감성파입니다 🎬',
+    '맛집 탐방이 취미예요! 같이 가실 분? 🍜',
+    '사진 찍는 걸 좋아해서 인스타를 열심히 해요 📸',
+    '게임도 좋아하고 보드게임 카페도 자주 가요 🎮',
+    '진지한 만남을 원해요. 같이 성장할 사람 찾습니다 🌱',
+    '유머감각이 있는 편이에요. 항상 웃는 얼굴! 😊',
+    '주말 드라이브가 취미이고 카페 투어를 즐겨요 🚗',
+    '독서와 글쓰기를 좋아하는 문학 소녀/소년 📖',
+    '서로 존중하며 편안한 관계를 원해요 💕',
+    '여행 다니면서 맛있는 거 먹는 게 최고! ✈️',
+    '운동 후 치맥이 삶의 낙입니다 🍺',
+    '주말에 전시회나 공연 보러 가는 것을 좋아해요 🎨',
+    '날씨 좋은 날 한강 산책이 최고예요 🌅',
+    '귀엽고 포근한 사람을 좋아해요 🧸',
+  ];
+
+  static final _regions = [
+    {'code': 'SEL', 'name': '서울'},
+    {'code': 'GYG', 'name': '경기'},
+    {'code': 'ICN', 'name': '인천'},
+    {'code': 'BSN', 'name': '부산'},
+    {'code': 'DGU', 'name': '대구'},
+    {'code': 'GWJ', 'name': '광주'},
+    {'code': 'DJN', 'name': '대전'},
+    {'code': 'JJD', 'name': '제주'},
+  ];
+
+  static final _occupations = [
+    '회사원', 'IT 개발자', '디자이너', '마케터', '교사',
+    '간호사', '약사', '공무원', '자영업', '대학생',
+    '대학원생', '프리랜서', '영업직', '연구원', '금융업',
+    '요리사', '엔지니어', '건축가', '법률가', '의료인',
+  ];
+
+  static final _names = [
+    '지수', '민준', '서연', '도윤', '하은',
+    '지호', '수아', '예준', '지우', '우진',
+    '유진', '준호', '지원', '서준', '수빈',
+    '유준', '은지', '현우', '다은', '건우',
+  ];
+
   Future<void> initializeMockUsers() async {
-    // Only if recommendation empty
     var recs = await _repo.getRecommendations('me');
     if (recs.isNotEmpty) return;
 
-    final names = [
-      '지수',
-      '민준',
-      '서연',
-      '도윤',
-      '하은',
-      '지호',
-      '수아',
-      '예준',
-      '지우',
-      '우진',
-      '유진',
-      '준호',
-      '지원',
-      '서준',
-      '수빈',
-      '유준',
-      '은지',
-      '현우',
-      '다은',
-      '건우'
-    ];
-
-    for (int i = 0; i < names.length; i++) {
+    for (int i = 0; i < _names.length; i++) {
       final isFemale = i % 2 == 0;
       final year = 1990 + _random.nextInt(10);
       final month = 1 + _random.nextInt(12);
       final day = 1 + _random.nextInt(28);
+      final region = _regions[i % _regions.length];
+      final heights = isFemale
+          ? [155, 158, 160, 162, 165, 168, 170]
+          : [170, 173, 175, 178, 180, 182, 185];
 
       await _repo.saveUser(MeetingUser(
         id: 'user_$i',
-        nickname: names[i],
+        nickname: _names[i],
         gender: isFemale ? 'F' : 'M',
         birthDate:
             '$year-${month.toString().padLeft(2, '0')}-${day.toString().padLeft(2, '0')}',
         sajuJson: '{}',
         avatarPath: null,
+        introduction: _introductions[i],
+        regionCode: region['code'],
+        regionName: region['name'],
+        height: heights[_random.nextInt(heights.length)],
+        occupation: _occupations[i],
+        idealTypeKeywords: _pickRandom(['유머', '진지함', '활발함', '차분함', '다정함', '지적임'], 2),
+        activityTags: _pickRandom(['카페', '등산', '영화', '운동', '여행', '독서', '게임', '요리'], 3),
       ));
     }
   }
 
-  // 32-bit FNV-1a hash for deterministic results across platforms
+  List<String> _pickRandom(List<String> source, int count) {
+    final shuffled = List<String>.from(source)..shuffle(_random);
+    return shuffled.take(count).toList();
+  }
+
+  // ─────────────────── Score Calculation ───────────────────
+
   int _fnv1aHash(String input) {
     var hash = 0x811c9dc5;
     for (var i = 0; i < input.length; i++) {
@@ -91,29 +134,34 @@ class MeetingService {
     return _fnv1aHash(seed).toUnsigned(32).toRadixString(16).padLeft(8, '0');
   }
 
-  // Calculate generic compatibility score (0-100) using deterministic hash
+  /// Calculate compatibility score (60-100)
   int calculateScore(String myId, String targetId) {
     final hash = _fnv1aHash(myId + targetId);
     return 60 + (hash.abs() % 41); // 60 ~ 100
   }
 
+  // ─────────────────── Like / Pass / Match ───────────────────
+
   Future<bool> likeUser(String myUserId, String targetUserId) async {
-    // 1. Save like
     final now = DateTime.now().toIso8601String();
     await _repo.saveLike(MeetingLike(
         fromUserId: myUserId, toUserId: targetUserId, createdAt: now));
 
-    // 2. Check for "Mutual Like"
-    // Demo logic: 'user_0' (지수) is ALWAYS a match for demo purposes
+    // Check for mutual like → match
     final hash = _fnv1aHash(myUserId + targetUserId);
     bool isMatch = (targetUserId == 'user_0') || (hash % 3 == 0);
 
     if (isMatch) {
+      final score = calculateScore(myUserId, targetUserId);
       final matchId = _uuid.v4();
       await _repo.saveMatch(MeetingMatch(
-          id: matchId, userA: myUserId, userB: targetUserId, matchedAt: now));
+        id: matchId,
+        userA: myUserId,
+        userB: targetUserId,
+        matchedAt: now,
+        compatibilityScore: score,
+      ));
 
-      // [ 지점 #2 ] MATCH 성립 History 기록
       await _safeHistory({
         'id': _deterministicId("match|$matchId"),
         'type': 'meeting_match',
@@ -124,16 +172,17 @@ class MeetingService {
           'matchId': matchId,
           'myUserId': myUserId,
           'targetUserId': targetUserId,
+          'score': score,
         }
       });
 
-      // Auto-send initial greeting (Mock)
-      await Future.delayed(const Duration(milliseconds: 500));
+      // Auto-send initial greeting
+      await Future.delayed(const Duration(milliseconds: 300));
       await _repo.sendMessage(MeetingMessage(
         id: _uuid.v4(),
         matchId: matchId,
         senderId: targetUserId,
-        text: '안녕하세요! 좋아요 눌러주셔서 감사해요 :)',
+        text: '안녕하세요! 좋아요 눌러주셔서 감사해요 😊',
         createdAt: DateTime.now().toIso8601String(),
       ));
 
@@ -141,6 +190,68 @@ class MeetingService {
     }
     return false;
   }
+
+  Future<void> passUser(String myUserId, String targetUserId) async {
+    final now = DateTime.now().toIso8601String();
+    await _repo.savePass(MeetingPass(
+        fromUserId: myUserId, toUserId: targetUserId, createdAt: now));
+  }
+
+  // ─────────────────── Block / Report ───────────────────
+
+  Future<void> blockUser(String myUserId, String targetUserId) async {
+    final block = MeetingBlock(
+      id: _uuid.v4(),
+      blockerUserId: myUserId,
+      blockedUserId: targetUserId,
+      createdAt: DateTime.now().toIso8601String(),
+    );
+    await _repo.blockUser(block);
+
+    await _safeHistory({
+      'id': _deterministicId("block|$myUserId|$targetUserId"),
+      'type': 'meeting_block',
+      'title': '[Meeting] 사용자 차단',
+      'body': '사용자를 차단했습니다.',
+      'createdAt': DateTime.now().toIso8601String(),
+      'meta': {
+        'blockerUserId': myUserId,
+        'blockedUserId': targetUserId,
+      }
+    });
+  }
+
+  Future<void> reportUser({
+    required String matchId,
+    required String reporterId,
+    required String reason,
+    String? description,
+  }) async {
+    final report = MeetingReport(
+      id: _uuid.v4(),
+      matchId: matchId,
+      reporterId: reporterId,
+      reason: reason,
+      description: description,
+      createdAt: DateTime.now().toIso8601String(),
+    );
+    await _repo.reportUser(report);
+
+    await _safeHistory({
+      'id': _deterministicId("report|${report.id}"),
+      'type': 'meeting_report',
+      'title': '[Meeting] 신고 접수',
+      'body': '신고가 접수되었습니다.',
+      'createdAt': DateTime.now().toIso8601String(),
+      'meta': {
+        'matchId': matchId,
+        'reporterId': reporterId,
+        'reason': reason,
+      }
+    });
+  }
+
+  // ─────────────────── Data Access ───────────────────
 
   Future<List<MeetingMatch>> getMatches(String userId) =>
       _repo.getMatches(userId);
@@ -152,6 +263,8 @@ class MeetingService {
       _repo.getMessages(matchId, limit: limit, offset: offset);
   Future<void> markAsRead(String matchId, String userId) =>
       _repo.markAsRead(matchId, userId);
+  Future<MeetingMessage?> getLastMessage(String matchId) =>
+      _repo.getLastMessage(matchId);
 
   Future<MeetingMessage> sendMessage({
     required String matchId,
@@ -170,21 +283,7 @@ class MeetingService {
       createdAt: now,
     ));
 
-    // [ 지점 #3 ] MESSAGE 전송 History 기록
-    await _safeHistory({
-      'id': _deterministicId("msg|$messageId"),
-      'type': 'meeting_message',
-      'title': '[Meeting] 메시지 전송',
-      'body': content.length > 20 ? '${content.substring(0, 20)}...' : content,
-      'createdAt': now,
-      'meta': {
-        'messageId': messageId,
-        'matchId': matchId,
-        'senderId': myUserId,
-      }
-    });
-
-    // Mock Reply logic
+    // Schedule mock reply
     _scheduleMockReply(matchId, otherUserId);
 
     return message;
@@ -198,8 +297,9 @@ class MeetingService {
         '오늘 하루 어떠셨나요?',
         '저도 그렇게 생각해요 ㅎㅎ',
         '다음에 밥 한번 먹어요!',
+        '사주 궁합이 잘 맞다니 신기하네요 ✨',
+        '어디 사세요? 가까우면 좋겠다!',
       ];
-      // Use message count to pick a reply deterministically
       final text = replies[messages.length % replies.length];
 
       await _repo.sendMessage(MeetingMessage(
@@ -212,51 +312,30 @@ class MeetingService {
     });
   }
 
-  /// 디버그용: 테스트 메시지 생성
-  Future<void> seedTestMessages(String matchId, {int count = 10}) async {
-    for (int i = 0; i < count; i++) {
-      final isMe = i % 2 == 0;
-      await _repo.sendMessage(MeetingMessage(
-        id: _uuid.v4(),
-        matchId: matchId,
-        senderId: isMe ? 'me' : 'other',
-        text: '테스트 메시지 $i',
-        createdAt: DateTime.now()
-            .subtract(Duration(minutes: count - i))
-            .toIso8601String(),
-        readAt: isMe ? DateTime.now().toIso8601String() : null,
-      ));
-    }
-  }
+  // ─────────────────── Demo Reset ───────────────────
 
-  /// 시연을 위한 전체 데이터 초기화 및 재설정
   Future<void> resetAndSeedAll({String myUserId = 'me'}) async {
-    // 1. 기존 데이터 삭제
     await _repo.clearAllData();
-
-    // 2. 추천 유저 20명 생성
-    // Use fixed seed for Random to make it deterministic if needed,
-    // but here we just want fixed names and counts.
     await initializeMockUsers();
 
-    // 3. 강제 매칭 1건 생성 (시연용 - 이미 대화가 진행중인 방)
     final matchId = 'demo_match_1';
-    final targetUserId = 'user_0'; // '지수'
+    final targetUserId = 'user_0';
     final now = DateTime.now().toIso8601String();
+    final score = calculateScore(myUserId, targetUserId);
 
     await _repo.saveMatch(MeetingMatch(
       id: matchId,
       userA: myUserId,
       userB: targetUserId,
       matchedAt: now,
+      compatibilityScore: score,
     ));
 
-    // 4. 초기 메시지 생성
     await _repo.sendMessage(MeetingMessage(
       id: _uuid.v4(),
       matchId: matchId,
       senderId: targetUserId,
-      text: '안녕하세요! 매칭되어서 기뻐요. 사주 궁합 보셨나요?',
+      text: '안녕하세요! 매칭되어서 기뻐요. 사주 궁합 보셨나요? 😊',
       createdAt:
           DateTime.now().subtract(const Duration(minutes: 5)).toIso8601String(),
     ));
@@ -270,25 +349,21 @@ class MeetingService {
           DateTime.now().subtract(const Duration(minutes: 2)).toIso8601String(),
     ));
 
-    // 5. 안 읽은 메시지 1개 추가 (상대방 측)
     await _repo.sendMessage(MeetingMessage(
       id: _uuid.v4(),
       matchId: matchId,
       senderId: targetUserId,
-      text: '정말요? 제가 보낸 답변 기다릴게요!',
+      text: '정말요? 우리 진짜 잘 맞을 것 같아요! 💜',
       createdAt: DateTime.now().toIso8601String(),
     ));
 
-    // [ 지점 #1 ] SEED 실행됨 History 기록
     await _safeHistory({
       'id': _deterministicId("seed|$myUserId"),
       'type': 'meeting_seed',
       'title': '[Meeting] Seed 완료',
       'body': '데모 데이터가 초기화되고 새로운 인연이 생성되었습니다.',
       'createdAt': DateTime.now().toIso8601String(),
-      'meta': {
-        'myUserId': myUserId,
-      }
+      'meta': {'myUserId': myUserId}
     });
   }
 }

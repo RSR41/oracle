@@ -18,7 +18,7 @@ import 'package:provider/provider.dart';
 import '../screens/stack/settings_screen.dart';
 import '../screens/fortune/fortune_today_screen.dart';
 import '../screens/fortune/fortune_detail_screen.dart';
-import '../screens/meeting/meeting_history_detail_screen.dart';
+import '../screens/meeting/meeting_gateway_screen.dart';
 import '../screens/dream/dream_input_screen.dart';
 import '../screens/dream/dream_result_screen.dart';
 import '../screens/tarot/tarot_screen.dart';
@@ -92,77 +92,6 @@ class AppRouter {
             ),
             if (showBetaFeatures)
               GoRoute(
-                path: '/meeting',
-                pageBuilder: (context, state) {
-                  final appState = Provider.of<AppState>(context);
-                  if (!appState.hasSajuProfile) {
-                    return const NoTransitionPage(child: MeetingProfileGate());
-                  }
-                  return NoTransitionPage(
-                    child: MeetingHomeScreen(
-                      myUserId: appState.profile?.nickname ?? 'me',
-                      myNickname: appState.profile?.nickname ?? '나',
-                      onHistoryRecord: (payload) async {
-                        final historyRepo = HistoryRepository();
-                        final result = FortuneResult(
-                          id: payload['id'],
-                          type: payload['type'],
-                          title: payload['title'],
-                          date: DateTime.now().toIso8601String().split('T')[0],
-                          summary: payload['body'],
-                          content: payload['body'],
-                          overallScore: 0,
-                          createdAt: payload['createdAt'],
-                        );
-
-                        await historyRepo.saveWithPayload(
-                          result: result,
-                          payload: HistoryPayload.wrap(
-                            feature: 'meeting',
-                            summary: {
-                              'title': result.title,
-                              'type': result.type,
-                              'date': result.date,
-                            },
-                            data: Map<String, dynamic>.from(payload),
-                            extra: payload['meta'] is Map<String, dynamic>
-                                ? Map<String, dynamic>.from(payload['meta'])
-                                : null,
-                          ),
-                        );
-                        debugPrint(
-                          'History recorded from App side: ${payload['type']}',
-                        );
-                      },
-                      onOpenMeetingHistory: () =>
-                          context.push('/meeting/history'),
-                    ),
-                  );
-                },
-                routes: [
-                  GoRoute(
-                    path: 'history',
-                    builder: (context, state) => const HistoryScreen(
-                      initialFilter: 'MEETING',
-                      lockFilter: true,
-                    ),
-                    routes: [
-                      GoRoute(
-                        path: 'detail/:id',
-                        builder: (context, state) {
-                          final id = state.pathParameters['id']!;
-                          return MeetingHistoryDetailScreen(
-                            id: id,
-                            extra: state.extra,
-                          );
-                        },
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            if (showBetaFeatures)
-              GoRoute(
                 path: '/compatibility',
                 pageBuilder: (context, state) =>
                     const NoTransitionPage(child: CompatibilityScreen()),
@@ -178,6 +107,70 @@ class AppRouter {
                   const NoTransitionPage(child: ProfileScreen()),
             ),
           ],
+        ),
+
+        // ── Meeting Gateway (mystical unlock screen) ──
+        GoRoute(
+          path: '/meeting-gateway',
+          builder: (context, state) => const MeetingGatewayScreen(),
+        ),
+
+        // ── Meeting Home (push, not tab) ──
+        GoRoute(
+          path: '/meeting',
+          builder: (context, state) {
+            final appState = Provider.of<AppState>(context);
+            if (!appState.hasSajuProfile) {
+              return const MeetingProfileGate();
+            }
+            return MeetingHomeScreen(
+              myUserId: appState.profile?.nickname ?? 'me',
+              myNickname: appState.profile?.nickname ?? '나',
+              onHistoryRecord: (payload) async {
+                final historyRepo = HistoryRepository();
+                final result = FortuneResult(
+                  id: payload['id'],
+                  type: payload['type'],
+                  title: payload['title'],
+                  date: DateTime.now().toIso8601String().split('T')[0],
+                  summary: payload['body'],
+                  content: payload['body'],
+                  overallScore: 0,
+                  createdAt: payload['createdAt'],
+                );
+
+                await historyRepo.saveWithPayload(
+                  result: result,
+                  payload: HistoryPayload.wrap(
+                    feature: 'meeting',
+                    summary: {
+                      'title': result.title,
+                      'type': result.type,
+                      'date': result.date,
+                    },
+                    data: Map<String, dynamic>.from(payload),
+                    extra: payload['meta'] is Map<String, dynamic>
+                        ? Map<String, dynamic>.from(payload['meta'])
+                        : null,
+                  ),
+                );
+                debugPrint(
+                  'History recorded from App side: ${payload['type']}',
+                );
+              },
+              onOpenMeetingHistory: () =>
+                  context.push('/meeting-history'),
+            );
+          },
+        ),
+
+        // ── Meeting History (push) ──
+        GoRoute(
+          path: '/meeting-history',
+          builder: (context, state) => const HistoryScreen(
+            initialFilter: 'MEETING',
+            lockFilter: true,
+          ),
         ),
 
         // Stack Screens (No Bottom Nav)
@@ -248,19 +241,18 @@ class AppRouter {
             );
           },
         ),
-        if (showBetaFeatures)
-          GoRoute(
-            path: '/meeting/chat',
-            builder: (context, state) {
-              final extra = state.extra as Map<String, dynamic>;
-              return MeetingChatScreen(
-                matchId: extra['matchId'] as String,
-                myUserId: extra['myUserId'] as String,
-                otherUserId: extra['otherUserId'] as String,
-                otherUserName: extra['otherUserName'] as String,
-              );
-            },
-          ),
+        GoRoute(
+          path: '/meeting/chat',
+          builder: (context, state) {
+            final extra = state.extra as Map<String, dynamic>;
+            return MeetingChatScreen(
+              matchId: extra['matchId'] as String,
+              myUserId: extra['myUserId'] as String,
+              otherUserId: extra['otherUserId'] as String,
+              otherUserName: extra['otherUserName'] as String,
+            );
+          },
+        ),
 
         // Feature & Placeholders
         GoRoute(

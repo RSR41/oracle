@@ -16,17 +16,37 @@ class MeetingLike {
       };
 }
 
+class MeetingPass {
+  final String fromUserId;
+  final String toUserId;
+  final String createdAt;
+
+  MeetingPass({
+    required this.fromUserId,
+    required this.toUserId,
+    required this.createdAt,
+  });
+
+  Map<String, dynamic> toMap() => {
+        'fromUserId': fromUserId,
+        'toUserId': toUserId,
+        'createdAt': createdAt,
+      };
+}
+
 class MeetingMatch {
   final String id;
   final String userA;
   final String userB;
   final String matchedAt;
+  final int? compatibilityScore;
 
   MeetingMatch({
     required this.id,
     required this.userA,
     required this.userB,
     required this.matchedAt,
+    this.compatibilityScore,
   });
 
   Map<String, dynamic> toMap() => {
@@ -34,6 +54,7 @@ class MeetingMatch {
         'userA': userA,
         'userB': userB,
         'matchedAt': matchedAt,
+        'compatibilityScore': compatibilityScore,
       };
 }
 
@@ -78,14 +99,18 @@ class MeetingReport {
   final String matchId;
   final String reporterId;
   final String reason;
+  final String? description;
   final String createdAt;
+  final String status;
 
   MeetingReport({
     required this.id,
     required this.matchId,
     required this.reporterId,
     required this.reason,
+    this.description,
     required this.createdAt,
+    this.status = 'pending',
   });
 
   Map<String, dynamic> toMap() => {
@@ -93,6 +118,36 @@ class MeetingReport {
         'matchId': matchId,
         'reporterId': reporterId,
         'reason': reason,
+        'description': description,
+        'createdAt': createdAt,
+        'status': status,
+      };
+}
+
+class MeetingBlock {
+  final String id;
+  final String blockerUserId;
+  final String blockedUserId;
+  final String createdAt;
+
+  MeetingBlock({
+    required this.id,
+    required this.blockerUserId,
+    required this.blockedUserId,
+    required this.createdAt,
+  });
+
+  Map<String, dynamic> toMap() => {
+        'id': id,
+        'blockerUserId': blockerUserId,
+        'blockedUserId': blockedUserId,
         'createdAt': createdAt,
       };
+
+  factory MeetingBlock.fromMap(Map<String, dynamic> map) => MeetingBlock(
+        id: map['id'],
+        blockerUserId: map['blockerUserId'],
+        blockedUserId: map['blockedUserId'],
+        createdAt: map['createdAt'],
+      );
 }

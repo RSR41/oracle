@@ -1,9 +1,11 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:uuid/uuid.dart';
 import '../models/meeting_match_models.dart';
 import '../repository/meeting_repository.dart';
 import '../services/meeting_service.dart';
+import '../theme/meeting_theme.dart';
 
 class MeetingChatScreen extends StatefulWidget {
   final String matchId;
@@ -61,13 +63,9 @@ class _MeetingChatScreenState extends State<MeetingChatScreen> {
   }
 
   Future<void> _loadMessages({bool initial = false}) async {
-    // C-3-1에서 변경된 limit/offset API 사용 (기본값 사용)
     final msgs = await _service.getMessages(widget.matchId);
-
     if (!mounted) return;
 
-    // 변경사항이 있을 때만 UI 업데이트 (개수가 같더라도 내용(시간)이 다를 수 있지만 MVP에선 개수로 충분)
-    // 실제 운영 환경에선 마지막 메시지 ID 등으로 체크 권장
     if (initial || msgs.length != _messages.length) {
       setState(() {
         _messages = msgs;
@@ -79,8 +77,6 @@ class _MeetingChatScreenState extends State<MeetingChatScreen> {
       } else {
         _scrollToBottom();
       }
-
-      // 읽음 처리
       _markAsRead();
     }
   }
@@ -95,10 +91,8 @@ class _MeetingChatScreenState extends State<MeetingChatScreen> {
 
     _textController.clear();
 
-    // Optimistic Update (UI에 즉시 반영)
-    final tempId = DateTime.now().millisecondsSinceEpoch.toString();
     final tempMsg = MeetingMessage(
-      id: tempId,
+      id: const Uuid().v4(),
       matchId: widget.matchId,
       senderId: widget.myUserId,
       text: text,
@@ -117,13 +111,12 @@ class _MeetingChatScreenState extends State<MeetingChatScreen> {
         content: text,
         otherUserId: widget.otherUserId,
       );
-      // Polling에 의해 최종 상태로 업데이트됨
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('메시지 전송 실패: $e')),
       );
-      _loadMessages(); // 상태 롤백/새로고침
+      _loadMessages();
     }
   }
 
@@ -143,60 +136,135 @@ class _MeetingChatScreenState extends State<MeetingChatScreen> {
     });
   }
 
-  void _showReportDialog() {
-    showDialog(
+  void _showReportSheet() {
+    showModalBottomSheet(
       context: context,
-      builder: (_) => AlertDialog(
-        title: const Text('신고하기'),
-        content: const Text('부적절한 사용자입니까? 신고 시 상대방과의 대화가 차단될 수 있습니다.'),
-        actions: [
-          TextButton(
-              onPressed: () => Navigator.pop(context), child: const Text('취소')),
-          TextButton(
-            onPressed: () async {
-              // TODO: 실제 신고 API 호출 (Repository 연동)
-              Navigator.pop(context);
-              Navigator.pop(context);
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('신고가 접수되었습니다.')),
-              );
-            },
-            child: const Text('신고', style: TextStyle(color: Colors.red)),
-          )
-        ],
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
+      builder: (_) => SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text('신고/차단', style: MeetingTheme.headingMedium),
+              const SizedBox(height: 16),
+              _buildReportOption(
+                icon: Icons.flag_outlined,
+                label: '스팸/광고',
+                reason: 'spam',
+              ),
+              _buildReportOption(
+                icon: Icons.warning_amber_rounded,
+                label: '욕설/비하',
+                reason: 'abuse',
+              ),
+              _buildReportOption(
+                icon: Icons.no_adult_content,
+                label: '부적절한 콘텐츠',
+                reason: 'sexual_content',
+              ),
+              _buildReportOption(
+                icon: Icons.person_off_outlined,
+                label: '사기/사칭',
+                reason: 'scam',
+              ),
+              const Divider(height: 24),
+              ListTile(
+                leading: const Icon(Icons.block, color: Colors.red),
+                title: const Text('이 사용자 차단',
+                    style: TextStyle(
+                        color: Colors.red, fontWeight: FontWeight.w600)),
+                onTap: () async {
+                  Navigator.pop(context);
+                  await _service.blockUser(
+                      widget.myUserId, widget.otherUserId);
+                  if (mounted) {
+                    Navigator.pop(context); // Exit chat
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('사용자가 차단되었습니다.'),
+                        backgroundColor: Colors.red,
+                      ),
+                    );
+                  }
+                },
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildReportOption({
+    required IconData icon,
+    required String label,
+    required String reason,
+  }) {
+    return ListTile(
+      leading: Icon(icon, color: MeetingTheme.textSecondary),
+      title: Text(label),
+      onTap: () async {
+        Navigator.pop(context); // Close sheet
+        await _service.reportUser(
+          matchId: widget.matchId,
+          reporterId: widget.myUserId,
+          reason: reason,
+        );
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('신고가 접수되었습니다. 검토 후 조치하겠습니다.'),
+              backgroundColor: MeetingTheme.primary,
+            ),
+          );
+        }
+      },
     );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: MeetingTheme.background,
       appBar: AppBar(
         title: Text(widget.otherUserName,
-            style: const TextStyle(fontWeight: FontWeight.bold)),
+            style: const TextStyle(
+                fontWeight: FontWeight.w700, color: MeetingTheme.textPrimary)),
         centerTitle: true,
-        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-        elevation: 0.5,
+        backgroundColor: MeetingTheme.surface,
+        elevation: 0,
+        surfaceTintColor: Colors.transparent,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios_rounded,
+              color: MeetingTheme.textPrimary),
+          onPressed: () => Navigator.pop(context),
+        ),
         actions: [
-          PopupMenuButton<String>(
-            onSelected: (v) {
-              if (v == 'report') _showReportDialog();
-              if (v == 'exit') Navigator.pop(context);
-            },
-            itemBuilder: (context) => [
-              const PopupMenuItem(
-                  value: 'report',
-                  child: Text('신고/차단', style: TextStyle(color: Colors.red))),
-              const PopupMenuItem(value: 'exit', child: Text('대화 종료')),
-            ],
-          )
+          IconButton(
+            icon: const Icon(Icons.more_vert_rounded,
+                color: MeetingTheme.textSecondary),
+            onPressed: _showReportSheet,
+          ),
         ],
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(1),
+          child: Container(
+            height: 1,
+            color: Colors.grey.withValues(alpha: 0.1),
+          ),
+        ),
       ),
       body: Column(
         children: [
           Expanded(
             child: _isLoading
-                ? const Center(child: CircularProgressIndicator())
+                ? const Center(
+                    child: CircularProgressIndicator(
+                        color: MeetingTheme.primary))
                 : _messages.isEmpty
                     ? _buildEmptyView()
                     : _buildMessageList(),
@@ -212,9 +280,19 @@ class _MeetingChatScreenState extends State<MeetingChatScreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.chat_bubble_outline, size: 48, color: Colors.grey[300]),
+          Container(
+            width: 64,
+            height: 64,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: MeetingTheme.primary.withValues(alpha: 0.1),
+            ),
+            child: const Icon(Icons.chat_bubble_outline,
+                size: 32, color: MeetingTheme.primary),
+          ),
           const SizedBox(height: 16),
-          const Text('반갑게 인사를 건네보세요!', style: TextStyle(color: Colors.grey)),
+          const Text('반갑게 인사를 건네보세요! 💜',
+              style: TextStyle(color: MeetingTheme.textSecondary)),
         ],
       ),
     );
@@ -228,9 +306,6 @@ class _MeetingChatScreenState extends State<MeetingChatScreen> {
       itemBuilder: (context, index) {
         final msg = _messages[index];
         final isMe = msg.senderId == widget.myUserId;
-
-        // 날짜 구분선 표시 여부 (생략 가능, MVP에선 없이 진행)
-
         return _buildChatBubble(msg, isMe);
       },
     );
@@ -245,13 +320,20 @@ class _MeetingChatScreenState extends State<MeetingChatScreen> {
             BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.75),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         decoration: BoxDecoration(
-          color: isMe ? Colors.indigoAccent : Colors.grey[200],
+          color: isMe ? MeetingTheme.primary : MeetingTheme.surface,
           borderRadius: BorderRadius.only(
-            topLeft: const Radius.circular(16),
-            topRight: const Radius.circular(16),
-            bottomLeft: Radius.circular(isMe ? 16 : 0),
-            bottomRight: Radius.circular(isMe ? 0 : 16),
+            topLeft: const Radius.circular(18),
+            topRight: const Radius.circular(18),
+            bottomLeft: Radius.circular(isMe ? 18 : 4),
+            bottomRight: Radius.circular(isMe ? 4 : 18),
           ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.04),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
+            ),
+          ],
         ),
         child: Column(
           crossAxisAlignment:
@@ -260,8 +342,9 @@ class _MeetingChatScreenState extends State<MeetingChatScreen> {
             Text(
               msg.text,
               style: TextStyle(
-                color: isMe ? Colors.white : Colors.black87,
+                color: isMe ? Colors.white : MeetingTheme.textPrimary,
                 fontSize: 15,
+                height: 1.4,
               ),
             ),
             const SizedBox(height: 4),
@@ -269,19 +352,21 @@ class _MeetingChatScreenState extends State<MeetingChatScreen> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 if (isMe && msg.readAt == null)
-                  const Padding(
-                    padding: EdgeInsets.only(right: 6),
+                  Padding(
+                    padding: const EdgeInsets.only(right: 4),
                     child: Text('1',
                         style: TextStyle(
                             fontSize: 11,
-                            color: Colors.yellowAccent,
+                            color: Colors.white.withValues(alpha: 0.7),
                             fontWeight: FontWeight.bold)),
                   ),
                 Text(
                   _formatTime(msg.createdAt),
                   style: TextStyle(
                     fontSize: 10,
-                    color: isMe ? Colors.white70 : Colors.black45,
+                    color: isMe
+                        ? Colors.white.withValues(alpha: 0.6)
+                        : MeetingTheme.textSecondary,
                   ),
                 ),
               ],
@@ -306,13 +391,13 @@ class _MeetingChatScreenState extends State<MeetingChatScreen> {
 
   Widget _buildInputArea() {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       decoration: BoxDecoration(
-        color: Theme.of(context).cardColor,
+        color: MeetingTheme.surface,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 4,
+            color: Colors.black.withValues(alpha: 0.03),
+            blurRadius: 8,
             offset: const Offset(0, -2),
           ),
         ],
@@ -320,30 +405,36 @@ class _MeetingChatScreenState extends State<MeetingChatScreen> {
       child: SafeArea(
         child: Row(
           children: [
-            const SizedBox(width: 8),
             Expanded(
-              child: TextField(
-                controller: _textController,
-                style: const TextStyle(fontSize: 15),
-                decoration: InputDecoration(
-                  hintText: '메시지를 입력하세요...',
-                  hintStyle: const TextStyle(fontSize: 14),
-                  contentPadding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(24),
-                    borderSide: BorderSide.none,
-                  ),
-                  filled: true,
-                  fillColor: Colors.grey[100],
+              child: Container(
+                decoration: BoxDecoration(
+                  color: MeetingTheme.surfaceVariant,
+                  borderRadius: BorderRadius.circular(24),
                 ),
-                onSubmitted: (_) => _sendMessage(),
+                child: TextField(
+                  controller: _textController,
+                  style: const TextStyle(fontSize: 15),
+                  decoration: const InputDecoration(
+                    hintText: '메시지를 입력하세요...',
+                    hintStyle: TextStyle(fontSize: 14, color: MeetingTheme.textSecondary),
+                    contentPadding:
+                        EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                    border: InputBorder.none,
+                  ),
+                  onSubmitted: (_) => _sendMessage(),
+                ),
               ),
             ),
-            const SizedBox(width: 4),
-            IconButton(
-              icon: const Icon(Icons.send_rounded, color: Colors.indigoAccent),
-              onPressed: _sendMessage,
+            const SizedBox(width: 8),
+            Container(
+              decoration: const BoxDecoration(
+                shape: BoxShape.circle,
+                gradient: MeetingTheme.headerGradient,
+              ),
+              child: IconButton(
+                icon: const Icon(Icons.send_rounded, color: Colors.white, size: 20),
+                onPressed: _sendMessage,
+              ),
             ),
           ],
         ),

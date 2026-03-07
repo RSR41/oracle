@@ -59,6 +59,11 @@ void main() async {
       await CloudHistorySyncService.syncOnStartup();
     }
 
+    // Ensure meeting tables exist
+    if (db != null) {
+      await MeetingRepositoryImpl.ensureTables(db);
+    }
+
     runApp(
       MultiProvider(
         providers: [
@@ -68,7 +73,6 @@ void main() async {
               create: (_) => MeetingRepositoryImpl(db!),
             )
           else
-            // Mock or Null Repository for platforms without SQLite support (like Web)
             Provider<MeetingRepository>(create: (_) => MeetingRepositoryStub()),
         ],
         child: const OracleApp(),
@@ -76,7 +80,6 @@ void main() async {
     );
   } catch (e) {
     debugPrint('Fatal initialization error: $e');
-    // Still try to run the app to show something if possible
     runApp(
       const MaterialApp(
         home: Scaffold(body: Center(child: Text('Initialization Error'))),
@@ -96,7 +99,6 @@ class OracleApp extends StatelessWidget {
       title: 'Oracle Fortune Telling',
       debugShowCheckedModeBanner: false,
 
-      // 한국어 로케일 설정 (Date Picker 등)
       locale: const Locale('ko', 'KR'),
       supportedLocales: const [Locale('ko', 'KR'), Locale('en', 'US')],
       localizationsDelegates: const [
@@ -105,19 +107,16 @@ class OracleApp extends StatelessWidget {
         GlobalCupertinoLocalizations.delegate,
       ],
 
-      // Theme Configuration
       theme: AppTheme.light,
       darkTheme: AppTheme.dark,
       themeMode: appState.themeMode,
 
-      // Router Configuration
       routerConfig: AppRouter.router(appState),
     );
   }
 }
 
-/// A stub implementation of MeetingRepository for platforms that don't support SQLite (like Web).
-/// This prevents the app from crashing during initialization.
+/// Stub implementation of MeetingRepository for platforms without SQLite (Web).
 class MeetingRepositoryStub implements MeetingRepository {
   @override
   Future<void> saveUser(MeetingUser user) async {}
@@ -127,6 +126,9 @@ class MeetingRepositoryStub implements MeetingRepository {
 
   @override
   Future<void> saveLike(MeetingLike like) async {}
+
+  @override
+  Future<void> savePass(MeetingPass pass) async {}
 
   @override
   Future<void> saveMatch(MeetingMatch match) async {}
@@ -149,6 +151,9 @@ class MeetingRepositoryStub implements MeetingRepository {
   }) async => [];
 
   @override
+  Future<MeetingMessage?> getLastMessage(String matchId) async => null;
+
+  @override
   Future<List<MeetingMatch>> getMatches(String userId) async => [];
 
   @override
@@ -159,6 +164,21 @@ class MeetingRepositoryStub implements MeetingRepository {
 
   @override
   Future<void> reportUser(MeetingReport report) async {}
+
+  @override
+  Future<void> blockUser(MeetingBlock block) async {}
+
+  @override
+  Future<List<MeetingBlock>> getBlocks(String userId) async => [];
+
+  @override
+  Future<bool> isBlocked(String userId, String targetId) async => false;
+
+  @override
+  Future<void> savePreference(MeetingPreference pref) async {}
+
+  @override
+  Future<MeetingPreference?> getPreference(String profileId) async => null;
 
   @override
   Future<void> clearAllData() async {}

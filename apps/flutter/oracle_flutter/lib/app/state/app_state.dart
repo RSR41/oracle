@@ -10,21 +10,29 @@ enum AppThemePreference { light, dark, system }
 /// State container for the application, following React AppContext.
 class AppState extends ChangeNotifier {
   AppLanguage _language = AppLanguage.ko;
-  AppThemePreference _theme = AppThemePreference.dark; // 기본값을 다크(밤하늘)로
+  AppThemePreference _theme = AppThemePreference.dark;
   SajuProfile? _profile;
   bool _isFirstRun = true;
+  bool _meetingUnlocked = false;
+  bool _meetingNotificationShown = false;
 
   AppLanguage get language => _language;
   AppThemePreference get theme => _theme;
   SajuProfile? get profile => _profile;
   bool get isFirstRun => _isFirstRun;
   bool get hasSajuProfile => _profile != null;
+  bool get meetingUnlocked => _meetingUnlocked;
+  bool get meetingNotificationShown => _meetingNotificationShown;
+
+  /// Whether the meeting notification banner should appear on home.
+  /// Shows when: user has saju profile AND notification hasn't been shown yet.
+  bool get shouldShowMeetingNotification =>
+      hasSajuProfile && !_meetingNotificationShown;
 
   /// Loads state from SharedPreferences (startup only)
   Future<void> init() async {
     final prefs = await SharedPreferences.getInstance();
 
-    // Load Lang
     final langStr = prefs.getString('language');
     if (langStr != null) {
       _language = AppLanguage.values.firstWhere(
@@ -33,7 +41,6 @@ class AppState extends ChangeNotifier {
       );
     }
 
-    // Load Theme
     final themeStr = prefs.getString('theme');
     if (themeStr != null) {
       _theme = AppThemePreference.values.firstWhere(
@@ -42,7 +49,6 @@ class AppState extends ChangeNotifier {
       );
     }
 
-    // Load Profile
     final profileJson = prefs.getString('saju_profile');
     if (profileJson != null) {
       try {
@@ -52,8 +58,10 @@ class AppState extends ChangeNotifier {
       }
     }
 
-    // Load First Run status
     _isFirstRun = !(prefs.getBool('first_run_complete') ?? false);
+    _meetingUnlocked = prefs.getBool('meeting_unlocked') ?? false;
+    _meetingNotificationShown =
+        prefs.getBool('meeting_notification_shown') ?? false;
 
     notifyListeners();
   }
@@ -85,6 +93,24 @@ class AppState extends ChangeNotifier {
     _profile = null;
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove('saju_profile');
+    notifyListeners();
+  }
+
+  /// Marks the meeting notification as shown (won't appear as banner again)
+  Future<void> markMeetingNotificationShown() async {
+    _meetingNotificationShown = true;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('meeting_notification_shown', true);
+    notifyListeners();
+  }
+
+  /// Unlocks the meeting feature permanently
+  Future<void> unlockMeeting() async {
+    _meetingUnlocked = true;
+    _meetingNotificationShown = true;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('meeting_unlocked', true);
+    await prefs.setBool('meeting_notification_shown', true);
     notifyListeners();
   }
 
