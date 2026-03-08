@@ -44,6 +44,9 @@ class _MeetingChatScreenState extends State<MeetingChatScreen> {
 
   @override
   void dispose() {
+    if (MeetingService.activeForegroundMatchId == widget.matchId) {
+      MeetingService.activeForegroundMatchId = null;
+    }
     _pollingTimer?.cancel();
     _textController.dispose();
     _scrollController.dispose();
@@ -51,6 +54,7 @@ class _MeetingChatScreenState extends State<MeetingChatScreen> {
   }
 
   Future<void> _initChat() async {
+    MeetingService.activeForegroundMatchId = widget.matchId;
     await _loadMessages(initial: true);
     _startPolling();
   }

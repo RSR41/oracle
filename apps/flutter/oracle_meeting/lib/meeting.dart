@@ -2,6 +2,7 @@ library oracle_meeting;
 
 export 'src/models/meeting_user.dart';
 export 'src/models/meeting_match_models.dart';
+export 'src/models/meeting_notification_event.dart';
 export 'src/models/meeting_preference.dart';
 export 'src/repository/meeting_repository.dart';
 export 'src/screens/meeting_home_screen.dart';

@@ -58,6 +58,7 @@ dependencies:
   # Phase E-10: AI Service HTTP client
   http: ^1.2.2
   supabase_flutter: ^2.10.3
+  flutter_local_notifications: ^17.2.2
 
 dev_dependencies:
   flutter_test:

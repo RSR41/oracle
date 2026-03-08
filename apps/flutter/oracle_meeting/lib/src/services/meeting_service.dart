@@ -2,6 +2,7 @@ import 'dart:math';
 import 'package:uuid/uuid.dart';
 import '../models/meeting_match_models.dart';
 import '../models/meeting_user.dart';
+import '../models/meeting_notification_event.dart';
 import '../repository/meeting_repository.dart';
 
 class MeetingService {
@@ -16,6 +17,13 @@ class MeetingService {
   static Future<void> Function(Map<String, dynamic> payload)?
       globalOnHistoryRecord;
 
+  /// Global callback for local notifications in host apps (oracle_flutter).
+  static Future<void> Function(MeetingNotificationEvent event)?
+      globalOnNotificationEvent;
+
+  /// Active opened matchId in foreground chat to prevent duplicate alerts.
+  static String? activeForegroundMatchId;
+
   MeetingService(this._repo, {this.onHistoryRecord});
 
   /// Safely record history without blocking the main flow
@@ -28,6 +36,22 @@ class MeetingService {
       }
     } catch (_) {
       // Ignore history errors to prevent blocking gameplay
+    }
+  }
+
+  bool _shouldSkipNotification(String matchId) {
+    return activeForegroundMatchId == matchId;
+  }
+
+  Future<void> _safeNotify(MeetingNotificationEvent event) async {
+    if (_shouldSkipNotification(event.matchId)) return;
+    try {
+      final callback = globalOnNotificationEvent;
+      if (callback != null) {
+        await callback(event);
+      }
+    } catch (_) {
+      // Ignore notification errors to prevent blocking meeting flows
     }
   }
 
@@ -176,6 +200,22 @@ class MeetingService {
         }
       });
 
+      await _safeNotify(MeetingNotificationEvent(
+        type: MeetingNotificationEventType.meetingMatchCreated,
+        matchId: matchId,
+        title: '새로운 매칭이 성립됐어요 💜',
+        body: '상대방과 대화를 시작해보세요.',
+        payload: {
+          'eventType': MeetingNotificationEventType
+              .meetingMatchCreated
+              .value,
+          'matchId': matchId,
+          'myUserId': myUserId,
+          'targetUserId': targetUserId,
+          'score': score,
+        },
+      ));
+
       // Auto-send initial greeting
       await Future.delayed(const Duration(milliseconds: 300));
       await _repo.sendMessage(MeetingMessage(
@@ -284,12 +324,20 @@ class MeetingService {
     ));
 
     // Schedule mock reply
-    _scheduleMockReply(matchId, otherUserId);
+    _scheduleMockReply(
+      matchId: matchId,
+      senderId: otherUserId,
+      receiverId: myUserId,
+    );
 
     return message;
   }
 
-  void _scheduleMockReply(String matchId, String senderId) {
+  void _scheduleMockReply({
+    required String matchId,
+    required String senderId,
+    required String receiverId,
+  }) {
     Future.delayed(const Duration(seconds: 2), () async {
       final messages = await _repo.getMessages(matchId);
       final replies = [
@@ -302,12 +350,30 @@ class MeetingService {
       ];
       final text = replies[messages.length % replies.length];
 
+      final createdAt = DateTime.now().toIso8601String();
       await _repo.sendMessage(MeetingMessage(
         id: _uuid.v4(),
         matchId: matchId,
         senderId: senderId,
         text: text,
-        createdAt: DateTime.now().toIso8601String(),
+        createdAt: createdAt,
+      ));
+
+      await _safeNotify(MeetingNotificationEvent(
+        type: MeetingNotificationEventType.meetingMessageReceived,
+        matchId: matchId,
+        title: '새 메시지가 도착했어요',
+        body: text,
+        payload: {
+          'eventType': MeetingNotificationEventType
+              .meetingMessageReceived
+              .value,
+          'matchId': matchId,
+          'senderId': senderId,
+          'receiverId': receiverId,
+          'text': text,
+          'createdAt': createdAt,
+        },
       ));
     });
   }
