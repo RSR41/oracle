@@ -261,7 +261,7 @@ class MeetingService {
     });
   }
 
-  Future<void> reportUser({
+  Future<MeetingReport> reportUser({
     required String matchId,
     required String reporterId,
     required String reason,
@@ -276,6 +276,7 @@ class MeetingService {
       createdAt: DateTime.now().toIso8601String(),
     );
     await _repo.reportUser(report);
+    await _repo.syncMeetingReportToServer(report);
 
     await _safeHistory({
       'id': _deterministicId("report|${report.id}"),
@@ -289,6 +290,31 @@ class MeetingService {
         'reason': reason,
       }
     });
+
+    return report;
+  }
+
+  Future<MeetingReport?> getRecentReportForMatch({
+    required String matchId,
+    required String reporterId,
+    required Duration within,
+  }) async {
+    final reports = await _repo.getReports(
+      reporterId: reporterId,
+      matchId: matchId,
+      limit: 10,
+    );
+    if (reports.isEmpty) return null;
+
+    final now = DateTime.now();
+    for (final report in reports) {
+      final createdAt = DateTime.tryParse(report.createdAt);
+      if (createdAt == null) continue;
+      if (now.difference(createdAt) <= within) {
+        return report;
+      }
+    }
+    return null;
   }
 
   // ─────────────────── Data Access ───────────────────

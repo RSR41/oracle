@@ -18,6 +18,18 @@ abstract class MeetingRepository {
   Future<int> getUnreadCount(String matchId, String userId);
   Future<void> markAsRead(String matchId, String userId);
   Future<void> reportUser(MeetingReport report);
+  Future<List<MeetingReport>> getReports({
+    String? reporterId,
+    String? matchId,
+    int limit = 50,
+  });
+  Future<void> updateReportStatus(
+      String reportId, MeetingReportStatus nextStatus);
+  Future<void> syncMeetingReportToServer(MeetingReport report);
+  Future<List<MeetingReport>> syncMeetingReportsFromServer({
+    String? reporterId,
+    String? matchId,
+  });
   Future<void> blockUser(MeetingBlock block);
   Future<List<MeetingBlock>> getBlocks(String userId);
   Future<bool> isBlocked(String userId, String targetId);
@@ -262,6 +274,78 @@ class MeetingRepositoryImpl implements MeetingRepository {
   @override
   Future<void> reportUser(MeetingReport report) async {
     await _db.insert('meeting_reports', report.toMap());
+  }
+
+  @override
+  Future<List<MeetingReport>> getReports({
+    String? reporterId,
+    String? matchId,
+    int limit = 50,
+  }) async {
+    final whereClauses = <String>[];
+    final whereArgs = <Object?>[];
+
+    if (reporterId != null) {
+      whereClauses.add('reporterId = ?');
+      whereArgs.add(reporterId);
+    }
+    if (matchId != null) {
+      whereClauses.add('matchId = ?');
+      whereArgs.add(matchId);
+    }
+
+    final result = await _db.query(
+      'meeting_reports',
+      where: whereClauses.isEmpty ? null : whereClauses.join(' AND '),
+      whereArgs: whereClauses.isEmpty ? null : whereArgs,
+      orderBy: 'createdAt DESC',
+      limit: limit,
+    );
+
+    return result.map((entry) => MeetingReport.fromMap(entry)).toList();
+  }
+
+  @override
+  Future<void> updateReportStatus(
+      String reportId, MeetingReportStatus nextStatus) async {
+    final result = await _db.query(
+      'meeting_reports',
+      where: 'id = ?',
+      whereArgs: [reportId],
+      limit: 1,
+    );
+
+    if (result.isEmpty) {
+      throw StateError('Meeting report not found: $reportId');
+    }
+
+    final current = MeetingReport.fromMap(result.first);
+    if (!current.status.canTransitionTo(nextStatus)) {
+      throw StateError(
+        'Invalid report status transition: ${current.status.value} -> ${nextStatus.value}',
+      );
+    }
+
+    await _db.update(
+      'meeting_reports',
+      {'status': nextStatus.value},
+      where: 'id = ?',
+      whereArgs: [reportId],
+    );
+  }
+
+  @override
+  Future<void> syncMeetingReportToServer(MeetingReport report) async {
+    // Backend integration hook: implemented by host app infra.
+  }
+
+  @override
+  Future<List<MeetingReport>> syncMeetingReportsFromServer({
+    String? reporterId,
+    String? matchId,
+  }) async {
+    // Backend integration hook: implemented by host app infra.
+    return [];
   }
 
   @override
