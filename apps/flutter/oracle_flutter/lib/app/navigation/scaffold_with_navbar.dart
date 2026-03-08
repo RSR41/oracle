@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import '../config/feature_flags.dart';
 
 class ScaffoldWithNavBar extends StatelessWidget {
   final Widget child;
@@ -8,7 +9,6 @@ class ScaffoldWithNavBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Fixed tabs (Home / Saju / History)
     final tabs = [
       _NavBarItem(
         route: '/home',
@@ -22,6 +22,13 @@ class ScaffoldWithNavBar extends StatelessWidget {
         selectedIcon: Icons.auto_awesome,
         label: '사주',
       ),
+      if (FeatureFlags.canUseMeeting)
+        _NavBarItem(
+          route: '/meeting',
+          icon: Icons.people_outline,
+          selectedIcon: Icons.people,
+          label: '미팅',
+        ),
       _NavBarItem(
         route: '/history',
         icon: Icons.history_outlined,

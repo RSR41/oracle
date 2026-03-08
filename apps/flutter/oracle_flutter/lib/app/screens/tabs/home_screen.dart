@@ -5,6 +5,7 @@ import 'package:oracle_flutter/app/theme/app_colors.dart';
 import 'package:oracle_flutter/app/state/app_state.dart';
 import 'package:oracle_flutter/app/widgets/starry_background.dart';
 import 'package:oracle_flutter/app/services/fortune_daily_service.dart';
+import 'package:oracle_flutter/app/config/feature_flags.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -100,13 +101,14 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
 
                 // ── Meeting Notification Banner ──
-                if (appState.shouldShowMeetingNotification &&
+                if (FeatureFlags.canUseMeeting &&
+                    appState.shouldShowMeetingNotification &&
                     _notificationVisible &&
                     !_notificationDismissed)
                   _buildMeetingNotificationBanner(appState, userName),
 
                 // ── Meeting Unlocked Entry (subtle) ──
-                if (appState.meetingUnlocked)
+                if (FeatureFlags.canUseMeeting && appState.meetingUnlocked)
                   _buildMeetingUnlockedEntry(),
 
                 // Today's Fortune Summary Card

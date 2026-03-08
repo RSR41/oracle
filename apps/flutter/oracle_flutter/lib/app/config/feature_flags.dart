@@ -23,7 +23,7 @@ class FeatureFlags {
   static bool get showBetaFeatures => phase2Features;
   static bool get aiOnline => _asBool(_aiEnv, fallback: false);
 
-  static bool get featureMeeting => false;
+  static bool get featureMeeting => canUseMeeting;
 
   static bool get featureDream {
     if (_legacyDreamEnv.isNotEmpty) return _asBool(_legacyDreamEnv);
