@@ -136,6 +136,13 @@ class MeetingRepositoryStub implements MeetingRepository {
   Future<void> savePass(MeetingPass pass) async {}
 
   @override
+  Future<MeetingLikeResult?> submitLikeRemote({
+    required String fromUserId,
+    required String toUserId,
+    required String createdAt,
+  }) async => null;
+
+  @override
   Future<void> saveMatch(MeetingMatch match) async {}
 
   @override

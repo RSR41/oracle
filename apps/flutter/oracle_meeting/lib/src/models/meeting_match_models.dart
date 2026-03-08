@@ -16,6 +16,13 @@ class MeetingLike {
       };
 }
 
+class MeetingLikeResult {
+  final bool isMatch;
+  final MeetingMatch? match;
+
+  const MeetingLikeResult({required this.isMatch, this.match});
+}
+
 class MeetingPass {
   final String fromUserId;
   final String toUserId;

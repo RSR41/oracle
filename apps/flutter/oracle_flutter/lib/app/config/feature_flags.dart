@@ -8,6 +8,8 @@ class FeatureFlags {
   static const String _dreamEnv = String.fromEnvironment('ENABLE_DREAM', defaultValue: '');
   static const String _compatEnv = String.fromEnvironment('ENABLE_COMPATIBILITY', defaultValue: '');
   static const String _meetingEnv = String.fromEnvironment('ENABLE_MEETING', defaultValue: 'false');
+  static const String _meetingM2Env = String.fromEnvironment('ENABLE_MEETING_M2', defaultValue: 'false');
+  static const String _meetingM3Env = String.fromEnvironment('ENABLE_MEETING_M3', defaultValue: 'false');
   static const String _cloudSyncEnv = String.fromEnvironment('CLOUD_SYNC', defaultValue: 'false');
 
   static const String _legacyDreamEnv = String.fromEnvironment('FEATURE_DREAM', defaultValue: '');
@@ -46,10 +48,19 @@ class FeatureFlags {
   }
 
   static bool get enableMeeting => _asBool(_meetingEnv, fallback: false);
+
+  /// M2: server-backed recommendation/matching/message beta.
+  static bool get enableMeetingM2 => _asBool(_meetingM2Env, fallback: false);
+
+  /// M3: production-grade realtime/safety rollout.
+  static bool get enableMeetingM3 => _asBool(_meetingM3Env, fallback: false);
+
   static bool get canUseMeeting => phase2Features && enableMeeting;
+  static bool get canUseMeetingM2 => canUseMeeting && enableMeetingM2;
+  static bool get canUseMeetingM3 => canUseMeetingM2 && enableMeetingM3;
   static bool get cloudSync => _asBool(_cloudSyncEnv, fallback: false);
 
   static void printSubmissionDiagnostics() {
-    debugPrint('[FeatureFlags] phase2=$phase2Features ai=$aiOnline dream=$enableDream compat=$enableCompatibility meeting=$enableMeeting cloudSync=$cloudSync');
+    debugPrint('[FeatureFlags] phase2=$phase2Features ai=$aiOnline dream=$enableDream compat=$enableCompatibility meeting=$enableMeeting meetingM2=$enableMeetingM2 meetingM3=$enableMeetingM3 cloudSync=$cloudSync');
   }
 }

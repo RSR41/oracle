@@ -2,12 +2,25 @@ import 'package:sqflite/sqflite.dart';
 import '../models/meeting_user.dart';
 import '../models/meeting_match_models.dart';
 import '../models/meeting_preference.dart';
+import 'meeting_remote_repository.dart';
+
+class MeetingSyncRules {
+  /// Conflict rule: newest ISO-8601 timestamp wins when local and remote diverge.
+  final bool latestTimestampWins;
+
+  const MeetingSyncRules({this.latestTimestampWins = true});
+}
 
 abstract class MeetingRepository {
   Future<void> saveUser(MeetingUser user);
   Future<MeetingUser?> getUser(String id);
   Future<void> saveLike(MeetingLike like);
   Future<void> savePass(MeetingPass pass);
+  Future<MeetingLikeResult?> submitLikeRemote({
+    required String fromUserId,
+    required String toUserId,
+    required String createdAt,
+  });
   Future<void> saveMatch(MeetingMatch match);
   Future<MeetingMatch?> findMatchBetween(String userA, String userB);
   Future<List<MeetingUser>> getRecommendations(String myUserId);
@@ -41,8 +54,14 @@ abstract class MeetingRepository {
 
 class MeetingRepositoryImpl implements MeetingRepository {
   final Database _db;
+  final MeetingRemoteRepository? _remote;
+  final MeetingSyncRules syncRules;
 
-  MeetingRepositoryImpl(this._db);
+  MeetingRepositoryImpl(
+    this._db, {
+    MeetingRemoteRepository? remoteRepository,
+    this.syncRules = const MeetingSyncRules(),
+  }) : _remote = remoteRepository;
 
   /// Ensures all meeting tables exist for fresh installs.
   ///
@@ -135,6 +154,45 @@ class MeetingRepositoryImpl implements MeetingRepository {
     ''');
   }
 
+  DateTime? _parseIso(String value) {
+    try {
+      return DateTime.parse(value);
+    } catch (_) {
+      return null;
+    }
+  }
+
+  bool _isIncomingNewer(String? localTimestamp, String incomingTimestamp) {
+    if (!syncRules.latestTimestampWins) return true;
+    if (localTimestamp == null || localTimestamp.isEmpty) return true;
+    final local = _parseIso(localTimestamp);
+    final incoming = _parseIso(incomingTimestamp);
+    if (local == null || incoming == null) return true;
+    return incoming.isAfter(local) || incoming.isAtSameMomentAs(local);
+  }
+
+  Future<void> _cacheMatch(MeetingMatch match) async {
+    final local = await _db.query('meeting_matches',
+        where: 'id = ?', whereArgs: [match.id], limit: 1);
+    if (local.isNotEmpty) {
+      final localMatchedAt = local.first['matchedAt'] as String?;
+      if (!_isIncomingNewer(localMatchedAt, match.matchedAt)) return;
+    }
+    await _db.insert('meeting_matches', match.toMap(),
+        conflictAlgorithm: ConflictAlgorithm.replace);
+  }
+
+  Future<void> _cacheMessage(MeetingMessage message) async {
+    final local = await _db.query('meeting_messages',
+        where: 'id = ?', whereArgs: [message.id], limit: 1);
+    if (local.isNotEmpty) {
+      final localCreatedAt = local.first['createdAt'] as String?;
+      if (!_isIncomingNewer(localCreatedAt, message.createdAt)) return;
+    }
+    await _db.insert('meeting_messages', message.toMap(),
+        conflictAlgorithm: ConflictAlgorithm.replace);
+  }
+
   @override
   Future<void> saveUser(MeetingUser user) async {
     await _db.insert('meeting_users', user.toJson(),
@@ -162,9 +220,31 @@ class MeetingRepositoryImpl implements MeetingRepository {
   }
 
   @override
+  Future<MeetingLikeResult?> submitLikeRemote({
+    required String fromUserId,
+    required String toUserId,
+    required String createdAt,
+  }) async {
+    if (_remote == null) return null;
+
+    try {
+      final result = await _remote.submitLike(
+        fromUserId: fromUserId,
+        toUserId: toUserId,
+        createdAt: createdAt,
+      );
+      if (result.match != null) {
+        await _cacheMatch(result.match!);
+      }
+      return result;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  @override
   Future<void> saveMatch(MeetingMatch match) async {
-    await _db.insert('meeting_matches', match.toMap(),
-        conflictAlgorithm: ConflictAlgorithm.replace);
+    await _cacheMatch(match);
   }
 
   @override
@@ -184,6 +264,17 @@ class MeetingRepositoryImpl implements MeetingRepository {
 
   @override
   Future<List<MeetingMatch>> getMatches(String userId) async {
+    if (_remote != null) {
+      try {
+        final remoteMatches = await _remote.fetchMatches(userId);
+        for (final match in remoteMatches) {
+          await _cacheMatch(match);
+        }
+      } catch (_) {
+        // Offline fallback to local cache.
+      }
+    }
+
     final result = await _db.query('meeting_matches',
         where: 'userA = ? OR userB = ?',
         whereArgs: [userId, userId],
@@ -202,33 +293,75 @@ class MeetingRepositoryImpl implements MeetingRepository {
 
   @override
   Future<List<MeetingUser>> getRecommendations(String myUserId) async {
-    // Exclude: already liked, passed, blocked, matched
+    if (_remote != null) {
+      try {
+        final remoteUsers = await _remote.fetchRecommendations(myUserId);
+        for (final user in remoteUsers) {
+          await saveUser(user);
+        }
+        return remoteUsers;
+      } catch (_) {
+        // Offline fallback to local cache.
+      }
+    }
+
     final result = await _db.rawQuery('''
-      SELECT * FROM meeting_users 
-      WHERE id != ? 
+      SELECT * FROM meeting_users
+      WHERE id != ?
       AND id NOT IN (SELECT toUserId FROM meeting_likes WHERE fromUserId = ?)
       AND id NOT IN (SELECT toUserId FROM meeting_passes WHERE fromUserId = ?)
       AND id NOT IN (SELECT blockedUserId FROM meeting_blocks WHERE blockerUserId = ?)
       AND id NOT IN (SELECT blockerUserId FROM meeting_blocks WHERE blockedUserId = ?)
       AND id NOT IN (
-        SELECT CASE WHEN userA = ? THEN userB ELSE userA END 
+        SELECT CASE WHEN userA = ? THEN userB ELSE userA END
         FROM meeting_matches WHERE userA = ? OR userB = ?
       )
       LIMIT 20
-    ''', [myUserId, myUserId, myUserId, myUserId, myUserId, myUserId, myUserId, myUserId]);
+    ''', [
+      myUserId,
+      myUserId,
+      myUserId,
+      myUserId,
+      myUserId,
+      myUserId,
+      myUserId,
+      myUserId,
+    ]);
 
     return result.map((e) => MeetingUser.fromJson(e)).toList();
   }
 
   @override
   Future<MeetingMessage> sendMessage(MeetingMessage message) async {
-    await _db.insert('meeting_messages', message.toMap());
+    if (_remote != null) {
+      try {
+        final remoteMessage = await _remote.sendMessage(message);
+        await _cacheMessage(remoteMessage);
+        return remoteMessage;
+      } catch (_) {
+        // Offline fallback to local cache.
+      }
+    }
+
+    await _cacheMessage(message);
     return message;
   }
 
   @override
   Future<List<MeetingMessage>> getMessages(String matchId,
       {int limit = 50, int offset = 0}) async {
+    if (_remote != null) {
+      try {
+        final remoteMessages =
+            await _remote.fetchMessages(matchId, limit: limit, offset: offset);
+        for (final message in remoteMessages) {
+          await _cacheMessage(message);
+        }
+      } catch (_) {
+        // Offline fallback to local cache.
+      }
+    }
+
     final result = await _db.query(
       'meeting_messages',
       where: 'matchId = ?',
@@ -256,6 +389,14 @@ class MeetingRepositoryImpl implements MeetingRepository {
 
   @override
   Future<int> getUnreadCount(String matchId, String userId) async {
+    if (_remote != null) {
+      try {
+        return await _remote.fetchUnreadCount(matchId, userId);
+      } catch (_) {
+        // Offline fallback to local cache.
+      }
+    }
+
     return Sqflite.firstIntValue(await _db.rawQuery('''
       SELECT COUNT(*) FROM meeting_messages
       WHERE matchId = ? AND senderId != ? AND readAt IS NULL
@@ -269,6 +410,14 @@ class MeetingRepositoryImpl implements MeetingRepository {
     await _db.update('meeting_messages', {'readAt': now},
         where: 'matchId = ? AND senderId != ? AND readAt IS NULL',
         whereArgs: [matchId, userId]);
+
+    if (_remote != null) {
+      try {
+        await _remote.markAsRead(matchId, userId);
+      } catch (_) {
+        // Keep local as fallback state.
+      }
+    }
   }
 
   @override
