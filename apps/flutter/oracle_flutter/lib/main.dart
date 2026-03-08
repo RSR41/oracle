@@ -13,6 +13,7 @@ import 'app/database/database_helper.dart';
 import 'app/config/supabase_config.dart';
 import 'app/config/feature_flags.dart';
 import 'app/services/cloud/cloud_history_sync_service.dart';
+import 'app/services/meeting_notification_service.dart';
 import 'package:oracle_meeting/meeting.dart';
 
 void main() async {
@@ -47,6 +48,10 @@ void main() async {
 
     final appState = AppState();
     await appState.init();
+
+    await MeetingNotificationService.instance.initialize();
+    await MeetingNotificationService.instance.requestPermission();
+    await MeetingNotificationService.instance.bindMeetingHooks();
 
     if (SupabaseConfig.isConfigured) {
       await Supabase.initialize(
