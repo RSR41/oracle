@@ -6,7 +6,7 @@ import 'package:flutter/foundation.dart';
 /// Manages schema creation and provides database access.
 class DatabaseHelper {
   static const String _databaseName = 'oracle_app.db';
-  static const int _databaseVersion = 2; // Bump version to 2
+  static const int _databaseVersion = 3;
 
   // Singleton pattern
   DatabaseHelper._internal();
@@ -67,24 +67,38 @@ class DatabaseHelper {
     if (oldVersion < 2) {
       await _createMeetingTables(db);
     }
+
+    if (oldVersion < 3) {
+      await _migrateMeetingSchemaV3(db);
+    }
   }
 
   Future<void> _createMeetingTables(Database db) async {
     // 1. Meeting Users
     await db.execute('''
-      CREATE TABLE meeting_users (
+      CREATE TABLE IF NOT EXISTS meeting_users (
         id TEXT PRIMARY KEY,
         nickname TEXT,
         gender TEXT,
         birthDate TEXT,
         sajuJson TEXT,
-        avatarPath TEXT
+        avatarPath TEXT,
+        age INTEGER,
+        introduction TEXT,
+        regionCode TEXT,
+        regionName TEXT,
+        height INTEGER,
+        occupation TEXT,
+        profilePhotoUrl TEXT,
+        idealTypeKeywords TEXT,
+        activityTags TEXT,
+        drinkSmoke TEXT
       )
     ''');
 
     // 2. Likes (Composite Key)
     await db.execute('''
-      CREATE TABLE meeting_likes (
+      CREATE TABLE IF NOT EXISTS meeting_likes (
         fromUserId TEXT,
         toUserId TEXT,
         createdAt TEXT,
@@ -94,23 +108,24 @@ class DatabaseHelper {
 
     // 3. Matches
     await db.execute('''
-      CREATE TABLE meeting_matches (
+      CREATE TABLE IF NOT EXISTS meeting_matches (
         id TEXT PRIMARY KEY,
         userA TEXT,
         userB TEXT,
-        matchedAt TEXT
+        matchedAt TEXT,
+        compatibilityScore INTEGER
       )
     ''');
     await db.execute(
-      'CREATE INDEX idx_matches_userA ON meeting_matches(userA)',
+      'CREATE INDEX IF NOT EXISTS idx_matches_userA ON meeting_matches(userA)',
     );
     await db.execute(
-      'CREATE INDEX idx_matches_userB ON meeting_matches(userB)',
+      'CREATE INDEX IF NOT EXISTS idx_matches_userB ON meeting_matches(userB)',
     );
 
     // 4. Messages
     await db.execute('''
-      CREATE TABLE meeting_messages (
+      CREATE TABLE IF NOT EXISTS meeting_messages (
         id TEXT PRIMARY KEY,
         matchId TEXT,
         senderId TEXT,
@@ -120,19 +135,135 @@ class DatabaseHelper {
       )
     ''');
     await db.execute(
-      'CREATE INDEX idx_messages_match_date ON meeting_messages(matchId, createdAt)',
+      'CREATE INDEX IF NOT EXISTS idx_messages_match_date ON meeting_messages(matchId, createdAt)',
     );
 
     // 5. Reports
     await db.execute('''
-      CREATE TABLE meeting_reports (
+      CREATE TABLE IF NOT EXISTS meeting_reports (
         id TEXT PRIMARY KEY,
         matchId TEXT,
         reporterId TEXT,
         reason TEXT,
+        description TEXT,
+        createdAt TEXT,
+        status TEXT DEFAULT 'pending'
+      )
+    ''');
+
+    await db.execute('''
+      CREATE TABLE IF NOT EXISTS meeting_passes (
+        fromUserId TEXT,
+        toUserId TEXT,
+        createdAt TEXT,
+        PRIMARY KEY (fromUserId, toUserId)
+      )
+    ''');
+
+    await db.execute('''
+      CREATE TABLE IF NOT EXISTS meeting_blocks (
+        id TEXT PRIMARY KEY,
+        blockerUserId TEXT,
+        blockedUserId TEXT,
         createdAt TEXT
       )
     ''');
+
+    await db.execute('''
+      CREATE TABLE IF NOT EXISTS meeting_preferences (
+        profileId TEXT PRIMARY KEY,
+        targetGender TEXT,
+        ageMin INTEGER DEFAULT 20,
+        ageMax INTEGER DEFAULT 40,
+        regionScope TEXT,
+        distanceKm INTEGER
+      )
+    ''');
+  }
+
+  Future<void> _migrateMeetingSchemaV3(Database db) async {
+    await _addColumnIfNotExists(db, 'meeting_reports', 'description', 'TEXT');
+    await _addColumnIfNotExists(
+      db,
+      'meeting_reports',
+      'status',
+      "TEXT DEFAULT 'pending'",
+    );
+    await _addColumnIfNotExists(
+      db,
+      'meeting_matches',
+      'compatibilityScore',
+      'INTEGER',
+    );
+
+    await _addColumnIfNotExists(db, 'meeting_users', 'age', 'INTEGER');
+    await _addColumnIfNotExists(db, 'meeting_users', 'introduction', 'TEXT');
+    await _addColumnIfNotExists(db, 'meeting_users', 'regionCode', 'TEXT');
+    await _addColumnIfNotExists(db, 'meeting_users', 'regionName', 'TEXT');
+    await _addColumnIfNotExists(db, 'meeting_users', 'height', 'INTEGER');
+    await _addColumnIfNotExists(db, 'meeting_users', 'occupation', 'TEXT');
+    await _addColumnIfNotExists(db, 'meeting_users', 'profilePhotoUrl', 'TEXT');
+    await _addColumnIfNotExists(
+      db,
+      'meeting_users',
+      'idealTypeKeywords',
+      'TEXT',
+    );
+    await _addColumnIfNotExists(db, 'meeting_users', 'activityTags', 'TEXT');
+    await _addColumnIfNotExists(db, 'meeting_users', 'drinkSmoke', 'TEXT');
+
+    await db.execute('''
+      CREATE TABLE IF NOT EXISTS meeting_passes (
+        fromUserId TEXT,
+        toUserId TEXT,
+        createdAt TEXT,
+        PRIMARY KEY (fromUserId, toUserId)
+      )
+    ''');
+
+    await db.execute('''
+      CREATE TABLE IF NOT EXISTS meeting_blocks (
+        id TEXT PRIMARY KEY,
+        blockerUserId TEXT,
+        blockedUserId TEXT,
+        createdAt TEXT
+      )
+    ''');
+
+    await db.execute('''
+      CREATE TABLE IF NOT EXISTS meeting_preferences (
+        profileId TEXT PRIMARY KEY,
+        targetGender TEXT,
+        ageMin INTEGER DEFAULT 20,
+        ageMax INTEGER DEFAULT 40,
+        regionScope TEXT,
+        distanceKm INTEGER
+      )
+    ''');
+  }
+
+  Future<void> _addColumnIfNotExists(
+    Database db,
+    String tableName,
+    String columnName,
+    String columnType,
+  ) async {
+    if (await _hasColumn(db, tableName, columnName)) {
+      return;
+    }
+
+    await db.execute(
+      'ALTER TABLE $tableName ADD COLUMN $columnName $columnType',
+    );
+  }
+
+  Future<bool> _hasColumn(
+    Database db,
+    String tableName,
+    String columnName,
+  ) async {
+    final columns = await db.rawQuery('PRAGMA table_info($tableName)');
+    return columns.any((column) => column['name'] == columnName);
   }
 
   /// Close database connection

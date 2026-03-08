@@ -32,7 +32,10 @@ class MeetingRepositoryImpl implements MeetingRepository {
 
   MeetingRepositoryImpl(this._db);
 
-  /// Ensures all meeting tables exist in the database
+  /// Ensures all meeting tables exist for fresh installs.
+  ///
+  /// Schema migrations for existing databases must be handled in
+  /// `DatabaseHelper.onUpgrade` in oracle_flutter.
   static Future<void> ensureTables(Database db) async {
     await db.execute('''
       CREATE TABLE IF NOT EXISTS meeting_users (
