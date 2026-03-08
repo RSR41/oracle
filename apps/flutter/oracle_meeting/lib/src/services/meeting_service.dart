@@ -4,11 +4,13 @@ import '../models/meeting_match_models.dart';
 import '../models/meeting_user.dart';
 import '../models/meeting_notification_event.dart';
 import '../repository/meeting_repository.dart';
+import 'meeting_match_rule.dart';
 
 class MeetingService {
   final MeetingRepository _repo;
   final Uuid _uuid = const Uuid();
   final Random _random = Random();
+  final MeetingMatchRule _matchRule;
 
   /// Callback for recording history in oracle_flutter
   final Future<void> Function(Map<String, dynamic> payload)? onHistoryRecord;
@@ -24,7 +26,11 @@ class MeetingService {
   /// Active opened matchId in foreground chat to prevent duplicate alerts.
   static String? activeForegroundMatchId;
 
-  MeetingService(this._repo, {this.onHistoryRecord});
+  MeetingService(
+    this._repo, {
+    this.onHistoryRecord,
+    MeetingMatchRule? matchRule,
+  }) : _matchRule = matchRule ?? const HashModuloMeetingMatchRule();
 
   /// Safely record history without blocking the main flow
   Future<void> _safeHistory(Map<String, dynamic> payload) async {
@@ -145,7 +151,7 @@ class MeetingService {
 
   // ─────────────────── Score Calculation ───────────────────
 
-  int _fnv1aHash(String input) {
+  int _stableHash(String input) {
     var hash = 0x811c9dc5;
     for (var i = 0; i < input.length; i++) {
       hash ^= input.codeUnitAt(i);
@@ -155,14 +161,12 @@ class MeetingService {
   }
 
   String _deterministicId(String seed) {
-    return _fnv1aHash(seed).toUnsigned(32).toRadixString(16).padLeft(8, '0');
+    return _stableHash(seed).toUnsigned(32).toRadixString(16).padLeft(8, '0');
   }
 
   /// Calculate compatibility score (60-100)
-  int calculateScore(String myId, String targetId) {
-    final hash = _fnv1aHash(myId + targetId);
-    return 60 + (hash.abs() % 41); // 60 ~ 100
-  }
+  int calculateScore(String myId, String targetId) =>
+      _matchRule.calculateCompatibilityScore(myId, targetId);
 
   // ─────────────────── Like / Pass / Match ───────────────────
 
@@ -171,20 +175,30 @@ class MeetingService {
     await _repo.saveLike(MeetingLike(
         fromUserId: myUserId, toUserId: targetUserId, createdAt: now));
 
-    // Check for mutual like → match
-    final hash = _fnv1aHash(myUserId + targetUserId);
-    bool isMatch = (targetUserId == 'user_0') || (hash % 3 == 0);
+    // Remote-first like flow (M2/M3), then local mock fallback.
+    final remoteLike = await _repo.submitLikeRemote(
+      fromUserId: myUserId,
+      toUserId: targetUserId,
+      createdAt: now,
+    );
+
+    final isMatch = remoteLike?.isMatch ??
+        _matchRule.shouldCreateMatch(myUserId, targetUserId);
 
     if (isMatch) {
-      final score = calculateScore(myUserId, targetUserId);
-      final matchId = _uuid.v4();
-      await _repo.saveMatch(MeetingMatch(
-        id: matchId,
-        userA: myUserId,
-        userB: targetUserId,
-        matchedAt: now,
-        compatibilityScore: score,
-      ));
+      final existingMatch = remoteLike?.match;
+      final score =
+          existingMatch?.compatibilityScore ?? calculateScore(myUserId, targetUserId);
+      final match = existingMatch ??
+          MeetingMatch(
+            id: _uuid.v4(),
+            userA: myUserId,
+            userB: targetUserId,
+            matchedAt: now,
+            compatibilityScore: score,
+          );
+      await _repo.saveMatch(match);
+      final matchId = match.id;
 
       await _safeHistory({
         'id': _deterministicId("match|$matchId"),
