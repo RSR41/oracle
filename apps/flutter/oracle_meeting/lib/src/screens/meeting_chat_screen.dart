@@ -26,6 +26,8 @@ class MeetingChatScreen extends StatefulWidget {
 }
 
 class _MeetingChatScreenState extends State<MeetingChatScreen> {
+  static const Duration _reportCooldown = Duration(minutes: 10);
+
   late MeetingService _service;
   final TextEditingController _textController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
@@ -213,20 +215,68 @@ class _MeetingChatScreenState extends State<MeetingChatScreen> {
       title: Text(label),
       onTap: () async {
         Navigator.pop(context); // Close sheet
-        await _service.reportUser(
+        final recentReport = await _service.getRecentReportForMatch(
+          matchId: widget.matchId,
+          reporterId: widget.myUserId,
+          within: _reportCooldown,
+        );
+
+        if (!mounted) return;
+
+        if (recentReport != null) {
+          final recentAt = DateTime.tryParse(recentReport.createdAt);
+          final waitMinutes = recentAt == null
+              ? _reportCooldown.inMinutes
+              : (_reportCooldown.inMinutes -
+                      DateTime.now().difference(recentAt).inMinutes)
+                  .clamp(1, _reportCooldown.inMinutes);
+
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                '동일 사용자 신고는 ${_reportCooldown.inMinutes}분 이내 1회만 가능합니다. '
+                '약 $waitMinutes분 후 다시 시도해주세요.',
+              ),
+              backgroundColor: Colors.orange,
+            ),
+          );
+          return;
+        }
+
+        final report = await _service.reportUser(
           matchId: widget.matchId,
           reporterId: widget.myUserId,
           reason: reason,
         );
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('신고가 접수되었습니다. 검토 후 조치하겠습니다.'),
-              backgroundColor: MeetingTheme.primary,
-            ),
-          );
-        }
+        if (!mounted) return;
+        await _showReportReceiptDialog(report);
       },
+    );
+  }
+
+  Future<void> _showReportReceiptDialog(MeetingReport report) {
+    return showDialog<void>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('신고가 접수되었습니다'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('접수번호: ${report.id.substring(0, 8).toUpperCase()}'),
+            const SizedBox(height: 8),
+            const Text('운영팀에서 내용을 검토한 뒤 필요 시 조치합니다.'),
+            const SizedBox(height: 4),
+            const Text('처리 상태는 pending → reviewed → actioned/rejected 순서로 반영됩니다.'),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('확인'),
+          ),
+        ],
+      ),
     );
   }
 

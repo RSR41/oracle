@@ -101,7 +101,7 @@ class MeetingReport {
   final String reason;
   final String? description;
   final String createdAt;
-  final String status;
+  final MeetingReportStatus status;
 
   MeetingReport({
     required this.id,
@@ -110,7 +110,7 @@ class MeetingReport {
     required this.reason,
     this.description,
     required this.createdAt,
-    this.status = 'pending',
+    this.status = MeetingReportStatus.pending,
   });
 
   Map<String, dynamic> toMap() => {
@@ -120,8 +120,18 @@ class MeetingReport {
         'reason': reason,
         'description': description,
         'createdAt': createdAt,
-        'status': status,
+        'status': status.value,
       };
+
+  factory MeetingReport.fromMap(Map<String, dynamic> map) => MeetingReport(
+        id: map['id'] as String,
+        matchId: map['matchId'] as String,
+        reporterId: map['reporterId'] as String,
+        reason: map['reason'] as String,
+        description: map['description'] as String?,
+        createdAt: map['createdAt'] as String,
+        status: MeetingReportStatus.fromValue(map['status'] as String?),
+      );
 }
 
 class MeetingBlock {
@@ -150,4 +160,35 @@ class MeetingBlock {
         blockedUserId: map['blockedUserId'],
         createdAt: map['createdAt'],
       );
+}
+enum MeetingReportStatus {
+  pending,
+  reviewed,
+  actioned,
+  rejected;
+
+  String get value => name;
+
+  static MeetingReportStatus fromValue(String? value) {
+    return MeetingReportStatus.values.firstWhere(
+      (status) => status.value == value,
+      orElse: () => MeetingReportStatus.pending,
+    );
+  }
+}
+
+extension MeetingReportStatusTransition on MeetingReportStatus {
+  bool canTransitionTo(MeetingReportStatus next) {
+    switch (this) {
+      case MeetingReportStatus.pending:
+        return next == MeetingReportStatus.reviewed ||
+            next == MeetingReportStatus.rejected;
+      case MeetingReportStatus.reviewed:
+        return next == MeetingReportStatus.actioned ||
+            next == MeetingReportStatus.rejected;
+      case MeetingReportStatus.actioned:
+      case MeetingReportStatus.rejected:
+        return false;
+    }
+  }
 }

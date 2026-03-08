@@ -171,6 +171,26 @@ class MeetingRepositoryStub implements MeetingRepository {
   Future<void> reportUser(MeetingReport report) async {}
 
   @override
+  Future<List<MeetingReport>> getReports({
+    String? reporterId,
+    String? matchId,
+    int limit = 50,
+  }) async => [];
+
+  @override
+  Future<void> updateReportStatus(
+      String reportId, MeetingReportStatus nextStatus) async {}
+
+  @override
+  Future<void> syncMeetingReportToServer(MeetingReport report) async {}
+
+  @override
+  Future<List<MeetingReport>> syncMeetingReportsFromServer({
+    String? reporterId,
+    String? matchId,
+  }) async => [];
+
+  @override
   Future<void> blockUser(MeetingBlock block) async {}
 
   @override
