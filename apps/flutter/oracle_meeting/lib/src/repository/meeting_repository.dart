@@ -228,7 +228,7 @@ class MeetingRepositoryImpl implements MeetingRepository {
     if (_remote == null) return null;
 
     try {
-      final result = await _remote.submitLike(
+      final result = await _remote!.submitLike(
         fromUserId: fromUserId,
         toUserId: toUserId,
         createdAt: createdAt,
@@ -266,7 +266,7 @@ class MeetingRepositoryImpl implements MeetingRepository {
   Future<List<MeetingMatch>> getMatches(String userId) async {
     if (_remote != null) {
       try {
-        final remoteMatches = await _remote.fetchMatches(userId);
+        final remoteMatches = await _remote!.fetchMatches(userId);
         for (final match in remoteMatches) {
           await _cacheMatch(match);
         }
@@ -295,7 +295,7 @@ class MeetingRepositoryImpl implements MeetingRepository {
   Future<List<MeetingUser>> getRecommendations(String myUserId) async {
     if (_remote != null) {
       try {
-        final remoteUsers = await _remote.fetchRecommendations(myUserId);
+        final remoteUsers = await _remote!.fetchRecommendations(myUserId);
         for (final user in remoteUsers) {
           await saveUser(user);
         }
@@ -335,7 +335,7 @@ class MeetingRepositoryImpl implements MeetingRepository {
   Future<MeetingMessage> sendMessage(MeetingMessage message) async {
     if (_remote != null) {
       try {
-        final remoteMessage = await _remote.sendMessage(message);
+        final remoteMessage = await _remote!.sendMessage(message);
         await _cacheMessage(remoteMessage);
         return remoteMessage;
       } catch (_) {
@@ -353,7 +353,7 @@ class MeetingRepositoryImpl implements MeetingRepository {
     if (_remote != null) {
       try {
         final remoteMessages =
-            await _remote.fetchMessages(matchId, limit: limit, offset: offset);
+            await _remote!.fetchMessages(matchId, limit: limit, offset: offset);
         for (final message in remoteMessages) {
           await _cacheMessage(message);
         }
@@ -391,7 +391,7 @@ class MeetingRepositoryImpl implements MeetingRepository {
   Future<int> getUnreadCount(String matchId, String userId) async {
     if (_remote != null) {
       try {
-        return await _remote.fetchUnreadCount(matchId, userId);
+        return await _remote!.fetchUnreadCount(matchId, userId);
       } catch (_) {
         // Offline fallback to local cache.
       }
@@ -413,7 +413,7 @@ class MeetingRepositoryImpl implements MeetingRepository {
 
     if (_remote != null) {
       try {
-        await _remote.markAsRead(matchId, userId);
+        await _remote!.markAsRead(matchId, userId);
       } catch (_) {
         // Keep local as fallback state.
       }
