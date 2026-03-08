@@ -42,6 +42,7 @@ class AppRouter {
 
   static GoRouter router(AppState appState) {
     final showBetaFeatures = FeatureFlags.showBetaFeatures;
+    final canUseMeeting = FeatureFlags.canUseMeeting;
 
     // 첫 실행 여부에 따라 초기 위치 결정
     final initialLocation = appState.isFirstRun ? '/welcome' : '/home';
@@ -57,6 +58,14 @@ class AppRouter {
 
         if (appState.isFirstRun && !isOnWelcome && !isOnOnboarding) {
           return '/welcome';
+        }
+
+        final isMeetingPath = state.matchedLocation == '/meeting' ||
+            state.matchedLocation == '/meeting-gateway' ||
+            state.matchedLocation == '/meeting-history' ||
+            state.matchedLocation.startsWith('/meeting/');
+        if (!canUseMeeting && isMeetingPath) {
+          return '/home';
         }
         return null;
       },
@@ -90,6 +99,12 @@ class AppRouter {
               pageBuilder: (context, state) =>
                   NoTransitionPage(child: FortuneScreen()),
             ),
+            if (canUseMeeting)
+              GoRoute(
+                path: '/meeting',
+                pageBuilder: (context, state) =>
+                    NoTransitionPage(child: _buildMeetingHome(context)),
+              ),
             if (showBetaFeatures)
               GoRoute(
                 path: '/compatibility',
@@ -110,68 +125,22 @@ class AppRouter {
         ),
 
         // ── Meeting Gateway (mystical unlock screen) ──
-        GoRoute(
-          path: '/meeting-gateway',
-          builder: (context, state) => const MeetingGatewayScreen(),
-        ),
+        if (canUseMeeting)
+          GoRoute(
+            path: '/meeting-gateway',
+            builder: (context, state) => const MeetingGatewayScreen(),
+          ),
 
-        // ── Meeting Home (push, not tab) ──
-        GoRoute(
-          path: '/meeting',
-          builder: (context, state) {
-            final appState = Provider.of<AppState>(context);
-            if (!appState.hasSajuProfile) {
-              return const MeetingProfileGate();
-            }
-            return MeetingHomeScreen(
-              myUserId: appState.profile?.nickname ?? 'me',
-              myNickname: appState.profile?.nickname ?? '나',
-              onHistoryRecord: (payload) async {
-                final historyRepo = HistoryRepository();
-                final result = FortuneResult(
-                  id: payload['id'],
-                  type: payload['type'],
-                  title: payload['title'],
-                  date: DateTime.now().toIso8601String().split('T')[0],
-                  summary: payload['body'],
-                  content: payload['body'],
-                  overallScore: 0,
-                  createdAt: payload['createdAt'],
-                );
-
-                await historyRepo.saveWithPayload(
-                  result: result,
-                  payload: HistoryPayload.wrap(
-                    feature: 'meeting',
-                    summary: {
-                      'title': result.title,
-                      'type': result.type,
-                      'date': result.date,
-                    },
-                    data: Map<String, dynamic>.from(payload),
-                    extra: payload['meta'] is Map<String, dynamic>
-                        ? Map<String, dynamic>.from(payload['meta'])
-                        : null,
-                  ),
-                );
-                debugPrint(
-                  'History recorded from App side: ${payload['type']}',
-                );
-              },
-              onOpenMeetingHistory: () =>
-                  context.push('/meeting-history'),
-            );
-          },
-        ),
 
         // ── Meeting History (push) ──
-        GoRoute(
-          path: '/meeting-history',
-          builder: (context, state) => const HistoryScreen(
-            initialFilter: 'MEETING',
-            lockFilter: true,
+        if (canUseMeeting)
+          GoRoute(
+            path: '/meeting-history',
+            builder: (context, state) => const HistoryScreen(
+              initialFilter: 'MEETING',
+              lockFilter: true,
+            ),
           ),
-        ),
 
         // Stack Screens (No Bottom Nav)
         GoRoute(
@@ -241,18 +210,19 @@ class AppRouter {
             );
           },
         ),
-        GoRoute(
-          path: '/meeting/chat',
-          builder: (context, state) {
-            final extra = state.extra as Map<String, dynamic>;
-            return MeetingChatScreen(
-              matchId: extra['matchId'] as String,
-              myUserId: extra['myUserId'] as String,
-              otherUserId: extra['otherUserId'] as String,
-              otherUserName: extra['otherUserName'] as String,
-            );
-          },
-        ),
+        if (canUseMeeting)
+          GoRoute(
+            path: '/meeting/chat',
+            builder: (context, state) {
+              final extra = state.extra as Map<String, dynamic>;
+              return MeetingChatScreen(
+                matchId: extra['matchId'] as String,
+                myUserId: extra['myUserId'] as String,
+                otherUserId: extra['otherUserId'] as String,
+                otherUserName: extra['otherUserName'] as String,
+              );
+            },
+          ),
 
         // Feature & Placeholders
         GoRoute(
@@ -346,6 +316,50 @@ class AppRouter {
       ],
     );
     return _router!;
+  }
+
+
+  static Widget _buildMeetingHome(BuildContext context) {
+    final appState = Provider.of<AppState>(context, listen: false);
+    if (!appState.hasSajuProfile) {
+      return const MeetingProfileGate();
+    }
+
+    return MeetingHomeScreen(
+      myUserId: appState.profile?.nickname ?? 'me',
+      myNickname: appState.profile?.nickname ?? '나',
+      onHistoryRecord: (payload) async {
+        final historyRepo = HistoryRepository();
+        final result = FortuneResult(
+          id: payload['id'],
+          type: payload['type'],
+          title: payload['title'],
+          date: DateTime.now().toIso8601String().split('T')[0],
+          summary: payload['body'],
+          content: payload['body'],
+          overallScore: 0,
+          createdAt: payload['createdAt'],
+        );
+
+        await historyRepo.saveWithPayload(
+          result: result,
+          payload: HistoryPayload.wrap(
+            feature: 'meeting',
+            summary: {
+              'title': result.title,
+              'type': result.type,
+              'date': result.date,
+            },
+            data: Map<String, dynamic>.from(payload),
+            extra: payload['meta'] is Map<String, dynamic>
+                ? Map<String, dynamic>.from(payload['meta'])
+                : null,
+          ),
+        );
+        debugPrint('History recorded from App side: ${payload['type']}');
+      },
+      onOpenMeetingHistory: () => context.push('/meeting-history'),
+    );
   }
 
   /// 첫 실행 후 router 재설정 (for hot reload)
