@@ -5,6 +5,18 @@ import '../models/meeting_user.dart';
 import '../models/meeting_notification_event.dart';
 import '../repository/meeting_repository.dart';
 
+class MeetingHistoryEventTypes {
+  static const String profileCompleted = 'meeting_profile_completed';
+  static const String compatibilitySnapshot = 'meeting_compatibility_snapshot';
+  static const String recommendationServed = 'meeting_recommendation_served';
+  static const String matchCreated = 'meeting_match_created';
+  static const String reportSubmitted = 'meeting_report_submitted';
+
+  // Legacy / supplementary types kept for backward compatibility.
+  static const String seed = 'meeting_seed';
+  static const String block = 'meeting_block';
+}
+
 class MeetingService {
   final MeetingRepository _repo;
   final Uuid _uuid = const Uuid();
@@ -158,10 +170,86 @@ class MeetingService {
     return _fnv1aHash(seed).toUnsigned(32).toRadixString(16).padLeft(8, '0');
   }
 
+
+  Future<void> _recordHistoryEvent({
+    required String eventType,
+    required String idSeed,
+    required String title,
+    required String body,
+    Map<String, dynamic>? meta,
+  }) async {
+    final createdAt = DateTime.now().toIso8601String();
+    await _safeHistory({
+      'id': _deterministicId(idSeed),
+      'type': eventType,
+      'title': title,
+      'body': body,
+      'createdAt': createdAt,
+      if (meta != null) 'meta': meta,
+    });
+  }
+
   /// Calculate compatibility score (60-100)
   int calculateScore(String myId, String targetId) {
     final hash = _fnv1aHash(myId + targetId);
     return 60 + (hash.abs() % 41); // 60 ~ 100
+  }
+
+  /// 저장 시점: 사용자의 소개팅 프로필 저장/완료 직후
+  Future<void> recordProfileCompleted({
+    required String userId,
+    required String nickname,
+    String? regionCode,
+  }) async {
+    await _recordHistoryEvent(
+      eventType: MeetingHistoryEventTypes.profileCompleted,
+      idSeed: 'profile|$userId',
+      title: '[Meeting] 프로필 작성 완료',
+      body: '$nickname님의 소개팅 프로필이 준비되었습니다.',
+      meta: {
+        'userId': userId,
+        'nickname': nickname,
+        if (regionCode != null) 'regionCode': regionCode,
+      },
+    );
+  }
+
+  /// 저장 시점: 추천 카드(소개 대상)가 사용자에게 노출될 때
+  Future<void> recordRecommendationServed({
+    required String myUserId,
+    required String targetUserId,
+    required int recommendationIndex,
+  }) async {
+    await _recordHistoryEvent(
+      eventType: MeetingHistoryEventTypes.recommendationServed,
+      idSeed: 'recommendation|$myUserId|$targetUserId|$recommendationIndex',
+      title: '[Meeting] 추천 카드 노출',
+      body: '새로운 추천 상대가 표시되었습니다.',
+      meta: {
+        'myUserId': myUserId,
+        'targetUserId': targetUserId,
+        'recommendationIndex': recommendationIndex,
+      },
+    );
+  }
+
+  /// 저장 시점: 궁합 점수를 계산해 화면에 스냅샷으로 보여줄 때
+  Future<void> recordCompatibilitySnapshot({
+    required String myUserId,
+    required String targetUserId,
+    required int score,
+  }) async {
+    await _recordHistoryEvent(
+      eventType: MeetingHistoryEventTypes.compatibilitySnapshot,
+      idSeed: 'compatibility|$myUserId|$targetUserId|$score',
+      title: '[Meeting] 궁합 스냅샷 저장',
+      body: '두 사람의 궁합 분석 스냅샷이 저장되었습니다.',
+      meta: {
+        'myUserId': myUserId,
+        'targetUserId': targetUserId,
+        'score': score,
+      },
+    );
   }
 
   // ─────────────────── Like / Pass / Match ───────────────────
@@ -188,7 +276,7 @@ class MeetingService {
 
       await _safeHistory({
         'id': _deterministicId("match|$matchId"),
-        'type': 'meeting_match',
+        'type': MeetingHistoryEventTypes.matchCreated,
         'title': '[Meeting] 매칭 성립',
         'body': '상대방과 매칭되었습니다! 대화를 시작해보세요.',
         'createdAt': now,
@@ -250,7 +338,7 @@ class MeetingService {
 
     await _safeHistory({
       'id': _deterministicId("block|$myUserId|$targetUserId"),
-      'type': 'meeting_block',
+      'type': MeetingHistoryEventTypes.block,
       'title': '[Meeting] 사용자 차단',
       'body': '사용자를 차단했습니다.',
       'createdAt': DateTime.now().toIso8601String(),
@@ -280,7 +368,7 @@ class MeetingService {
 
     await _safeHistory({
       'id': _deterministicId("report|${report.id}"),
-      'type': 'meeting_report',
+      'type': MeetingHistoryEventTypes.reportSubmitted,
       'title': '[Meeting] 신고 접수',
       'body': '신고가 접수되었습니다.',
       'createdAt': DateTime.now().toIso8601String(),
@@ -451,7 +539,7 @@ class MeetingService {
 
     await _safeHistory({
       'id': _deterministicId("seed|$myUserId"),
-      'type': 'meeting_seed',
+      'type': MeetingHistoryEventTypes.seed,
       'title': '[Meeting] Seed 완료',
       'body': '데모 데이터가 초기화되고 새로운 인연이 생성되었습니다.',
       'createdAt': DateTime.now().toIso8601String(),

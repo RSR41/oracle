@@ -35,6 +35,19 @@ class _HistoryScreenState extends State<HistoryScreen> {
   bool get _isMeetingLocked =>
       widget.lockFilter && widget.initialFilter == 'MEETING';
 
+  static const Map<String, String> _meetingTypeLabels = {
+    'meeting_profile_completed': '프로필 완료',
+    'meeting_compatibility_snapshot': '궁합 스냅샷',
+    'meeting_recommendation_served': '추천 노출',
+    'meeting_match_created': '매칭 성립',
+    'meeting_report_submitted': '신고 접수',
+    'meeting_seed': 'Seed',
+    'meeting_match': '매칭(구)',
+    'meeting_report': '신고(구)',
+    'meeting_message': '메시지',
+    'meeting_block': '차단',
+  };
+
   @override
   void initState() {
     super.initState();
@@ -218,16 +231,44 @@ class _HistoryScreenState extends State<HistoryScreen> {
     ThemeData theme,
     List<FortuneResult> items,
   ) {
-    final seeds = items.where((i) => i.type == 'meeting_seed').toList();
-    final matches = items.where((i) => i.type == 'meeting_match').toList();
+    final onboarding = items
+        .where(
+          (i) =>
+              i.type == 'meeting_profile_completed' ||
+              i.type == 'meeting_recommendation_served' ||
+              i.type == 'meeting_seed',
+        )
+        .toList();
+    final compatibility = items
+        .where((i) => i.type == 'meeting_compatibility_snapshot')
+        .toList();
+    final matches = items
+        .where(
+          (i) =>
+              i.type == 'meeting_match_created' ||
+              i.type == 'meeting_match',
+        )
+        .toList();
+    final reports = items
+        .where(
+          (i) =>
+              i.type == 'meeting_report_submitted' ||
+              i.type == 'meeting_report' ||
+              i.type == 'meeting_block',
+        )
+        .toList();
     final messages = items.where((i) => i.type == 'meeting_message').toList();
 
     return ListView(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
       children: [
-        _buildMeetingSection('Seed', seeds, theme),
+        _buildMeetingSection('Onboarding', onboarding, theme),
+        const SizedBox(height: 12),
+        _buildMeetingSection('Compatibility', compatibility, theme),
         const SizedBox(height: 12),
         _buildMeetingSection('Match', matches, theme),
+        const SizedBox(height: 12),
+        _buildMeetingSection('Safety', reports, theme),
         const SizedBox(height: 12),
         _buildMeetingSection('Message', messages, theme),
       ],
@@ -449,13 +490,24 @@ class _HistoryScreenState extends State<HistoryScreen> {
                               color: Colors.blue.withValues(alpha: 0.1),
                               borderRadius: BorderRadius.circular(4),
                             ),
-                            child: const Text(
-                              'Meeting',
-                              style: TextStyle(
-                                fontSize: 10,
-                                color: Colors.blue,
-                                fontWeight: FontWeight.bold,
-                              ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  _meetingTypeIcon(item.type),
+                                  size: 12,
+                                  color: Colors.blue,
+                                ),
+                                const SizedBox(width: 4),
+                                Text(
+                                  _meetingTypeLabels[item.type] ?? 'Meeting',
+                                  style: const TextStyle(
+                                    fontSize: 10,
+                                    color: Colors.blue,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
                         ),
@@ -630,6 +682,30 @@ class _HistoryScreenState extends State<HistoryScreen> {
         );
       },
     );
+  }
+
+
+  IconData _meetingTypeIcon(String type) {
+    switch (type) {
+      case 'meeting_profile_completed':
+        return Icons.badge_outlined;
+      case 'meeting_recommendation_served':
+        return Icons.recommend_outlined;
+      case 'meeting_compatibility_snapshot':
+        return Icons.favorite_outline;
+      case 'meeting_match_created':
+      case 'meeting_match':
+        return Icons.favorite;
+      case 'meeting_report_submitted':
+      case 'meeting_report':
+        return Icons.report_gmailerrorred;
+      case 'meeting_block':
+        return Icons.block;
+      case 'meeting_message':
+        return Icons.chat_bubble_outline;
+      default:
+        return Icons.event_note;
+    }
   }
 
   Widget _detailRow(String label, String value) {
