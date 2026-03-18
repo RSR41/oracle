@@ -31,6 +31,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   bool _isEditing = false;
   bool _isTimeUnknown = false;
   bool _isSavingSaju = false;
+  bool _hasSavedSaju = false;
   SajuResult? _sajuResult;
 
   @override
@@ -68,6 +69,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         _isTimeUnknown = true;
       }
       _calculateSaju();
+      _hasSavedSaju = false;
       setState(() {});
     }
   }
@@ -131,12 +133,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
 
     await context.read<AppState>().saveProfile(profile);
-    setState(() => _isEditing = false);
+    setState(() {
+      _isEditing = false;
+      _hasSavedSaju = false;
+    });
 
     if (mounted) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('프로필이 저장되었습니다')));
+      final timeNotice = _isTimeUnknown || _birthTime == null
+          ? ' 출생 시간이 없어 시주는 제외되며, 일부 해석 정확도는 낮아질 수 있습니다.'
+          : '';
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('프로필이 저장되었습니다.$timeNotice 아래에서 사주 결과를 저장하면 히스토리에서도 다시 볼 수 있습니다.'),
+          duration: const Duration(seconds: 4),
+        ),
+      );
     }
   }
 
@@ -188,9 +199,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
           .timeout(const Duration(seconds: 8));
 
       if (!mounted) return;
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('사주 결과가 히스토리에 저장되었습니다.')));
+      setState(() => _hasSavedSaju = true);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('사주 결과가 히스토리에 저장되었습니다. 히스토리 탭에서 다시 확인할 수 있습니다.')),
+      );
     } catch (e) {
       try {
         await _historyRepo.logSaveError(
@@ -312,6 +324,23 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ),
         const SizedBox(height: 24),
 
+        if (_isTimeUnknown || profile.birthTime == null || profile.birthTime!.isEmpty) ...[
+          _buildInfoBanner(
+            icon: Icons.info_outline,
+            color: AppColors.caramel,
+            title: '출생 시간 미상',
+            message: '출생 시간을 모르면 시주는 제외됩니다. 현재 결과는 3주 기준 해석이며, 일부 세부 해석과 정확도는 제한될 수 있습니다.',
+          ),
+          const SizedBox(height: 16),
+        ],
+        _buildInfoBanner(
+          icon: Icons.rule_folder_outlined,
+          color: AppColors.primary,
+          title: '정확도 안내',
+          message: '현재 사주 계산은 앱용 해석 엔진 기반입니다. 일반적인 해석에는 충분하지만, 절기 경계일·출생 시간 미상·음력/윤달 케이스는 오차가 있을 수 있습니다.',
+        ),
+        const SizedBox(height: 16),
+
         // Saju Result
         if (_sajuResult != null) ...[_buildSajuResultCard(theme, appState)],
       ],
@@ -323,6 +352,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
     return Column(
       children: [
+        _buildInfoBanner(
+          icon: _hasSavedSaju ? Icons.check_circle_outline : Icons.save_outlined,
+          color: _hasSavedSaju ? Colors.green : AppColors.primary,
+          title: _hasSavedSaju ? '히스토리 저장 완료' : '결과 저장 안내',
+          message: _hasSavedSaju
+              ? '현재 사주 결과가 히스토리에 저장되어 있습니다.'
+              : '프로필 저장과 히스토리 저장은 별도입니다. 아래 버튼을 누르면 현재 계산된 사주 결과를 히스토리에 저장할 수 있습니다.',
+        ),
+        const SizedBox(height: 16),
         // 사주 팔자 (Four Pillars)
         Container(
           width: double.infinity,
@@ -596,7 +634,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     child: CircularProgressIndicator(strokeWidth: 2),
                   )
                 : const Icon(Icons.save_outlined),
-            label: Text(_isSavingSaju ? '저장 중...' : '사주 결과 저장'),
+            label: Text(
+              _isSavingSaju
+                  ? '저장 중...'
+                  : _hasSavedSaju
+                  ? '사주 결과 다시 저장'
+                  : '사주 결과 히스토리에 저장',
+            ),
             style: FilledButton.styleFrom(
               backgroundColor: AppColors.primary,
               foregroundColor: Colors.white,
@@ -701,6 +745,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
             style: theme.textTheme.bodyMedium?.copyWith(
               color: AppColors.mutedForeground,
             ),
+          ),
+          const SizedBox(height: 16),
+          _buildInfoBanner(
+            icon: Icons.info_outline,
+            color: AppColors.primary,
+            title: '입력 안내',
+            message: '생년월일은 필수입니다. 출생 시간을 모르면 시주는 제외되며, 절기 경계일이나 음력/윤달 케이스는 실제 명리 계산과 차이가 있을 수 있습니다.',
           ),
           const SizedBox(height: 24),
 
@@ -910,6 +961,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
             ],
           ),
+          const SizedBox(height: 10),
+          Text(
+            _isTimeUnknown
+                ? '출생 시간이 없으면 시주는 제외되며, 세부 해석 정확도는 일부 제한됩니다.'
+                : '출생 시간을 알고 있으면 더 정확한 사주 해석이 가능합니다.',
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: _isTimeUnknown
+                  ? AppColors.caramel
+                  : AppColors.mutedForeground,
+              height: 1.4,
+            ),
+          ),
           const SizedBox(height: 32),
 
           // Preview (if date selected)
@@ -999,6 +1062,61 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 child: const Text('취소'),
               ),
             ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildInfoBanner({
+    required IconData icon,
+    required Color color,
+    required String title,
+    required String message,
+  }) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.08),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: color.withValues(alpha: 0.35)),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            margin: const EdgeInsets.only(top: 1),
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: color.withValues(alpha: 0.12),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Icon(icon, size: 18, color: color),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.nightTextPrimary,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  message,
+                  style: const TextStyle(
+                    fontSize: 13,
+                    height: 1.45,
+                    color: AppColors.nightTextSecondary,
+                  ),
+                ),
+              ],
+            ),
+          ),
         ],
       ),
     );
