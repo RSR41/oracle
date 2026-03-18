@@ -215,6 +215,7 @@ class SajuService {
           hanja = '劫財';
           description = '나와 비슷하나 다른 기운. 사교적이고 활동적이지만 재물 소비가 잦습니다.';
         }
+        break;
       case '식상':
         if (sameYinYang) {
           name = '식신';
@@ -225,6 +226,7 @@ class SajuService {
           hanja = '傷官';
           description = '내가 낳은 다른 기운. 재능이 출중하고 비판적 사고가 강하지만 반항심이 있을 수 있습니다.';
         }
+        break;
       case '재성':
         if (sameYinYang) {
           name = '편재';
@@ -235,6 +237,7 @@ class SajuService {
           hanja = '正財';
           description = '안정적 수입과 저축 능력이 뛰어나며 근면 성실합니다.';
         }
+        break;
       case '관성':
         if (sameYinYang) {
           name = '편관';
@@ -245,6 +248,7 @@ class SajuService {
           hanja = '正官';
           description = '명예와 직위를 중시하며 책임감이 강하고 규칙을 잘 지킵니다.';
         }
+        break;
       case '인성':
         if (sameYinYang) {
           name = '편인';
@@ -255,6 +259,7 @@ class SajuService {
           hanja = '正印';
           description = '학업운이 좋고 지적 능력이 뛰어나며 어머니와 인연이 깊습니다.';
         }
+        break;
       default:
         name = '비견';
         hanja = '比肩';
