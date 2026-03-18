@@ -142,7 +142,35 @@ Firebase(Firestore/Auth/Functions)로 전환하는 경우, 현재 Prisma 중심 
 
 **의사결정 권장안:** 단기 출시/안정성 기준으로는 **Prisma + 무료 PostgreSQL 유지**가 유리합니다.
 
-## 6) API Endpoints
+## 6) AI 빠른 설정(Gemini 권장)
+
+무료 위주로 운영하려면 현재 기준 **Gemini**가 가장 적합합니다.
+
+### backend/.env
+```dotenv
+LLM_PROVIDER="gemini"
+GEMINI_API_KEY="YOUR_GEMINI_API_KEY"
+GEMINI_MODEL="gemini-1.5-flash"
+GEMINI_VISION_MODEL="gemini-1.5-flash"
+LLM_TIMEOUT_MS=30000
+LLM_MAX_TOKENS=1024
+```
+
+### Flutter 실행 시 dart-define
+```bash
+flutter run \
+  --dart-define=API_PROFILE=PHASE2 \
+  --dart-define=API_BASE_URL=http://<YOUR_BACKEND_HOST>:8080 \
+  --dart-define=AI_ONLINE=true \
+  --dart-define=BETA_FEATURES=true
+```
+
+소개팅 기능까지 열려면 필요 시 추가:
+```bash
+--dart-define=ENABLE_MEETING=true
+```
+
+## 7) API Endpoints
 
 - Auth: `/auth/register`, `/auth/login`, `/auth/me`
 - Tags (Public): `/public/tags/:tagId`

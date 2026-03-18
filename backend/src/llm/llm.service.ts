@@ -255,17 +255,39 @@ export class LlmService implements LLMProvider {
 생일: ${req.birthDay}일
 ${req.birthHour ? `생시: ${req.birthHour}시` : ''}
 ${req.gender ? `성별: ${req.gender === 'male' ? '남성' : '여성'}` : ''}
+${req.targetDate ? `조회일: ${req.targetDate}` : ''}
 
-JSON 형식으로 응답해주세요:
-{ "summary": "...", "details": [{"category": "재물운", "content": "..."}], "caution": "..." }`;
+반드시 아래 JSON 객체 하나만 반환하세요. 설명문, 코드블록, 마크다운은 금지입니다.
+{
+  "title": "오늘의 사주 운세",
+  "summary": "2문장 이내 핵심 요약",
+  "details": [
+    {"category": "전체 흐름", "content": "2~3문장 설명", "rating": 4},
+    {"category": "재물운", "content": "2~3문장 설명", "rating": 4},
+    {"category": "연애운", "content": "2~3문장 설명", "rating": 3},
+    {"category": "건강운", "content": "2~3문장 설명", "rating": 3}
+  ],
+  "caution": "1문장 주의사항"
+}`;
     }
 
     private buildTarotPrompt(req: TarotReadingRequest): string {
         return `다음 타로 카드를 해석해주세요.
 뽑은 카드: ${req.cards.join(', ')}
 ${req.question ? `질문: ${req.question}` : ''}
+${req.spreadType ? `스프레드: ${req.spreadType}` : ''}
 
-JSON 형식으로 응답해주세요.`;
+반드시 아래 JSON 객체 하나만 반환하세요. 설명문, 코드블록, 마크다운은 금지입니다.
+{
+  "title": "타로 카드 해석",
+  "summary": "2문장 이내 핵심 요약",
+  "details": [
+    {"category": "현재 흐름", "content": "2~3문장 설명", "rating": 4},
+    {"category": "주의 포인트", "content": "2~3문장 설명", "rating": 3},
+    {"category": "행동 조언", "content": "2~3문장 설명", "rating": 4}
+  ],
+  "caution": "1문장 주의사항"
+}`;
     }
 
     private buildDreamPrompt(req: DreamMeaningRequest): string {
@@ -274,55 +296,106 @@ JSON 형식으로 응답해주세요.`;
 ${req.keywords?.length ? `키워드: ${req.keywords.join(', ')}` : ''}
 ${req.sajuContext ? `사주 컨텍스트: ${req.sajuContext}` : ''}
 
-JSON 형식으로 응답해주세요.
+반드시 아래 JSON 객체 하나만 반환하세요. 설명문, 코드블록, 마크다운은 금지입니다.
 {
-  "summary": "한 줄 요약",
+  "title": "꿈 해석",
+  "summary": "2문장 이내 핵심 요약",
   "details": [
-    {"category":"상징 해석","content":"...","rating":4},
-    {"category":"오늘의 흐름","content":"...","rating":4}
+    {"category":"상징 해석","content":"2~3문장 설명","rating":4},
+    {"category":"심리 상태","content":"2~3문장 설명","rating":4},
+    {"category":"오늘의 흐름","content":"2~3문장 설명","rating":3},
+    {"category":"행동 조언","content":"1~2문장 설명","rating":4}
   ],
-  "caution": "주의사항"
+  "caution": "1문장 주의사항"
 }`;
     }
 
     private buildFacePrompt(req: FaceReadingRequest): string {
         return `다음 입력을 바탕으로 관상을 분석해주세요.
+얼굴 특징 힌트:
 ${JSON.stringify(req.features, null, 2)}
 ${req.sajuContext ? `사주 컨텍스트: ${req.sajuContext}` : ''}
 
-JSON 형식으로 응답해주세요.
+중요 원칙:
+- 의료적 진단처럼 말하지 마세요.
+- 단정적 표현 대신 오락 목적의 해석으로 작성하세요.
+- 외모 비하 표현은 금지합니다.
+
+반드시 아래 JSON 객체 하나만 반환하세요. 설명문, 코드블록, 마크다운은 금지입니다.
 {
-  "summary": "최소 5~7문장 길이의 자세한 총평",
+  "title": "관상 분석",
+  "summary": "총평 3~4문장",
   "details": [
-    {"category":"이마","content":"...","rating":4},
-    {"category":"눈","content":"...","rating":4},
-    {"category":"코","content":"...","rating":3},
-    {"category":"입","content":"...","rating":3},
-    {"category":"턱","content":"...","rating":4}
+    {"category":"이마","content":"관찰 기반 해석 1~2문장","rating":4},
+    {"category":"눈","content":"관찰 기반 해석 1~2문장","rating":4},
+    {"category":"코","content":"관찰 기반 해석 1~2문장","rating":3},
+    {"category":"입","content":"관찰 기반 해석 1~2문장","rating":3},
+    {"category":"턱","content":"관찰 기반 해석 1~2문장","rating":4}
   ],
-  "caution": "주의사항"
+  "caution": "1문장 주의사항"
 }`;
     }
 
     private parseAiResult(content: string, defaultTitle: string): AiReadingResult {
+        const disclaimer = '본 분석은 오락 목적의 참고 정보이며, 전문적인 조언을 대체하지 않습니다.';
+
         try {
-            // JSON 파싱 시도
-            const parsed = JSON.parse(content);
+            const parsed = this.extractJsonObject(content);
+            const details = Array.isArray(parsed?.details)
+                ? parsed.details
+                    .filter((item) => item && typeof item === 'object')
+                    .map((item) => ({
+                        category: String(item.category ?? '해석'),
+                        content: String(item.content ?? ''),
+                        rating: typeof item.rating === 'number'
+                            ? Math.max(1, Math.min(5, Math.round(item.rating)))
+                            : undefined,
+                    }))
+                    .filter((item) => item.content.trim().length > 0)
+                : [];
+
+            const summary = typeof parsed?.summary === 'string' && parsed.summary.trim().length > 0
+                ? parsed.summary.trim()
+                : content.trim();
+
             return {
-                title: parsed.title || defaultTitle,
-                summary: parsed.summary || '',
-                details: parsed.details || [],
-                caution: parsed.caution,
-                disclaimer: '본 분석은 오락 목적의 참고 정보이며, 전문적인 조언을 대체하지 않습니다.',
+                title: typeof parsed?.title === 'string' && parsed.title.trim().length > 0
+                    ? parsed.title.trim()
+                    : defaultTitle,
+                summary,
+                details,
+                caution: typeof parsed?.caution === 'string' ? parsed.caution.trim() : undefined,
+                disclaimer,
             };
-        } catch {
-            // JSON 파싱 실패 시 전체를 summary로
+        } catch (error) {
+            this.logger.warn(`AI 결과 JSON 파싱 실패, raw text로 대체: ${error instanceof Error ? error.message : error}`);
             return {
                 title: defaultTitle,
-                summary: content,
+                summary: content.trim(),
                 details: [],
-                disclaimer: '본 분석은 오락 목적의 참고 정보이며, 전문적인 조언을 대체하지 않습니다.',
+                disclaimer,
             };
+        }
+    }
+
+    private extractJsonObject(content: string): any {
+        const trimmed = content.trim();
+        if (!trimmed) {
+            throw new Error('빈 응답입니다');
+        }
+
+        const fencedMatch = trimmed.match(/```(?:json)?\s*([\s\S]*?)\s*```/i);
+        const candidate = fencedMatch?.[1]?.trim() || trimmed;
+
+        try {
+            return JSON.parse(candidate);
+        } catch {
+            const firstBrace = candidate.indexOf('{');
+            const lastBrace = candidate.lastIndexOf('}');
+            if (firstBrace === -1 || lastBrace === -1 || firstBrace >= lastBrace) {
+                throw new Error('JSON 객체를 찾을 수 없습니다');
+            }
+            return JSON.parse(candidate.slice(firstBrace, lastBrace + 1));
         }
     }
 
