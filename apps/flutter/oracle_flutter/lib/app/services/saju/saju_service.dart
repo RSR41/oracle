@@ -4,7 +4,10 @@
 /// 日上起時法 for hour, with ten gods, 12 stages, spirit stars, and major cycles
 library;
 
+import 'day_master_strength_models.dart';
+import 'daewoon_models.dart';
 import 'saju_models.dart';
+import 'solar_terms.dart';
 
 class SajuService {
   // ═══════════════════════════════════════════════════
@@ -574,6 +577,332 @@ class SajuService {
     return (sajuMonth + 2) % 12;
   }
 
+  static const List<SolarTerm> _monthBoundaryTerms = [
+    SolarTerm.sohan,
+    SolarTerm.ipchun,
+    SolarTerm.gyeongchip,
+    SolarTerm.cheongmyeong,
+    SolarTerm.ipha,
+    SolarTerm.mangjong,
+    SolarTerm.soseo,
+    SolarTerm.ipchu,
+    SolarTerm.baengno,
+    SolarTerm.hallo,
+    SolarTerm.ipdong,
+    SolarTerm.daeseol,
+  ];
+
+  static int resolveSajuYear(DateTime birthDateTime) {
+    final ipchun = getSolarTermDateTime(birthDateTime.year, SolarTerm.ipchun);
+    if (ipchun == null) {
+      final month = birthDateTime.month;
+      final day = birthDateTime.day;
+      return (month < 2 || (month == 2 && day < 4))
+          ? birthDateTime.year - 1
+          : birthDateTime.year;
+    }
+    return birthDateTime.isBefore(ipchun)
+        ? birthDateTime.year - 1
+        : birthDateTime.year;
+  }
+
+  static int resolveSajuMonthIndex(DateTime birthDateTime) {
+    final sequence = buildSolarTermSequence(birthDateTime.year);
+    if (sequence.isEmpty) {
+      return _getSajuMonth(birthDateTime.month, birthDateTime.day);
+    }
+
+    SolarTermEntry? currentTerm;
+    for (final entry in sequence) {
+      if (!birthDateTime.isBefore(entry.dateTime)) {
+        currentTerm = entry;
+      } else {
+        break;
+      }
+    }
+
+    if (currentTerm == null) {
+      return _getSajuMonth(birthDateTime.month, birthDateTime.day);
+    }
+
+    final termIndex = _monthBoundaryTerms.indexOf(currentTerm.term);
+    if (termIndex == -1) {
+      return _getSajuMonth(birthDateTime.month, birthDateTime.day);
+    }
+
+    return termIndex;
+  }
+
+  static List<String> buildSajuWarnings({
+    required DateTime birthDateTime,
+    required bool birthTimeKnown,
+  }) {
+    final warnings = <String>[];
+
+    if (!birthTimeKnown) {
+      warnings.add('출생 시간이 없어 시주는 제외되며, 일부 세부 해석 정확도는 제한될 수 있습니다.');
+    }
+
+    if (isNearSolarTermBoundary(birthDateTime)) {
+      warnings.add('절기 경계일에 가까워 년주 또는 월주가 실제 출생 시각에 따라 달라질 수 있습니다.');
+    }
+
+    if (buildSolarTermSequence(birthDateTime.year).isEmpty) {
+      warnings.add('절기 정밀 테이블이 없어 현재는 근사 절기 계산을 사용하고 있습니다.');
+    }
+
+    return warnings;
+  }
+
+  static bool? _isMale(String? gender) {
+    if (gender == null) return null;
+
+    final normalized = gender.trim().toLowerCase();
+    if (normalized == '남' || normalized == 'male' || normalized == 'm') {
+      return true;
+    }
+    if (normalized == '여' || normalized == 'female' || normalized == 'f') {
+      return false;
+    }
+    return null;
+  }
+
+  static DayMasterStrengthResult _buildLegacyDayMasterStrengthResult(
+    String legacyLabel,
+  ) {
+    return DayMasterStrengthResult.fromLegacyString(
+      legacyLabel,
+      methodVersion: 'legacy-ratio-v1',
+    );
+  }
+
+  static String _parentElementOf(String element) {
+    final idx = _elementOrder.indexOf(element);
+    if (idx == -1) return '토';
+    return _elementOrder[(idx + 4) % 5];
+  }
+
+  static String _childElementOf(String element) {
+    final idx = _elementOrder.indexOf(element);
+    if (idx == -1) return '토';
+    return _elementOrder[(idx + 1) % 5];
+  }
+
+  static String _controlledByMeElementOf(String element) {
+    final idx = _elementOrder.indexOf(element);
+    if (idx == -1) return '토';
+    return _elementOrder[(idx + 2) % 5];
+  }
+
+  static String _controlsMeElementOf(String element) {
+    final idx = _elementOrder.indexOf(element);
+    if (idx == -1) return '토';
+    return _elementOrder[(idx + 3) % 5];
+  }
+
+  static SolarTermEntry? _getNextSolarTerm(DateTime birthDateTime) {
+    final sequence = buildSolarTermSequence(birthDateTime.year);
+    if (sequence.isEmpty) return null;
+    for (final entry in sequence) {
+      if (!entry.dateTime.isBefore(birthDateTime)) {
+        return entry;
+      }
+    }
+    return null;
+  }
+
+  static SolarTermEntry? _getPrevSolarTerm(DateTime birthDateTime) {
+    final sequence = buildSolarTermSequence(birthDateTime.year);
+    if (sequence.isEmpty) return null;
+    for (final entry in sequence.reversed) {
+      if (!entry.dateTime.isAfter(birthDateTime)) {
+        return entry;
+      }
+    }
+    return null;
+  }
+
+  static ({int years, int months, double totalDays, double rawYears})
+  _convertDaysToDaewoonOffset(double totalDays) {
+    const daysPerYear = 3.0;
+    const monthsPerDay = 4.0;
+    final rawYears = totalDays / daysPerYear;
+    final years = rawYears.floor();
+    final remainDays = totalDays - (years * daysPerYear);
+    final months = (remainDays * monthsPerDay).round().clamp(0, 11);
+    return (years: years, months: months, totalDays: totalDays, rawYears: rawYears);
+  }
+
+  static List<DaewoonEntry> _buildDaewoonEntries({
+    required int monthStemIndex,
+    required int monthBranchIndex,
+    required DaewoonDirection direction,
+    required int startYear,
+    required int count,
+  }) {
+    final entries = <DaewoonEntry>[];
+    final step = direction == DaewoonDirection.forward ? 1 : -1;
+    var currentStemIndex = monthStemIndex;
+    var currentBranchIndex = monthBranchIndex;
+
+    for (var i = 0; i < count; i++) {
+      currentStemIndex = (currentStemIndex + step + 10) % 10;
+      currentBranchIndex = (currentBranchIndex + step + 12) % 12;
+      final ageStart = startYear + (i * 10);
+      entries.add(
+        DaewoonEntry(
+          order: i + 1,
+          stem: heavenlyStems[currentStemIndex],
+          stemHanja: heavenlyStemsHanja[currentStemIndex],
+          branch: earthlyBranches[currentBranchIndex],
+          branchHanja: earthlyBranchesHanja[currentBranchIndex],
+          startAge: ageStart,
+          endAge: ageStart + 9,
+          description: _getMajorCycleDescription(
+            stemToElement[heavenlyStems[currentStemIndex]] ?? '토',
+            '${heavenlyStems[currentStemIndex]}${earthlyBranches[currentBranchIndex]}',
+          ),
+        ),
+      );
+    }
+
+    return entries;
+  }
+
+  static DaewoonResult _buildDaewoonResultFromLegacy({
+    required int yearStemIndex,
+    required String? gender,
+    required List<MajorCycle> majorCycles,
+  }) {
+    final isYangYear = yearStemIndex % 2 == 0;
+    final isMale = _isMale(gender) ?? false;
+    final forward = (isYangYear && isMale) || (!isYangYear && !isMale);
+
+    final warnings = <String>[
+      '대운 시작 시점의 정밀 년/월 계산은 아직 적용되지 않았습니다.',
+    ];
+
+    if (_isMale(gender) == null) {
+      warnings.add('성별 정보가 모호하여 대운 방향은 legacy 규칙으로 계산했습니다.');
+    }
+
+    final entries = <DaewoonEntry>[];
+    for (var i = 0; i < majorCycles.length; i++) {
+      final cycle = majorCycles[i];
+      entries.add(
+        DaewoonEntry(
+          order: i + 1,
+          stem: cycle.pillar.stem,
+          stemHanja: cycle.pillar.stemHanja,
+          branch: cycle.pillar.branch,
+          branchHanja: cycle.pillar.branchHanja,
+          startAge: cycle.startAge,
+          endAge: cycle.endAge,
+          description: cycle.description,
+        ),
+      );
+    }
+
+    return DaewoonResult(
+      direction: forward ? DaewoonDirection.forward : DaewoonDirection.backward,
+      referenceTerm: null,
+      referenceTermDateTime: null,
+      totalDays: null,
+      rawYears: null,
+      startYear: null,
+      startMonth: null,
+      methodVersion: 'legacy-major-cycles-v1',
+      usedFallback: true,
+      warnings: warnings,
+      entries: entries,
+    );
+  }
+
+  static DaewoonResult _calculateDaewoonResult({
+    required int yearStemIndex,
+    required int monthStemIndex,
+    required int monthBranchIndex,
+    required String? gender,
+    required DateTime birthDateTime,
+    required bool birthTimeKnown,
+    required List<MajorCycle> legacyMajorCycles,
+  }) {
+    final isYangYear = yearStemIndex % 2 == 0;
+    final isMale = _isMale(gender);
+    if (isMale == null) {
+      return _buildDaewoonResultFromLegacy(
+        yearStemIndex: yearStemIndex,
+        gender: gender,
+        majorCycles: legacyMajorCycles,
+      );
+    }
+
+    final direction = (isYangYear && isMale) || (!isYangYear && !isMale)
+        ? DaewoonDirection.forward
+        : DaewoonDirection.backward;
+
+    final referenceTerm = direction == DaewoonDirection.forward
+        ? _getNextSolarTerm(birthDateTime)
+        : _getPrevSolarTerm(birthDateTime);
+
+    if (referenceTerm == null) {
+      return _buildDaewoonResultFromLegacy(
+        yearStemIndex: yearStemIndex,
+        gender: gender,
+        majorCycles: legacyMajorCycles,
+      );
+    }
+
+    final diffMinutes = referenceTerm.dateTime
+        .difference(birthDateTime)
+        .inMinutes
+        .abs();
+    final totalDays = diffMinutes / 1440.0;
+    final converted = _convertDaysToDaewoonOffset(totalDays);
+    final entries = _buildDaewoonEntries(
+      monthStemIndex: monthStemIndex,
+      monthBranchIndex: monthBranchIndex,
+      direction: direction,
+      startYear: converted.years,
+      count: 10,
+    );
+
+    final warnings = <String>[];
+    if (!birthTimeKnown) {
+      warnings.add('출생 시간이 없어 정오 기준으로 대운 시작 시점을 근사 계산했습니다.');
+    }
+    if (buildSolarTermSequence(birthDateTime.year).isEmpty) {
+      warnings.add('절기 정밀 테이블이 비어 있어 정밀 대운 계산을 완료할 수 없습니다.');
+    }
+
+    return DaewoonResult(
+      direction: direction,
+      referenceTerm: referenceTerm.term.name,
+      referenceTermDateTime: referenceTerm.dateTime,
+      totalDays: converted.totalDays,
+      rawYears: converted.rawYears,
+      startYear: converted.years,
+      startMonth: converted.months,
+      methodVersion: 'term-distance-v1',
+      usedFallback: false,
+      warnings: warnings,
+      entries: entries,
+    );
+  }
+
+  static List<String> _mergeUniqueWarnings(
+    List<String> base,
+    List<String> extra,
+  ) {
+    final merged = <String>[...base];
+    for (final item in extra) {
+      if (!merged.contains(item)) {
+        merged.add(item);
+      }
+    }
+    return merged;
+  }
+
   // ═══════════════════════════════════════════════════
   // 년상기월법(年上起月法): 년간에 따른 월간 결정
   // 갑/기년 → 병인월 시작, 을/경년 → 무인월 시작,
@@ -665,7 +994,7 @@ class SajuService {
   }) {
     // 양남음녀 순행, 음남양녀 역행
     final isYangYear = yearStemIndex % 2 == 0;
-    final isMale = gender == '남' || gender == 'male' || gender == 'M';
+    final isMale = _isMale(gender) ?? false;
     final forward = (isYangYear && isMale) || (!isYangYear && !isMale);
 
     final cycles = <MajorCycle>[];
@@ -733,13 +1062,33 @@ class SajuService {
     String? birthTime,
     String? gender,
   }) {
+    final birthTimeKnown = birthTime != null && birthTime.isNotEmpty;
+    final workingBirthDateTime = birthTimeKnown
+        ? (() {
+            final parts = birthTime!.split(':');
+            final hour = parts.isNotEmpty ? int.tryParse(parts[0]) ?? 12 : 12;
+            final minute = parts.length >= 2 ? int.tryParse(parts[1]) ?? 0 : 0;
+            return DateTime(
+              birthDate.year,
+              birthDate.month,
+              birthDate.day,
+              hour,
+              minute,
+            );
+          })()
+        : DateTime(birthDate.year, birthDate.month, birthDate.day, 12, 0);
+
+    final warnings = buildSajuWarnings(
+      birthDateTime: workingBirthDateTime,
+      birthTimeKnown: birthTimeKnown,
+    );
+
     final year = birthDate.year;
     final month = birthDate.month;
     final day = birthDate.day;
 
     // ── 년주 계산 ──
-    // 입춘(2/4) 이전이면 전년도 간지 사용
-    final sajuYear = (month < 2 || (month == 2 && day < 4)) ? year - 1 : year;
+    final sajuYear = resolveSajuYear(workingBirthDateTime);
     final yearStemIndex = ((sajuYear - 4) % 10 + 10) % 10;
     final yearBranchIndex = ((sajuYear - 4) % 12 + 12) % 12;
     final yearPillar = Pillar(
@@ -750,7 +1099,7 @@ class SajuService {
     );
 
     // ── 월주 계산 (年上起月法 + 절기) ──
-    final sajuMonth = _getSajuMonth(month, day);
+    final sajuMonth = resolveSajuMonthIndex(workingBirthDateTime);
     final monthBranchIndex = _monthBranchIndex(sajuMonth);
     final monthStemStart = _monthStemStart(yearStemIndex);
     final monthStemIndex = (monthStemStart + sajuMonth) % 10;
@@ -811,13 +1160,14 @@ class SajuService {
     final dayMasterElement = stemToElement[dayMaster] ?? '토';
 
     // ── 일간 강약 판단 ──
-    final dayMasterStrength = _calculateDayMasterStrength(
-      dayMasterElement,
-      elements,
-      hiddenElements,
-      monthBranchIndex,
-      dayBranchIndex,
+    final dayMasterStrengthResult = _calculateDayMasterStrengthDetailed(
+      dayMasterElement: dayMasterElement,
+      monthPillar: monthPillar,
+      yearPillar: yearPillar,
+      dayPillar: dayPillar,
+      hourPillar: hourPillar,
     );
+    final dayMasterStrength = dayMasterStrengthResult.labelText;
 
     // ── 지배/부족 오행 ──
     final totalElements = <String, int>{};
@@ -867,6 +1217,16 @@ class SajuService {
       gender: gender,
       birthDate: birthDate,
     );
+    final daewoonResult = _calculateDaewoonResult(
+      yearStemIndex: yearStemIndex,
+      monthStemIndex: monthStemIndex,
+      monthBranchIndex: monthBranchIndex,
+      gender: gender,
+      birthDateTime: workingBirthDateTime,
+      birthTimeKnown: birthTimeKnown,
+      legacyMajorCycles: majorCycles,
+    );
+    final mergedWarnings = _mergeUniqueWarnings(warnings, daewoonResult.warnings);
 
     // ── 해석 생성 ──
     final interpretation = _generateInterpretation(
@@ -921,6 +1281,9 @@ class SajuService {
       majorCycles: majorCycles,
       hiddenElements: hiddenElements,
       dayMasterStrength: dayMasterStrength,
+      warnings: mergedWarnings,
+      dayMasterStrengthResult: dayMasterStrengthResult,
+      daewoonResult: daewoonResult,
     );
   }
 
@@ -959,6 +1322,187 @@ class SajuService {
       }
     }
     return counts;
+  }
+
+  DayMasterStrengthResult _calculateDayMasterStrengthDetailed({
+    required String dayMasterElement,
+    required Pillar monthPillar,
+    required Pillar yearPillar,
+    required Pillar dayPillar,
+    required Pillar? hourPillar,
+  }) {
+    var score = 50;
+    final factors = <StrengthFactor>[];
+
+    final parentElement = _parentElementOf(dayMasterElement);
+    final childElement = _childElementOf(dayMasterElement);
+    final wealthElement = _controlledByMeElementOf(dayMasterElement);
+    final officerElement = _controlsMeElementOf(dayMasterElement);
+
+    final pillars = [yearPillar, monthPillar, dayPillar, if (hourPillar != null) hourPillar];
+    final stemsExceptDay = [yearPillar.stem, monthPillar.stem, if (hourPillar != null) hourPillar.stem];
+    final branchesExceptMonth = [yearPillar.branch, dayPillar.branch, if (hourPillar != null) hourPillar.branch];
+    final allBranches = [yearPillar.branch, monthPillar.branch, dayPillar.branch, if (hourPillar != null) hourPillar.branch];
+
+    final monthElement = branchToElement[monthPillar.branch] ?? '토';
+    int monthScore;
+    String monthDesc;
+    if (monthElement == dayMasterElement || monthElement == parentElement) {
+      monthScore = 15;
+      monthDesc = '월지가 일간 또는 인성 오행으로 득령했습니다.';
+    } else if (monthElement == childElement) {
+      monthScore = -8;
+      monthDesc = '월지가 식상 오행이라 일간 기운이 일부 설기됩니다.';
+    } else if (monthElement == wealthElement) {
+      monthScore = -12;
+      monthDesc = '월지가 재성 오행이라 일간 기운 소모가 큽니다.';
+    } else if (monthElement == officerElement) {
+      monthScore = -15;
+      monthDesc = '월지가 관성 오행이라 일간 압박이 강합니다.';
+    } else {
+      monthScore = 0;
+      monthDesc = '월령 영향이 중립적으로 반영됩니다.';
+    }
+    score += monthScore;
+    factors.add(StrengthFactor(
+      type: StrengthFactorType.monthOrder,
+      score: monthScore,
+      title: '월령',
+      description: monthDesc,
+      meta: {'monthBranch': monthPillar.branch, 'monthElement': monthElement},
+    ));
+
+    var rootPositive = 0;
+    var rootNegative = 0;
+    for (final branch in branchesExceptMonth) {
+      final hidden = branchHiddenStems[branch] ?? const <String>[];
+      final mainStem = hidden.isNotEmpty ? hidden.first : null;
+      final mainElement = mainStem != null ? (stemToElement[mainStem] ?? branchToElement[branch] ?? '토') : (branchToElement[branch] ?? '토');
+      if (mainElement == dayMasterElement || mainElement == parentElement) {
+        rootPositive++;
+      } else if (mainElement == officerElement) {
+        rootNegative++;
+      }
+    }
+    final rootScore = [0, 4, 7, 10][rootPositive.clamp(0, 3)] - [0, 3, 6, 10][rootNegative.clamp(0, 3)];
+    score += rootScore;
+    factors.add(StrengthFactor(
+      type: StrengthFactorType.rootSupport,
+      score: rootScore.clamp(-10, 10),
+      title: '통근',
+      description: '지원 통근 ${rootPositive}곳, 압박 통근 ${rootNegative}곳이 반영되었습니다.',
+      meta: {'supportRoots': rootPositive, 'pressureRoots': rootNegative},
+    ));
+
+    var stemSupport = 0;
+    var stemDrain = 0;
+    for (final stem in stemsExceptDay) {
+      final element = stemToElement[stem] ?? '토';
+      if (element == dayMasterElement || element == parentElement) {
+        stemSupport++;
+      } else {
+        stemDrain++;
+      }
+    }
+    final stemScore = (stemSupport * 3 - stemDrain * 2).clamp(-10, 10);
+    score += stemScore;
+    factors.add(StrengthFactor(
+      type: StrengthFactorType.visibleStemSupport,
+      score: stemScore,
+      title: '투간',
+      description: '천간 지원 ${stemSupport}개, 소모/압박 ${stemDrain}개가 반영되었습니다.',
+      meta: {'stemSupport': stemSupport, 'stemDrain': stemDrain},
+    ));
+
+    var leakageCount = 0;
+    for (final pillar in pillars) {
+      final stemEl = stemToElement[pillar.stem] ?? '토';
+      final branchEl = branchToElement[pillar.branch] ?? '토';
+      if (stemEl == childElement) leakageCount++;
+      if (branchEl == childElement) leakageCount++;
+    }
+    final drainScore = leakageCount <= 0 ? 0 : leakageCount == 1 ? -2 : leakageCount == 2 ? -5 : leakageCount == 3 ? -8 : -10;
+    score += drainScore;
+    factors.add(StrengthFactor(
+      type: StrengthFactorType.leakage,
+      score: drainScore,
+      title: '누수(식상)',
+      description: leakageCount == 0 ? '식상 누수가 크지 않습니다.' : '식상 오행이 ${leakageCount}회 감지되어 일간 기운이 소모됩니다.',
+      meta: {'leakageCount': leakageCount},
+    ));
+
+    var hiddenSupport = 0;
+    var hiddenDrain = 0;
+    for (final branch in allBranches) {
+      final hidden = branchHiddenStems[branch] ?? const <String>[];
+      for (final stem in hidden.skip(1)) {
+        final element = stemToElement[stem] ?? '토';
+        if (element == dayMasterElement || element == parentElement) {
+          hiddenSupport++;
+        } else if (element == officerElement) {
+          hiddenDrain++;
+        }
+      }
+    }
+    final rawHidden = (hiddenSupport >= 2 ? 4 : hiddenSupport * 2) - (hiddenDrain >= 2 ? 4 : hiddenDrain * 2);
+    final hiddenScore = rawHidden.clamp(-5, 5);
+    score += hiddenScore;
+    factors.add(StrengthFactor(
+      type: StrengthFactorType.hiddenStemSupport,
+      score: hiddenScore,
+      title: '장간 지원',
+      description: '장간 보조 지원 ${hiddenSupport}건, 압박 ${hiddenDrain}건이 반영되었습니다.',
+      meta: {'hiddenSupport': hiddenSupport, 'hiddenDrain': hiddenDrain},
+    ));
+
+    const branchClashes = {
+      '자': '오', '축': '미', '인': '신', '묘': '유', '진': '술', '사': '해',
+      '오': '자', '미': '축', '신': '인', '유': '묘', '술': '진', '해': '사'
+    };
+    var conflictPenalty = 0;
+    final supportBranches = <String>{};
+    for (final branch in allBranches) {
+      final mainElement = branchToElement[branch] ?? '토';
+      if (mainElement == dayMasterElement || mainElement == parentElement) {
+        supportBranches.add(branch);
+      }
+    }
+    for (final branch in supportBranches) {
+      final clash = branchClashes[branch];
+      if (clash != null && allBranches.contains(clash)) {
+        conflictPenalty = -2;
+        break;
+      }
+    }
+    score += conflictPenalty;
+    if (conflictPenalty != 0) {
+      factors.add(StrengthFactor(
+        type: StrengthFactorType.combinationOrClash,
+        score: conflictPenalty,
+        title: '합·충 영향',
+        description: '통근 지지 일부가 충을 받아 일간 지원력이 감쇠되었습니다.',
+      ));
+    }
+
+    final finalScore = score.clamp(0, 100).toInt();
+    final label = finalScore >= 70
+        ? StrengthLabel.strong
+        : finalScore >= 58
+        ? StrengthLabel.slightlyStrong
+        : finalScore >= 43
+        ? StrengthLabel.balanced
+        : finalScore >= 31
+        ? StrengthLabel.slightlyWeak
+        : StrengthLabel.weak;
+
+    return DayMasterStrengthResult(
+      baseScore: 50,
+      score: finalScore,
+      label: label,
+      factors: factors,
+      methodVersion: 'weighted-strength-v1',
+      usedFallback: false,
+    );
   }
 
   // 일간 강약 판단

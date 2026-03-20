@@ -1,6 +1,9 @@
 /// Saju Calculation Models
 library;
 
+import 'day_master_strength_models.dart';
+import 'daewoon_models.dart';
+
 /// 기둥 (년/월/일/시)
 class Pillar {
   final String stem; // 천간 (갑, 을, 병...)
@@ -145,7 +148,7 @@ class MajorCycle {
   };
 
   factory MajorCycle.fromJson(Map<String, dynamic> json) => MajorCycle(
-    pillar: Pillar.fromJson(json['pillar']),
+    pillar: Pillar.fromJson(Map<String, dynamic>.from(json['pillar'] as Map)),
     startAge: json['startAge'] as int,
     endAge: json['endAge'] as int,
     description: json['description'] as String,
@@ -177,6 +180,9 @@ class SajuResult {
   final List<MajorCycle> majorCycles; // 대운 목록
   final Map<String, int> hiddenElements; // 장간 포함 오행 세부
   final String dayMasterStrength; // 일간 강약 (신강/신약)
+  final List<String> warnings; // 절기 경계일/출생시간 미상 등 주의사항
+  final DayMasterStrengthResult? dayMasterStrengthResult;
+  final DaewoonResult? daewoonResult;
 
   SajuResult({
     required this.yearPillar,
@@ -205,6 +211,9 @@ class SajuResult {
     this.majorCycles = const [],
     this.hiddenElements = const {},
     this.dayMasterStrength = '중화',
+    this.warnings = const [],
+    this.dayMasterStrengthResult,
+    this.daewoonResult,
   });
 
   /// 사주 팔자 요약 문자열
@@ -236,50 +245,81 @@ class SajuResult {
     'majorCycles': majorCycles.map((c) => c.toJson()).toList(),
     'hiddenElements': hiddenElements,
     'dayMasterStrength': dayMasterStrength,
+    'warnings': warnings,
+    'dayMasterStrengthResult': dayMasterStrengthResult?.toJson(),
+    'daewoonResult': daewoonResult?.toJson(),
   };
 
   factory SajuResult.fromJson(Map<String, dynamic> json) => SajuResult(
-    yearPillar: Pillar.fromJson(json['yearPillar']),
-    monthPillar: Pillar.fromJson(json['monthPillar']),
-    dayPillar: Pillar.fromJson(json['dayPillar']),
+    yearPillar: Pillar.fromJson(
+      Map<String, dynamic>.from(json['yearPillar'] as Map),
+    ),
+    monthPillar: Pillar.fromJson(
+      Map<String, dynamic>.from(json['monthPillar'] as Map),
+    ),
+    dayPillar: Pillar.fromJson(
+      Map<String, dynamic>.from(json['dayPillar'] as Map),
+    ),
     hourPillar: json['hourPillar'] != null
-        ? Pillar.fromJson(json['hourPillar'])
+        ? Pillar.fromJson(
+            Map<String, dynamic>.from(json['hourPillar'] as Map),
+          )
         : null,
-    elements: Map<String, int>.from(json['elements']),
-    dominantElement: json['dominantElement'],
-    weakestElement: json['weakestElement'],
-    zodiac: json['zodiac'],
-    zodiacHanja: json['zodiacHanja'],
-    dayMaster: json['dayMaster'],
-    dayMasterElement: json['dayMasterElement'],
-    interpretation: json['interpretation'],
-    luckyColors: List<String>.from(json['luckyColors']),
-    luckyNumbers: List<int>.from(json['luckyNumbers']),
-    overallScore: json['overallScore'],
-    tenGods:
-        (json['tenGods'] as Map<String, dynamic>?)?.map(
-          (k, v) => MapEntry(k, TenGod.fromJson(v)),
-        ) ??
-        {},
+    elements: Map<String, int>.from(json['elements'] as Map),
+    dominantElement: json['dominantElement'] as String,
+    weakestElement: json['weakestElement'] as String,
+    zodiac: json['zodiac'] as String,
+    zodiacHanja: json['zodiacHanja'] as String,
+    dayMaster: json['dayMaster'] as String,
+    dayMasterElement: json['dayMasterElement'] as String,
+    interpretation: json['interpretation'] as String,
+    luckyColors: List<String>.from(json['luckyColors'] ?? const <String>[]),
+    luckyNumbers: List<int>.from(json['luckyNumbers'] ?? const <int>[]),
+    overallScore: (json['overallScore'] as num?)?.toInt() ?? 0,
+    tenGods: (json['tenGods'] as Map?)
+            ?.map(
+              (k, v) => MapEntry(
+                k.toString(),
+                TenGod.fromJson(Map<String, dynamic>.from(v as Map)),
+              ),
+            ) ??
+        const <String, TenGod>{},
     dayTwelveStage: json['dayTwelveStage'] != null
-        ? TwelveStage.fromJson(json['dayTwelveStage'])
+        ? TwelveStage.fromJson(
+            Map<String, dynamic>.from(json['dayTwelveStage'] as Map),
+          )
         : const TwelveStage(
             name: '관대',
             hanja: '冠帶',
             stageIndex: 2,
             description: '',
           ),
-    spiritStars:
-        (json['spiritStars'] as List<dynamic>?)
-            ?.map((s) => SpiritStar.fromJson(s))
+    spiritStars: (json['spiritStars'] as List<dynamic>?)
+            ?.map(
+              (s) => SpiritStar.fromJson(Map<String, dynamic>.from(s as Map)),
+            )
             .toList() ??
-        [],
-    majorCycles:
-        (json['majorCycles'] as List<dynamic>?)
-            ?.map((c) => MajorCycle.fromJson(c))
+        const <SpiritStar>[],
+    majorCycles: (json['majorCycles'] as List<dynamic>?)
+            ?.map(
+              (c) => MajorCycle.fromJson(Map<String, dynamic>.from(c as Map)),
+            )
             .toList() ??
-        [],
-    hiddenElements: Map<String, int>.from(json['hiddenElements'] ?? {}),
-    dayMasterStrength: json['dayMasterStrength'] ?? '중화',
+        const <MajorCycle>[],
+    hiddenElements: Map<String, int>.from(
+      json['hiddenElements'] as Map? ?? const {},
+    ),
+    dayMasterStrength: json['dayMasterStrength'] as String? ?? '중화',
+    warnings: List<String>.from(json['warnings'] ?? const <String>[]),
+    dayMasterStrengthResult: json['dayMasterStrengthResult'] != null
+        ? DayMasterStrengthResult.fromJson(
+            Map<String, dynamic>.from(json['dayMasterStrengthResult'] as Map),
+          )
+        : null,
+    daewoonResult: json['daewoonResult'] != null
+        ? DaewoonResult.fromJson(
+            Map<String, dynamic>.from(json['daewoonResult'] as Map),
+          )
+        : null,
   );
 }
